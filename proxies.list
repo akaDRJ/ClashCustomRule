@@ -60,8 +60,10 @@ DOMAIN-SUFFIX,segment.io
 DOMAIN-SUFFIX,segment.com
 DOMAIN-SUFFIX,launchdarkly.com
 DOMAIN-SUFFIX,v2rayssr.com
+DOMAIN-SUFFIX,heygen.com
 DOMAIN-SUFFIX,pub.dev
 DOMAIN-SUFFIX,jina.ai
+DOMAIN-SUFFIX,missuo.me
 DOMAIN-KEYWORD,jsdeliver
 DOMAIN-KEYWORD,moegirl
 DOMAIN-KEYWORD,twhentai
@@ -79,7 +81,8 @@ DOMAIN-KEYWORD,perplexity
 DOMAIN-KEYWORD,onenewbite
 DOMAIN-KEYWORD,annas-archive
 DOMAIN-KEYWORD,readwise
-
+DOMAIN-KEYWORD,npm
+DOMAIN-KEYWORD,astro
 # 代理列表
 
 # MyList && Other
@@ -100,12 +103,15 @@ DOMAIN-SUFFIX,myteamspeak.com
 DOMAIN-SUFFIX,notion.so
 DOMAIN-SUFFIX,notion.site
 DOMAIN-SUFFIX,notion-static.co
+DOMAIN-KEYWORD,notion
 DOMAIN-SUFFIX,ping.pe
 DOMAIN-SUFFIX,reddit.com
 DOMAIN-SUFFIX,teddysun.com
 DOMAIN-SUFFIX,tumbex.com
 DOMAIN-SUFFIX,twdvd.com
 DOMAIN-SUFFIX,unsplash.com
+DOMAIN-SUFFIX,x.com
+DOMAIN-KEYWORD,splunkcloud
 
 # 国外域名
 DOMAIN-SUFFIX,eu
@@ -135,6 +141,7 @@ DOMAIN-KEYWORD,spotify
 DOMAIN-KEYWORD,telegram
 DOMAIN-KEYWORD,twitter
 DOMAIN-KEYWORD,whatsapp
+DOMAIN-KEYWORD,stealth
 
 # GFW list
 DOMAIN-SUFFIX,gfwlist.start
