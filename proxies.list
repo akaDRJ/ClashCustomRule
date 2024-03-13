@@ -56,8 +56,6 @@ DOMAIN-SUFFIX,www.eton.club
 DOMAIN-SUFFIX,bazel.build
 DOMAIN-SUFFIX,threads.net
 DOMAIN-SUFFIX,civitai.com
-DOMAIN-SUFFIX,segment.io
-DOMAIN-SUFFIX,segment.com
 DOMAIN-SUFFIX,launchdarkly.com
 DOMAIN-SUFFIX,v2rayssr.com
 DOMAIN-SUFFIX,heygen.com
@@ -85,6 +83,7 @@ DOMAIN-KEYWORD,readwise
 DOMAIN-KEYWORD,npm
 DOMAIN-KEYWORD,huggingface
 DOMAIN-KEYWORD,astro
+DOMAIN-KEYWORD,trancy
 # 代理列表
 
 # MyList && Other
@@ -113,6 +112,7 @@ DOMAIN-SUFFIX,tumbex.com
 DOMAIN-SUFFIX,twdvd.com
 DOMAIN-SUFFIX,unsplash.com
 DOMAIN-SUFFIX,x.com
+DOMAIN-SUFFIX,forecho.com
 DOMAIN-SUFFIX,ruby-lang.org
 DOMAIN-KEYWORD,splunkcloud
 
@@ -5203,6 +5203,7 @@ DOMAIN-SUFFIX,venetianmacao.com
 DOMAIN-SUFFIX,ventureswell.com
 DOMAIN-SUFFIX,veoh.com
 DOMAIN-SUFFIX,vercel.app
+DOMAIN-SUFFIX,vercel.com
 DOMAIN-SUFFIX,verizon.net
 DOMAIN-SUFFIX,vermonttibet.org
 DOMAIN-SUFFIX,versavpn.com
