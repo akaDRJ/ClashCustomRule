@@ -58,6 +58,7 @@
 ;增强国外GFW：支持
 
 ;设置规则标志位
+;有个小技巧，下列不同列表可能会有重复规则，可以将想要命中的规则尽量提前
 ruleset=🚀 节点选择,https://raw.githubusercontent.com/chinnsenn/ClashCustomRule/master/proxies.list
 ruleset=🎯 全球直连,https://raw.githubusercontent.com/chinnsenn/ClashCustomRule/master/direct.list
 ruleset=🎯 全球直连,https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/LocalAreaNetwork.list
@@ -212,16 +213,20 @@ exclude_remarks=(IPV6|重置|流量|用户|本站|漏洞|永久虚通路|车|邀
     ruleset=🍎 苹果服务,https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Apple.list
     # 表示引用 https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Apple.list 规则
     # 且将此规则指向 [proxy_group] 所设置 🍎 苹果服务 策略组
+    
     ruleset=Domestic Services,clash-domain:https://ruleset.dev/clash_domestic_services_domains,86400
     # 表示引用clash-domain类型的 https://ruleset.dev/clash_domestic_services_domains 规则
     # 规则更新间隔为86400秒
     # 且将此规则指向 [proxy_group] 所设置 Domestic Services 策略组
+    
     ruleset=🎯 全球直连,rules/NobyDa/Surge/Download.list
     # 表示引用本地 rules/NobyDa/Surge/Download.list 规则
     # 且将此规则指向 [proxy_group] 所设置 🎯 全球直连 策略组
+    
     ruleset=🎯 全球直连,[]GEOIP,CN
     # 表示引用 GEOIP 中关于中国的所有 IP
     # 且将此规则指向 [proxy_group] 所设置 🎯 全球直连 策略组
+    
     ruleset=!!import:snippets/rulesets.txt
     # 表示引用本地的snippets/rulesets.txt规则
     ```
