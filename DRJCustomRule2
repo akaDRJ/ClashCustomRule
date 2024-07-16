@@ -78,8 +78,8 @@ custom_proxy_group=Streaming media`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US
 
 custom_proxy_group=Cryptocurrency`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 
-custom_proxy_group=PayPal`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
-custom_proxy_group=Stripe`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
+; custom_proxy_group=PayPal`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
+; custom_proxy_group=Stripe`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 
 custom_proxy_group=OpenAI`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Google Gemini`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
