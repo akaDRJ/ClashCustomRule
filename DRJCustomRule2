@@ -15,7 +15,7 @@ ruleset=Streaming media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2r
 ruleset=Streaming media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/spotify.yaml,86400
 
 # Cryptocurrency
-ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/release/rule/Clash/Crypto/Crypto.yaml,86400
+ruleset=Cryptocurrency,[]GEOSITE,category-cryptocurrency
 
 # Payment
 ruleset=PayPal,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/paypal.yaml,86400
