@@ -18,8 +18,8 @@ ruleset=Streaming media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2r
 ruleset=Cryptocurrency,[]GEOSITE,category-cryptocurrency
 
 # Payment
-ruleset=PayPal,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/paypal.yaml,86400
-ruleset=Stripe,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/stripe.yaml,86400
+; ruleset=PayPal,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/paypal.yaml,86400
+; ruleset=Stripe,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/stripe.yaml,86400
 
 # AI
 ruleset=OpenAI,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/openai.yaml,86400
