@@ -54,7 +54,7 @@ ruleset=Social Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayD
 ruleset=Social Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/zoom.yaml,86400
 
 # Media
-ruleset=Media CN,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-media-cn.yaml,86400
+; ruleset=Media CN,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-media-cn.yaml,86400
 ruleset=Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-media.yaml,86400
 ruleset=Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-forums.yaml,86400
 
