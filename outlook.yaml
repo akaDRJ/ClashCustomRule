@@ -4,4 +4,4 @@ payload:
 - "outlook.office365.com"
 - "smtp-mail.outlook.com"
 - "smtp.office365.com"
-- "m.hotmail.com"
+- "+.m.hotmail.com"
