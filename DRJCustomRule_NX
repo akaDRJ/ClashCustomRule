@@ -73,6 +73,8 @@ custom_proxy_group=Poe`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SE
 custom_proxy_group=Games CN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=Games`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 
+custom_proxy_group=Stripe`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+
 custom_proxy_group=Google FCM`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 
 custom_proxy_group=Outlook`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
