@@ -21,6 +21,9 @@ ruleset=new Bing,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomai
 ruleset=Claude,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/anthropic.yaml,86400
 ruleset=Poe,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/quora.yaml,86400
 
+# Payment
+ruleset=Stripe,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/stripe.yaml,86400
+
 # Gaming platform
 ruleset=Games CN,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-games@cn.yaml,86400
 ruleset=Games,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-games.yaml,86400
