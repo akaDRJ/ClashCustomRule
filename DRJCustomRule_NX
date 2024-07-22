@@ -50,7 +50,6 @@ ruleset=Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2
 ruleset=Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-forums.yaml,86400
 
 # Others
-
 ruleset=Global Direct,[]GEOIP,LAN
 ruleset=CN Direct,[]GEOIP,CN
 ruleset=Final,[]FINAL
