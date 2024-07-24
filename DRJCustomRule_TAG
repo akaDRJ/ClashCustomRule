@@ -21,6 +21,9 @@ ruleset=new Bing,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomai
 ruleset=Claude,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/anthropic.yaml,86400
 ruleset=Poe,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/quora.yaml,86400
 
+# Payment
+ruleset=Stripe,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/stripe.yaml,86400
+
 # Gaming platform
 ruleset=Games CN,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-games@cn.yaml,86400
 ruleset=Games,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-games.yaml,86400
@@ -47,7 +50,6 @@ ruleset=Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2
 ruleset=Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/category-forums.yaml,86400
 
 # Others
-
 ruleset=Global Direct,[]GEOIP,LAN
 ruleset=CN Direct,[]GEOIP,CN
 ruleset=Final,[]FINAL
@@ -69,6 +71,8 @@ custom_proxy_group=Poe`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SE
 
 custom_proxy_group=Games CN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=Games`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+
+custom_proxy_group=Stripe`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 
 custom_proxy_group=Google FCM`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 
