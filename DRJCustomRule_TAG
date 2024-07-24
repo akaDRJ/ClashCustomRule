@@ -98,8 +98,8 @@ custom_proxy_group=US Fallback`fallback`[]US`[]JP`[]SG`[]TW`[]HK`http://cp.cloud
 custom_proxy_group=HK`select`(香港|港|Hong Kong|HK)
 custom_proxy_group=TW`select`(台湾|台|Taiwan|TW)
 custom_proxy_group=SG`select`(新加坡|坡|Singapore|SG)
-custom_proxy_group=JP`select`(日本|日|Japan|JP)
-custom_proxy_group=US`select`(美国|美|United States|US)
+custom_proxy_group=JP`select`(日本|Japan|JP)
+custom_proxy_group=US`select`(美国|United States|US)
 
 
 
