@@ -3,6 +3,7 @@
 ; 设置规则标志位
 
 # Streaming media
+ruleset=BBC,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/bbc.yaml,86400
 ruleset=Streaming media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/netflix.yaml,86400
 ruleset=Streaming media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/hulu.yaml,86400
 ruleset=Streaming media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/disney.yaml,86400
@@ -59,6 +60,7 @@ ruleset=Final,[]FINAL
 custom_proxy_group=SELECT`select`.*
 custom_proxy_group=AUTO`url-test`.*`http://cp.cloudflare.com/generate_204`300,,50
 
+custom_proxy_group=BBC`select`[]DIRECT`[]UK`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=Streaming media`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 
 custom_proxy_group=Cryptocurrency`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
@@ -100,7 +102,7 @@ custom_proxy_group=TW`select`(台湾|台|Taiwan|TW)
 custom_proxy_group=SG`select`(新加坡|坡|Singapore|SG)
 custom_proxy_group=JP`select`(日本|Japan|JP)
 custom_proxy_group=US`select`(美国|United States|US)
-
+custom_proxy_group=UK`select`(英国|英|United Kingdom|UK)
 
 
 ; 设置分组标志位
