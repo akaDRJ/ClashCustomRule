@@ -52,6 +52,7 @@ ruleset=Media,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2
 
 # Others
 ruleset=Global Direct,[]GEOIP,LAN
+ruleset=CN Direct,[]GEOSITE,CN
 ruleset=CN Direct,[]GEOIP,CN
 ruleset=Final,[]FINAL
 ; 设置规则标志位
