@@ -34,7 +34,7 @@ ruleset=Google FCM,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDom
 
 # Microsoft
 ruleset=Outlook,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml,86400
-ruleset=Microsoft CN,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/microsoft@cn.yaml,86400
+; ruleset=Microsoft CN,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/microsoft@cn.yaml,86400
 ruleset=Microsoft,clash-domain:https://raw.githubusercontent.com/zsfyi/V2rayDomains2Clash/generated/microsoft.yaml,86400
 
 # Apple
@@ -80,7 +80,7 @@ custom_proxy_group=Stripe`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[
 custom_proxy_group=Google FCM`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 
 custom_proxy_group=Outlook`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
-custom_proxy_group=Microsoft CN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+; custom_proxy_group=Microsoft CN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=Microsoft`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 
 custom_proxy_group=Apple CN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
