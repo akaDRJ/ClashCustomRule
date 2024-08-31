@@ -1,4 +1,3 @@
-[custom]
 
 ; 设置规则标志位
 
@@ -61,7 +60,7 @@ ruleset=Final,[]FINAL
 custom_proxy_group=SELECT`select`.*
 custom_proxy_group=AUTO`url-test`.*`http://cp.cloudflare.com/generate_204`300,,50
 
-custom_proxy_group=BBC`select`[]DIRECT`[]UK`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=BBC`select`[]US Fallback`[]US`[]UK`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Streaming media`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 
 custom_proxy_group=Cryptocurrency`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
@@ -75,7 +74,7 @@ custom_proxy_group=Poe`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SE
 custom_proxy_group=Games CN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=Games`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 
-custom_proxy_group=Stripe`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Stripe`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 
 custom_proxy_group=Google FCM`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 
