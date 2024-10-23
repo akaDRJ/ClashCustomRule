@@ -38,6 +38,8 @@ dns:
 
 proxy-groups:
 - {name: 默认, type: select, proxies: [⏫自动选择, 直连, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, 🌊其它地区, ⛳全部节点], icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Proxy.png"}
+- {name: Crypto, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Cryptocurrency.png"}
+- {name: OpenAI, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png"}
 - {name: Google, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png"}
 - {name: Apple, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple.png"}
 - {name: Telegram, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram.png"}
@@ -77,13 +79,13 @@ proxies:
 
 rules:
 - GEOIP,lan,直连,no-resolve
+- RULE-SET,crypto_domain,Crypto
+- RULE-SET,openai_domain,OpenAI
 - RULE-SET,x_domain,X
 - RULE-SET,youtube_domain,YouTube
-- RULE-SET,google_domain,Google
 - RULE-SET,telegram_domain,Telegram
 - RULE-SET,netflix_domain,Netflix
 - RULE-SET,spotify_domain,Spotify
-- RULE-SET,geolocation-!cn,其他
 - RULE-SET,nintendo_domain,Nintendo
 - RULE-SET,epic_domain,Epic_Games
 - RULE-SET,playstation_domain,PlayStation
@@ -91,6 +93,9 @@ rules:
 - RULE-SET,steamcn_domain,Steam大陆服
 - RULE-SET,tiktok_domain,Tiktok
 - RULE-SET,disneyplus_domain,DisneyPlus
+- RULE-SET,google_domain,Google
+- RULE-SET,microsoft_domain,Microsoft
+- RULE-SET,geolocation-!cn,其他
 
 - RULE-SET,google_ip,Google
 - RULE-SET,netflix_ip,Netflix
@@ -101,8 +106,8 @@ rules:
 - MATCH,其他
 
 rule-anchor:
-  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: text}
-  domain: &domain {type: http, interval: 86400, behavior: domain, format: text}
+  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: yaml}
+  domain: &domain {type: http, interval: 86400, behavior: domain, format: yaml}
 rule-providers:
   private:
     <<: *domain
@@ -110,15 +115,22 @@ rule-providers:
   cn_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.yaml"
+  outlook_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/refs/heads/master/outlook.yaml"
+  crypto_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.yaml"
+  openai_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml"    
   x_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.yaml"
   youtube_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml"
-  google_domain:
-    <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml"
+ 
   telegram_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.yaml"
@@ -152,7 +164,12 @@ rule-providers:
   disneyplus_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.yaml"
-
+  microsoft_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml"
+  google_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml"
   cn_ip:
     <<: *ip
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.yaml"
