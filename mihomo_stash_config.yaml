@@ -1,6 +1,7 @@
 ######### 锚点 start #######
 # 策略组相关
-pr: &pr {type: select, proxies: [默认, ⏫自动选择, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, 🌊其它地区, ⛳全部节点, 直连]}
+pr: &pr {type: select, proxies: [🚀节点选择, ⏫自动选择, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, ⛳全部节点]}
+df: &df{type: select, proxies: [直连, 🚀节点选择, ⏫自动选择, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, ⛳全部节点]}
 #这里是订阅更新和延迟测试相关的
 p: &p {type: http, interval: 3600, health-check: {enable: true, url: "https://www.gstatic.com/generate_204", interval: 300}}
 ######### 锚点 end #######
@@ -9,13 +10,13 @@ p: &p {type: http, interval: 3600, health-check: {enable: true, url: "https://ww
 proxy-providers:
   multisubs:
     <<: *p
-    url: "https://ssb.chinnsenn.com/download/collection/mihomo"
+    url: "https://ssb.chinnsenn.com/download/collection/allsubscriptions"
 ipv6: true
 allow-lan: true
 mixed-port: 7890
 external-controller: 127.0.0.1:9090
 external-ui: ui
-external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip"
+external-ui-url: "https://github.com/chinnsenn/metacubexd/archive/gh-pages.zip"
 
 profile:
   store-selected: true
@@ -37,43 +38,72 @@ dns:
 
 
 proxy-groups:
-- {name: 默认, type: select, proxies: [⏫自动选择, 直连, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, 🌊其它地区, ⛳全部节点], icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Proxy.png"}
-- {name: Google, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png"}
-- {name: Apple, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple.png"}
-- {name: Telegram, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram.png"}
-- {name: Twitter, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Twitter.png"}
-- {name: GitHub, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/GitHub.png"}
-- {name: ehentai, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Panda.png"}
-- {name: 哔哩哔哩, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili.png"}
-- {name: 哔哩东南亚, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili.png"}
-- {name: 巴哈姆特, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Bahamut.png"}
-- {name: YouTube, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png"}
-- {name: Netflix, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png"}
-- {name: Spotify, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png"}
-- {name: DisneyPlus, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Disney+.png"}
-- {name: Tiktok, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TikTok.png"}
-- {name: Nintendo, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Nintendo.png"}
-- {name: Epic_Games, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Epic_Games.png"}
-- {name: PlayStation, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/PlayStation.png"}
-- {name: Steam国际服, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Steam.png"}
-- {name: Steam大陆服, <<: *pr, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Steam.png"}
-- {name: 国内, type: select, proxies: [直连, 默认, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, 🌊其它地区, ⛳全部节点, ⏫自动选择], icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China_Map.png"}
-- {name: 其他, type: select, proxies: [直连, 默认, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, 🌊其它地区, ⛳全部节点, ⏫自动选择], icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png"}
+- {name: 🚀节点选择, type: select, proxies: [⏫自动选择, 直连, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, ⛳全部节点], icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Proxy.png"}
+- {name: Google, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Google_Search.png"}
+- {name: Apple, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Apple.png"}
+- {name: Telegram, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Telegram.png"}
+- {name: OpenAI, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/ChatGPT.png"}
+- {name: Anthropic, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Anthropic.png"}
+- {name: Twitter, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Twitter.png"}
+- {name: Wallet, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Wallet.jpg"}
+- {name: GitHub, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/GitHub.png"}
+- {name: ehentai, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Panda.png"}
+- {name: 哔哩哔哩, <<: *df, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/bilibili.png"}
+- {name: 哔哩东南亚, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/bilibili.png"}
+- {name: 巴哈姆特, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Bahamut.png"}
+- {name: YouTube, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/YouTube.png"}
+- {name: Netflix, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Netflix.png"}
+- {name: Spotify, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Spotify.png"}
+- {name: DisneyPlus, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Disney+.png"}
+- {name: Tiktok, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/TikTok.png"}
+- {name: DeepL, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/DeepL.jpg"}
+- {name: Binance, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Binance.jpg"}
+- {name: Nintendo, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Nintendo.png"}
+- {name: Epic_Games, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Epic_Games.png"}
+- {name: PlayStation, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/PlayStation.png"}
+- {name: Steam国际服, <<: *pr, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Steam.png"}
+- {name: Steam大陆服, <<: *df, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Steam.png"}
+- {name: 国内, type: select, proxies: [直连, 🚀节点选择, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, ⛳全部节点, ⏫自动选择], icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/China_Map.png"}
+- {name: 其他, type: select, proxies: [直连, 🚀节点选择, 🇭🇰香港, 🇭🇰香港自动选择, 🧋台湾, 🧋台湾自动选择, 🇯🇵日本, 🇯🇵日本自动选择, 🇸🇬新加坡, 🇸🇬新加坡自动选择, 🇺🇲美国, 🇺🇲美国自动选择, ⛳全部节点, ⏫自动选择], icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Final.png"}
   #分隔,下面是地区分组
-- {name: 🇭🇰香港, type: select, include-all: true, filter: "(?i)港|hk|hongkong|hong kong", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png"}
-- {name: 🧋台湾, type: select, include-all: true, filter: "(?i)台|tw|taiwan", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TW.png"}
-- {name: 🇯🇵日本, type: select, include-all: true, filter: "(?i)日|jp|japan", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png"}
-- {name: 🇺🇲美国, type: select, include-all: true, filter: "(?i)美|us|unitedstates|united states", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png"}
-- {name: 🇸🇬新加坡, type: select, include-all: true, filter: "(?i)(新|sg|singapore)", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png"}
-- {name: 🌊其它地区, type: select, include-all: true, filter: "(?i)^(?!.*(?:🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|新|sg|singapore|美|us|unitedstates)).*", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Available.png"}
-- {name: ⏫自动选择, type: url-test, include-all: true, filter: "直连", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png"}
-- {name: ⛳全部节点, type: select, include-all: true, icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png"}
-
-- {name: 🇭🇰香港自动选择,type: url-test, include-all: true, filter: "(?i) 港|hk|hongkong|hong kong", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png"}
-- {name: 🧋台湾自动选择,type: url-test, include-all: true, filter: "(?i) 台|tw|taiwan", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TW.png"}
-- {name: 🇯🇵日本自动选择,type: url-test, include-all: true, filter: "(?i) 日|jp|japan", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png"}
-- {name: 🇺🇲美国自动选择,type: url-test, include-all: true, filter: "(?i) 美|us|unitedstates|united states", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png"}
-- {name: 🇸🇬新加坡自动选择,type: url-test, include-all: true, filter: "(?i)(新|sg|singapore)", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png"}
+  
+- {name: 🇭🇰香港, type: select, include-all: true, filter: "(?i)港|hk|hongkong|hong kong", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/HK.png"}
+- {name: 🧋台湾, type: select, include-all: true, filter: "(?i)台|tw|taiwan", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/TW.png"}
+- {name: 🇯🇵日本, type: select, include-all: true, filter: "(?i)日|jp|japan", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/JP.png"}
+- {name: 🇺🇲美国, type: select, include-all: true, filter: "(?i)美|us|unitedstates|united states", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/US.png"}
+- {name: 🇸🇬新加坡, type: select, include-all: true, filter: "(?i)(新|sg|singapore)", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/SG.png"}
+- {name: 🇰🇷韩国, type: select, include-all: true, filter: "(?i)kr|korea|kor|首尔|韩|韓", icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/KR.png"}
+- {name: 🇬🇧英国, type: select, include-all: true, filter: "(?i)uk|英|伦敦", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/UK.png"}
+- {name: 🇩🇪德国, type: select, include-all: true, filter: "(?i)de|德", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/DE.png"}
+- {name: 🇨🇦加拿大, type: select, include-all: true, filter: "(?i)ca|canada|加拿大|枫", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/CA.png"}
+- {name: 🇧🇷巴西, type: select, include-all: true, filter: "(?i)ba|巴西", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/BR.png"}
+- {name: 🇮🇳印度, type: select, include-all: true, filter: "(?i)in|印度", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/IN.png"}
+- {name: 🇳🇱荷兰, type: select, include-all: true, filter: "(?i)nl|荷兰"}
+- {name: 🇮🇹意大利, type: select, include-all: true, filter: "(?i)it|意大利|意"}
+- {name: 🇨🇭瑞士, type: select, include-all: true, filter: "(?i)ch|瑞士"}
+- {name: 🇫🇷法国, type: select, include-all: true, filter: "(?i)fr|法|巴黎", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/FR.png"}
+- {name: 🇸🇦沙特阿拉伯, type: select, include-all: true, filter: "(?i)沙|沙特|阿拉伯"}
+- {name: 🇮🇱以色列, type: select, include-all: true, filter: "(?i)il|以色列"}
+- {name: 🇦🇪迪拜, type: select, include-all: true, filter: "(?i)uae|迪拜|杜拜|dubayy"}
+- {name: 🇲🇽墨西哥, type: select, include-all: true, filter: "(?i)墨西哥|mexico|méxico|mexican"}
+- {name: 🇨🇱智利, type: select, include-all: true, filter: "(?i)智利|chile|cl"}
+- {name: 🇦🇷阿根廷, type: select, include-all: true, filter: "(?i)阿根廷|argentina|ar", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/AR.png"}
+- {name: 🇿🇦南非, type: select, include-all: true, filter: "(?i)南非|zuid-afrika"}
+- {name: 🇸🇪瑞典, type: select, include-all: true, filter: "(?i)瑞典|sweden|sverige"}
+- {name: 🇹🇷土耳其, type: select, include-all: true, filter: "(?i)tr|土耳其|土", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/TR.png"}
+- {name: 🇦🇺澳大利亚, type: select, include-all: true, filter: "(?i)土澳|澳大利亚|澳|aus", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/AU.png"}
+- {name: 🇵🇭菲律宾, type: select, include-all: true, filter: "(?i)菲|ph", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/PH.png"}
+- {name: 🇹🇭泰国, type: select, include-all: true, filter: "(?i)泰|th", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/TH.png"}
+- {name: 🇵🇰巴基斯坦, type: select, include-all: true, filter: "(?i)巴基斯坦|pk"}
+- {name: 🇷🇺俄罗斯, type: select, include-all: true, filter: "(?i)俄|俄罗斯|rus|rf", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/RU.png"}
+- {name: 🇳🇬尼日利亚, type: select, include-all: true, filter: "(?i)尼日利亚|ngr"}
+- {name: ⏫自动选择, type: url-test, include-all: true, filter: "(?i)^(?!.*(?:直连)).*", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Auto.png"}
+- {name: ⛳全部节点, type: select, include-all: true, icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/Global.png"}
+- {name: 🇭🇰香港自动选择,type: url-test, include-all: true, filter: "(?i)港|hk|hongkong|hong kong", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/HK.png"}
+- {name: 🧋台湾自动选择,type: url-test, include-all: true, filter: "(?i)台|tw|taiwan", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/TW.png"}
+- {name: 🇯🇵日本自动选择,type: url-test, include-all: true, filter: "(?i)日|jp|japan", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/JP.png"}
+- {name: 🇺🇲美国自动选择,type: url-test, include-all: true, filter: "(?i)美|us|unitedstates|united states", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/US.png"}
+- {name: 🇸🇬新加坡自动选择,type: url-test, include-all: true, filter: "(?i)(新|sg|singapore)", icon: "https://raw.githubusercontent.com/chinnsenn/Qure/master/IconSet/Color/SG.png"}
 
 proxies:
 - name: "直连"
@@ -88,8 +118,13 @@ rules:
 - RULE-SET,gitlab_domain,GitHub
 - RULE-SET,twitter_domain,Twitter
 - RULE-SET,youtube_domain,YouTube
+- RULE-SET,disneyplus_domain,DisneyPlus
 - RULE-SET,google_domain,Google
 - RULE-SET,telegram_domain,Telegram
+- RULE-SET,stripe_domain,Wallet
+- RULE-SET,wise_domain,Wallet
+- RULE-SET,openai_domain,OpenAI
+- RULE-SET,anthropic_domain,Anthropic
 - RULE-SET,netflix_domain,Netflix
 - RULE-SET,bilibili_domain,哔哩哔哩
 - RULE-SET,bahamut_domain,巴哈姆特
@@ -102,7 +137,8 @@ rules:
 - RULE-SET,steamintl_domain,Steam国际服
 - RULE-SET,steamcn_domain,Steam大陆服
 - RULE-SET,tiktok_domain,Tiktok
-- RULE-SET,disneyplus_domain,DisneyPlus
+- RULE-SET,binance_domain,Binance
+- RULE-SET,deepl_domain,DeepL
 
 - RULE-SET,google_ip,Google
 - RULE-SET,netflix_ip,Netflix
@@ -118,86 +154,104 @@ rule-anchor:
 rule-providers:
   private:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/private.list"
   cn_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/cn.list"
   biliintl_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/biliintl.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/biliintl.list"
   ehentai_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/ehentai.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/ehentai.list"
   github_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/github.list"
   gitlab_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gitlab.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/gitlab.list"
   twitter_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/twitter.list"
   youtube_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/youtube.list"
   google_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/google.list"
   telegram_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/telegram.list"
   netflix_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/Netflix.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/netflix.list"
   bilibili_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bilibili.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/bilibili.list"
   bahamut_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/bahamut.list"
   spotify_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/spotify.list"
   pixiv_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/pixiv.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/pixiv.list"
   geolocation-!cn:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/geolocation-!cn.list"
   nintendo_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/nintendo.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/nintendo.list"
   epic_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/epicgames.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/epicgames.list"
   playstation_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/playstation.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/playstation.list"
   steamintl_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/steam.list"
   steamcn_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam%40cn.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/steam%40cn.list"
   tiktok_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/tiktok.list"
   disneyplus_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/disney.list"
+  openai_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/openai.list"
+  anthropic_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/anthropic.list"
+  stripe_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/stripe.list"
+  wise_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/wise.list"
+  binance_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/binance.list"
+  deepl_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geosite/deepl.list"
 
   cn_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geoip/cn.list"
   google_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geoip/google.list"
   netflix_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/Netflix.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geoip/netflix.list"
   twitter_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/twitter.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geoip/twitter.list"
   telegram_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.list"
+    url: "https://raw.githubusercontent.com/chinnsenn/meta-rules-dat/meta/geo/geoip/telegram.list"
