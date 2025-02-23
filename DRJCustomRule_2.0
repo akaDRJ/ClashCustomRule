@@ -31,9 +31,9 @@ custom_proxy_group=SELECT`select`.*
 custom_proxy_group=AUTO`url-test`.*`http://cp.cloudflare.com/generate_204`300,,50
 custom_proxy_group=Outlook`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Youtube`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
-custom_proxy_group=Disney`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
-custom_proxy_group=Netflix`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
-custom_proxy_group=Cryptocurrency`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Disney`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Netflix`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Cryptocurrency`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=PT`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=AI`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=GamesCN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
@@ -46,9 +46,10 @@ custom_proxy_group=Apple`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]
 
 custom_proxy_group=Global Direct`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=CN Direct`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
-custom_proxy_group=Final`select`[]HK Fallback`[]US Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Final`select`[]HK Fallback`[]TW Fallback`[]US Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 
 custom_proxy_group=HK Fallback`fallback`[]HK`[]TW`[]SG`[]JP`[]US`http://cp.cloudflare.com/generate_204`300,,50
+custom_proxy_group=TW Fallback`fallback`[]TW`[]HK`[]SG`[]JP`[]US`http://cp.cloudflare.com/generate_204`300,,50
 custom_proxy_group=US Fallback`fallback`[]US`[]JP`[]SG`[]TW`[]HK`http://cp.cloudflare.com/generate_204`300,,50
 
 custom_proxy_group=HK`url-test`(香港|港|Hong Kong|HK).*`http://cp.cloudflare.com/generate_204`300,,50
