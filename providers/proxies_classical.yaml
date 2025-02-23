@@ -9,7 +9,6 @@ payload:
   - DOMAIN-KEYWORD,libsolutions
   - DOMAIN-KEYWORD,patreon
   - DOMAIN-KEYWORD,chatpdf
-  - DOMAIN-KEYWORD,codeium
   - DOMAIN-KEYWORD,scotthyoung
   - DOMAIN-KEYWORD,singlelogin
   - DOMAIN-KEYWORD,perplexity
@@ -45,3 +44,4 @@ payload:
   - DOMAIN-KEYWORD,porn
   - DOMAIN-KEYWORD,ttvnw
   - DOMAIN-KEYWORD,omnivore
+  - DOMAIN-KEYWORD,nifty
