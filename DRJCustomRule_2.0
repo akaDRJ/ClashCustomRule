@@ -5,7 +5,7 @@
 ruleset=Outlook,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml,86400
 ruleset=Youtube,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs,86400
 ruleset=Disney,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.mrs,86400
-ruleset=Netflix,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs,86400
+ruleset=Netflix,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.yaml,86400
 ruleset=Netflix,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs,86400
 ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.mrs,86400
 ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/refs/heads/master/crypto.yaml,86400
