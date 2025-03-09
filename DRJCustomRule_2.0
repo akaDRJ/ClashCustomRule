@@ -20,7 +20,8 @@ ruleset=Microsoft,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-
 ruleset=AppleCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.mrs,86400
 ruleset=Apple,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.mrs,86400
 
-ruleset=CN Direct,[]GEOSITE,CN
+ruleset=Netflix,[]GEOIP,NETFLIX
+
 ruleset=Global Direct,[]GEOIP,LAN
 ruleset=CN Direct,[]GEOIP,CN,no-resolve
 ruleset=Final,[]FINAL
