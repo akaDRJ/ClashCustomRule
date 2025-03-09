@@ -3,22 +3,22 @@
 ; 设置规则标志位
 
 ruleset=Outlook,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml,86400
-ruleset=Youtube,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs,86400
-ruleset=Disney,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.mrs,86400
+ruleset=Youtube,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml,86400
+ruleset=Disney,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.yaml,86400
 ruleset=Netflix,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml,86400
-ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.mrs,86400
+ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.yaml,86400
 ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/refs/heads/master/crypto.yaml,86400
 ruleset=PT,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml,86400
-ruleset=AI,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs,86400
+ruleset=AI,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml,86400
 ruleset=AI,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-chat-!cn.yaml,86400
 ruleset=GamesCN,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/steamcontent.yaml,86400
 ruleset=GamesCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.yaml,86400
 ruleset=GamesCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games@cn.yaml,86400
-ruleset=Games,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.mrs,86400
-ruleset=Google,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs,86400
-ruleset=Microsoft,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs,86400
-ruleset=AppleCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.mrs,86400
-ruleset=Apple,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.mrs,86400
+ruleset=Games,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.yaml,86400
+ruleset=Google,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml,86400
+ruleset=Microsoft,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml,86400
+ruleset=AppleCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml,86400
+ruleset=Apple,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml,86400
 
 ruleset=Global Direct,[]GEOIP,LAN
 ruleset=CN Direct,[]GEOIP,CN,no-resolve
