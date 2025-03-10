@@ -3,6 +3,7 @@
 ; 设置规则标志位
 
 ruleset=Outlook,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml,86400
+ruleset=X,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.yaml,86400
 ruleset=Youtube,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml,86400
 ruleset=Disney,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.yaml,86400
 ruleset=Netflix,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml,86400
@@ -29,6 +30,7 @@ ruleset=Final,[]FINAL
 custom_proxy_group=SELECT`select`.*
 custom_proxy_group=AUTO`url-test`.*`http://cp.cloudflare.com/generate_204`300,,50
 custom_proxy_group=Outlook`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=X`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Youtube`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Disney`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Netflix`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
