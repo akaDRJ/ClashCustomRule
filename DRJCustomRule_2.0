@@ -3,6 +3,7 @@
 ; 设置规则标志位
 
 ruleset=GoogleFCM,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/googlefcm.yaml,86400
+ruleset=PT,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml,86400
 ruleset=Outlook,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml,86400
 ruleset=X,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.yaml,86400
 ruleset=Youtube,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml,86400
@@ -10,7 +11,6 @@ ruleset=Disney,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rul
 ruleset=Netflix,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml,86400
 ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.yaml,86400
 ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.yaml,86400
-ruleset=PT,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml,86400
 ruleset=AI,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml,86400
 ruleset=AI,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-chat-!cn.yaml,86400
 ruleset=GamesCN,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/steamcontent.yaml,86400
@@ -30,13 +30,14 @@ ruleset=Final,[]FINAL
 
 custom_proxy_group=SELECT`select`.*
 custom_proxy_group=AUTO`url-test`.*`http://cp.cloudflare.com/generate_204`300,,50
-custom_proxy_group=Outlook`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=GoogleFCM`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=Outlook`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=PT`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=X`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Youtube`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Disney`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Netflix`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=Cryptocurrency`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
-custom_proxy_group=PT`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=AI`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
 custom_proxy_group=GamesCN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
 custom_proxy_group=Games`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
