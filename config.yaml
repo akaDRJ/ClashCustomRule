@@ -109,41 +109,75 @@ dns:
   nameserver:
     - 223.5.5.5
     - 119.29.29.29
- 
-# 出站策略
-# 注意锚点必须放在引用的上方，可以集中把锚点全部放yaml的顶部。
-# pr: &pr {type: select, proxies: [🚀 默认代理, 🔯 香港故转, 🔯 日本故转, ♻️ 香港自动, ♻️ 日本自动, ♻️ 美国自动, ♻️ 自动选择, 🇭🇰 香港节点, 🇯🇵 日本节点, 🇺🇲 美国节点, 🌐 全部节点, 直连]}
-proxy-groups:
-  - {name: GoogleFCM, type: select, proxies: [DIRECT, HK, TW, SG, JP, US, AUTO, SELECT]}
-  - {name: Outlook, type: select, proxies: [DIRECT, HK, TW, SG, JP, US, AUTO, SELECT]}
-  - {name: PT, type: select, proxies: [DIRECT, HK, TW, SG, JP, US, AUTO, SELECT]}
-  - {name: X, type: select, proxies: [US Fallback, US, JP, SG, TW, HK, AUTO, SELECT, DIRECT]}
-  - {name: Youtube, type: select, proxies: [US Fallback, US, JP, SG, TW, HK, AUTO, SELECT, DIRECT]}
-  - {name: Disney, type: select, proxies: [TW Fallback, TW, HK, SG, JP, US, AUTO, SELECT, DIRECT]}
-  - {name: Netflix, type: select, proxies: [TW Fallback, TW, HK, SG, JP, US, AUTO, SELECT, DIRECT]}
-  - {name: Cryptocurrency, type: select, proxies: [TW Fallback, TW, HK, SG, JP, US, AUTO, SELECT, DIRECT]}
-  - {name: AI, type: select, proxies: [US Fallback, US, JP, SG, TW, HK, AUTO, SELECT, DIRECT]}
-  - {name: GamesCN, type: select, proxies: [DIRECT, HK, TW, SG, JP, US, AUTO, SELECT]}
-  - {name: Games, type: select, proxies: [HK Fallback, HK, TW, SG, JP, US, AUTO, SELECT, DIRECT]}
-  - {name: Google, type: select, proxies: [US Fallback, US, JP, SG, TW, HK, AUTO, SELECT, DIRECT]}
-  - {name: Microsoft, type: select, proxies: [US Fallback, US, JP, SG, TW, HK, AUTO, SELECT, DIRECT]}
-  - {name: AppleCN, type: select, proxies: [DIRECT, HK, TW, SG, JP, US, AUTO, SELECT]}
-  - {name: Apple, type: select, proxies: [HK Fallback, HK, TW, SG, JP, US, AUTO, SELECT, DIRECT]}
-  - {name: Global Direct, type: select, proxies: [DIRECT, HK, TW, SG, JP, US, AUTO, SELECT]}
-  - {name: CN Direct, type: select, proxies: [DIRECT, HK, TW, SG, JP, US, AUTO, SELECT]}
-  - {name: Final, type: select, proxies: [HK Fallback, TW Fallback, US Fallback, HK, TW, SG, JP, US, AUTO, SELECT, DIRECT]}
-  - {name: HK Fallback, type: fallback, proxies: [HK, TW, SG, JP, US], url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
-  - {name: TW Fallback, type: fallback, proxies: [TW, HK, SG, JP, US], url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
-  - {name: US Fallback, type: fallback, proxies: [US, JP, SG, TW, HK], url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
-  - {name: HK, type: url-test, include-all: true, filter: "(?i)(香港|港|hong ?kong|hk).*", url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
-  - {name: TW, type: url-test, include-all: true, filter: "(?i)(台湾|臺灣|台|taiwan|tw).*", url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
-  - {name: SG, type: url-test, include-all: true, filter: "(?i)(新加坡|坡|singapore|sg).*", url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
-  - {name: JP, type: url-test, include-all: true, filter: "(?i)(日本|日|japan|jp).*", url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
-  - {name: US, type: url-test, include-all: true, filter: "(?i)(美国|美國|美|united ?states|us).*", url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
 
-# 规则匹配
-# 此规则部分没有做防泄露处理，因为弊严重大于利！
+# 出站策略 —— 以下内容全部替换为文件a中的规则和代理组，语法依然采用文件b的 YAML 格式
+
+rule-providers:
+  GoogleFCM:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/googlefcm.yaml"
+    interval: 86400
+  PT:
+    type: http
+    url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml"
+    interval: 86400
+  Outlook:
+    type: http
+    url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml"
+    interval: 86400
+  X:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.yaml"
+    interval: 86400
+  Youtube:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml"
+    interval: 86400
+  Disney:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.yaml"
+    interval: 86400
+  Netflix:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml"
+    interval: 86400
+  Cryptocurrency:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.yaml"
+    interval: 86400
+  AI:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml"
+    interval: 86400
+  GamesCN:
+    type: http
+    url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/steamcontent.yaml"
+    interval: 86400
+  Games:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.yaml"
+    interval: 86400
+  Google:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml"
+    interval: 86400
+  Microsoft:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml"
+    interval: 86400
+  AppleCN:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml"
+    interval: 86400
+  Apple:
+    type: http
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml"
+    interval: 86400
+
 rules:
+  - RULE-SET,Global Direct,Direct
+  - RULE-SET,CN Direct,Direct
+  - RULE-SET,Final,Final
   - RULE-SET,GoogleFCM,GoogleFCM
   - RULE-SET,PT,PT
   - RULE-SET,Outlook,Outlook
@@ -159,33 +193,33 @@ rules:
   - RULE-SET,Microsoft,Microsoft
   - RULE-SET,AppleCN,AppleCN
   - RULE-SET,Apple,Apple
-  - RULE-SET,Global Direct,Global Direct
-  - RULE-SET,CN Direct,CN Direct
-  - RULE-SET,Final,Final
 
-# 规则集
-rule-anchor:
-  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
-  domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
-  domain2: &domain {type: http, interval: 86400, behavior: domain, format: yaml}
-  class: &class {type: http, interval: 86400, behavior: classical, format: text}
-rule-providers:
-  rule-providers:
-  GoogleFCM: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/googlefcm.yaml", interval: 86400 }
-  PT: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml", interval: 86400 }
-  Outlook: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml", interval: 86400 }
-  X: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.yaml", interval: 86400 }
-  Youtube: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml", interval: 86400 }
-  Disney: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.yaml", interval: 86400 }
-  Netflix: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml", interval: 86400 }
-  Cryptocurrency: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.yaml", interval: 86400 }
-  AI: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml", interval: 86400 }
-  GamesCN: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/steamcontent.yaml", interval: 86400 }
-  Games: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.yaml", interval: 86400 }
-  Google: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml", interval: 86400 }
-  Microsoft: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml", interval: 86400 }
-  AppleCN: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml", interval: 86400 }
-  Apple: { type: http, behavior: domain, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml", interval: 86400 }
-  Global Direct: {type: http, behavior: ipcidr, format: mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs", interval: 86400}
-  CN Direct: {type: http, behavior: ipcidr, format: mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs", interval: 86400}
-  Final: {type: http, behavior: classical, format: yaml, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/others/ruleset/final.yaml", interval: 86400}
+proxy-groups:
+  - {name: SELECT, type: select, filter: ".*"}
+  - {name: AUTO, type: url-test, filter: ".*", test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
+  - {name: GoogleFCM, type: select, proxies: ["DIRECT", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT"]}
+  - {name: Outlook, type: select, proxies: ["DIRECT", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT"]}
+  - {name: PT, type: select, proxies: ["DIRECT", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT"]}
+  - {name: X, type: select, proxies: ["US Fallback", "US", "JP", "SG", "TW", "HK", "AUTO", "SELECT", "DIRECT"]}
+  - {name: Youtube, type: select, proxies: ["US Fallback", "US", "JP", "SG", "TW", "HK", "AUTO", "SELECT", "DIRECT"]}
+  - {name: Disney, type: select, proxies: ["TW Fallback", "TW", "HK", "SG", "JP", "US", "AUTO", "SELECT", "DIRECT"]}
+  - {name: Netflix, type: select, proxies: ["TW Fallback", "TW", "HK", "SG", "JP", "US", "AUTO", "SELECT", "DIRECT"]}
+  - {name: Cryptocurrency, type: select, proxies: ["TW Fallback", "TW", "HK", "SG", "JP", "US", "AUTO", "SELECT", "DIRECT"]}
+  - {name: AI, type: select, proxies: ["US Fallback", "US", "JP", "SG", "TW", "HK", "AUTO", "SELECT", "DIRECT"]}
+  - {name: GamesCN, type: select, proxies: ["DIRECT", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT"]}
+  - {name: Games, type: select, proxies: ["HK Fallback", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT", "DIRECT"]}
+  - {name: Google, type: select, proxies: ["US Fallback", "US", "JP", "SG", "TW", "HK", "AUTO", "SELECT", "DIRECT"]}
+  - {name: Microsoft, type: select, proxies: ["US Fallback", "US", "JP", "SG", "TW", "HK", "AUTO", "SELECT", "DIRECT"]}
+  - {name: AppleCN, type: select, proxies: ["DIRECT", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT"]}
+  - {name: Apple, type: select, proxies: ["HK Fallback", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT", "DIRECT"]}
+  - {name: Global Direct, type: select, proxies: ["DIRECT", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT"]}
+  - {name: CN Direct, type: select, proxies: ["DIRECT", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT"]}
+  - {name: Final, type: select, proxies: ["HK Fallback", "TW Fallback", "US Fallback", "HK", "TW", "SG", "JP", "US", "AUTO", "SELECT", "DIRECT"]}
+  - {name: HK Fallback, type: fallback, proxies: ["HK", "TW", "SG", "JP", "US"], test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
+  - {name: TW Fallback, type: fallback, proxies: ["TW", "HK", "SG", "JP", "US"], test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
+  - {name: US Fallback, type: fallback, proxies: ["US", "JP", "SG", "TW", "HK"], test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
+  - {name: HK, type: url-test, filter: "(?i)(香港|港|hong ?kong|hk).*", test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
+  - {name: TW, type: url-test, filter: "(?i)(台湾|臺灣|台|taiwan|tw).*", test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
+  - {name: SG, type: url-test, filter: "(?i)(新加坡|坡|singapore|sg).*", test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
+  - {name: JP, type: url-test, filter: "(?i)(日本|日|japan|jp).*", test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
+  - {name: US, type: url-test, filter: "(?i)(美国|美國|美|united ?states|us).*", test-url: "http://cp.cloudflare.com/generate_204", interval: 300, tolerance: 50}
