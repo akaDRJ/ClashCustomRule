@@ -2,8 +2,8 @@
 
 ; 设置规则标志位
 
-ruleset=Direct,[]GEOSITE,private
-ruleset=Direct,[]GEOIP,private,no-resolve
+ruleset=Global Direct,[]GEOSITE,private
+ruleset=Global Direct,[]GEOIP,private,no-resolve
 ruleset=GoogleFCM,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/googlefcm.yaml,86400
 ruleset=PT,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml,86400
 ruleset=Outlook,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml,86400
@@ -24,9 +24,9 @@ ruleset=Microsoft,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-
 ruleset=AppleCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml,86400
 ruleset=Apple,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml,86400
 
-ruleset=Direct,[]GEOSITE,cn
-ruleset=Direct,[]GEOIP,LAN
-ruleset=Direct,[]GEOIP,CN,no-resolve
+ruleset=Global Direct,[]GEOSITE,cn
+ruleset=Global Direct,[]GEOIP,LAN
+ruleset=Global Direct,[]GEOIP,CN,no-resolve
 ruleset=Final,[]FINAL
 
 ; 设置规则标志位
