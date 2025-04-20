@@ -1,0 +1,70 @@
+[custom]
+
+; 设置规则标志位
+
+ruleset=Global Direct,[]GEOSITE,private
+ruleset=Global Direct,[]GEOIP,private,no-resolve
+ruleset=Global Direct,clash-classic:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Direct/Direct.yaml,86400
+ruleset=Global Direct,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/haivivi.yaml,86400
+
+ruleset=GoogleFCM,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/googlefcm.yaml,86400
+ruleset=PT,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml,86400
+ruleset=Outlook,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml,86400
+ruleset=X,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.yaml,86400
+ruleset=Youtube,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml,86400
+ruleset=Disney,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.yaml,86400
+ruleset=Netflix,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml,86400
+ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.yaml,86400
+ruleset=Cryptocurrency,clash-domain:https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.yaml,86400
+ruleset=AI,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml,86400
+ruleset=AI,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-chat-!cn.yaml,86400
+ruleset=GamesCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.yaml,86400
+ruleset=GamesCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games@cn.yaml,86400
+ruleset=GamesDownload,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-game-platforms-download.yaml,86400
+ruleset=Games,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.yaml,86400
+ruleset=Google,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml,86400
+ruleset=MicrosoftCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft@cn.yaml,86400
+ruleset=Microsoft,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml,86400
+ruleset=AppleCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml,86400
+ruleset=Apple,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml,86400
+
+ruleset=Global Direct,[]GEOSITE,cn
+ruleset=Global Direct,[]GEOIP,CN,no-resolve
+ruleset=Final,[]FINAL
+
+; 设置规则标志位
+
+custom_proxy_group=SELECT`select`.*
+custom_proxy_group=AUTO`smart`.*`http://cp.cloudflare.com/generate_204`300,,50
+custom_proxy_group=GoogleFCM`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=Outlook`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=PT`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=X`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Youtube`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Disney`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Netflix`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=Cryptocurrency`select`[]TW Fallback`[]TW`[]HK`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=AI`select`[]US Fallback`[]US`[]JP`[]SG`[]TW`[]HK`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=GamesCN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=GamesDownload`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=Games`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+
+custom_proxy_group=Google`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=MicrosoftCN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=Microsoft`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+custom_proxy_group=AppleCN`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=Apple`select`[]HK Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+
+custom_proxy_group=Global Direct`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=Direct`select`[]DIRECT`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT
+custom_proxy_group=Final`select`[]HK Fallback`[]TW Fallback`[]US Fallback`[]HK`[]TW`[]SG`[]JP`[]US`[]AUTO`[]SELECT`[]DIRECT
+
+custom_proxy_group=HK Fallback`fallback`[]HK`[]TW`[]SG`[]JP`[]US`http://cp.cloudflare.com/generate_204`300,,50
+custom_proxy_group=TW Fallback`fallback`[]TW`[]HK`[]SG`[]JP`[]US`http://cp.cloudflare.com/generate_204`300,,50
+custom_proxy_group=US Fallback`fallback`[]US`[]HK`[]TW`[]SG`[]JP`http://cp.cloudflare.com/generate_204`300,,50
+
+custom_proxy_group=HK`smart`(?i)(香港|港|hong ?kong|hk).*`http://cp.cloudflare.com/generate_204`300,,50
+custom_proxy_group=TW`smart`(?i)(台湾|臺灣|台|taiwan|tw).*`http://cp.cloudflare.com/generate_204`300,,50
+custom_proxy_group=SG`smart`(?i)(新加坡|坡|singapore|sg).*`http://cp.cloudflare.com/generate_204`300,,50
+custom_proxy_group=JP`smart`(?i)(日本|日|japan|jp).*`http://cp.cloudflare.com/generate_204`300,,50
+custom_proxy_group=US`smart`(?i)(美国|美國|美|united ?states|us).*`http://cp.cloudflare.com/generate_204`300,,50
