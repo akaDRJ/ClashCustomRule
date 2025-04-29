@@ -28,7 +28,7 @@ ruleset=Microsoft,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-
 ruleset=AppleCN,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml,86400
 ruleset=Apple,clash-domain:https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml,86400
 
-ruleset=Global Direct,[]GEOSITE,cn
+ruleset=Global Direct,[]GEOSITE,CN
 ruleset=Global Direct,[]GEOIP,CN,no-resolve
 ruleset=Final,[]FINAL
 
