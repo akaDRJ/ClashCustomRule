@@ -112,14 +112,17 @@ proxy-groups:
   - {name: 🍎 Apple, type: select, proxies: [直连, 🚀 默认代理]}
   - {name: 🎯 直连, type: select, proxies: [直连, 🚀 默认代理]}
   - {name: 🐟 漏网之鱼, <<: *pr}
-  - {name: 🇭🇰 香港节点, type: select, include-all: true, filter: "(?i)港|hk|hongkong|hong kong"}
-  - {name: 🇯🇵 日本节点, type: select, include-all: true, filter: "(?i)日|jp|japan"}
-  - {name: 🇺🇲 美国节点, type: select, include-all: true, filter: "(?i)美|us|unitedstates|united states"}
+  - {name: 🇭🇰 香港节点, type: select, include-all: true, filter: "(?i)(香港|港|hong ?kong|hk)"}
+  - {name: 🇹🇼 台湾节点, type: select, include-all: true, filter: "(?i)(台湾|臺灣|台|taiwan|tw)"}
+  - {name: 🇸🇬 新加坡节点, type: select, include-all: true, filter: "(?i)(新加坡|坡|singapore|sg)"}
+  - {name: 🇯🇵 日本节点, type: select, include-all: true, filter: "(?i)(日本|日|japan|jp)"}
+  - {name: 🇺🇲 美国节点, type: select, include-all: true, filter: "(?i)(美国|美國|美|united ?states|us)"}
   - {name: 🔯 香港故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|深|美)).)*$"}
-  - {name: 🔯 日本故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美)).)*$" }
-  - {name: ♻️ 香港自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|深|美)).)*$"}
-  - {name: ♻️ 日本自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美)).)*$" }
-  - {name: ♻️ 美国自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|US|(?i)States|America))^((?!(港|台|日|韩|新)).)*$"}
+  - {name: 🔯 台湾故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(台|TW|(?i)Tai(?:wan|pei)))^((?!(港|日|韩|新|深|美)).)*$" }
+  - {name: 🔯 美国故转, type: fallback, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|US|USA|(?i)United\\s?States|(?i)American))^((?!(港|台|日|韩|新|深)).)*$" }
+  - {name: ♻️ 香港自动, type: smart, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|深|美)).)*$"}
+  - {name: ♻️ 台湾自动, type: smart, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(台|TW|(?i)Tai(?:wan|pei)))^((?!(港|日|韩|新|深|美)).)*$" }
+  - {name: ♻️ 美国自动, type: smart, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|US|USA|(?i)United\\s?States|(?i)American))^((?!(港|台|日|韩|新|深)).)*$"}
   - {name: ♻️ 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(直连)).)*$"}
   - {name: 🌐 全部节点, type: select, include-all: true}
 
