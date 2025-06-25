@@ -65,7 +65,7 @@ secret: "123456"
 dns:
   enable: true
   listen: 0.0.0.0:7874
-  ipv6: true
+  ipv6: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.20.0.1/16
   nameserver:
@@ -328,6 +328,7 @@ rules:
   - GEOSITE,netflix,Netflix
   - GEOSITE,binance,Cryptocurrency
   - GEOSITE,gateio,Cryptocurrency
+  - GEOSITE,category-cryptocurrency,Cryptocurrency
   - RULE-SET,crypto,Cryptocurrency
   - GEOSITE,openai,AI
   - GEOSITE,category-ai-chat-!cn,AI
