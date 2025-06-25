@@ -108,7 +108,7 @@ proxy-groups:
   - name: Smart
     type: smart 
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -128,7 +128,7 @@ proxy-groups:
   - name: HK Smart
     type: smart
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -148,7 +148,7 @@ proxy-groups:
   - name: TW Smart
     type: smart
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -168,7 +168,7 @@ proxy-groups:
   - name: SG Smart
     type: smart
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -178,7 +178,7 @@ proxy-groups:
   - name: JP Smart
     type: smart
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -188,7 +188,7 @@ proxy-groups:
   - name: KR Smart
     type: smart
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -208,7 +208,7 @@ proxy-groups:
   - name: US Smart
     type: smart
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -218,7 +218,7 @@ proxy-groups:
   - name: UK Smart
     type: smart
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true    
     interval: 300
@@ -228,7 +228,7 @@ proxy-groups:
   - name: Others Smart
     type: smart
     include-all: true
-    policy-priority: "NX:1.2"
+    policy-priority: "NX:1.2;CNIX:0.6"
     uselightgbm: true
     collectdata: true
     interval: 300
