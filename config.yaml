@@ -140,10 +140,14 @@ default: &default
     - 直连
     - 所有-手动
     - 所有-智选
+    - 香港-故转
+    - 台湾-故转
+    - 新加坡-故转
+    - 美国-故转
     - 香港-智选
     - 台湾-智选
-    - 日本-智选
     - 新加坡-智选
+    - 日本-智选
     - 韩国-智选
     - 美国-智选
     - 英国-智选
@@ -189,6 +193,16 @@ proxy-groups:
     filter: "^((?!(直连|拒绝)).)*$"
 
   # 香港组
+  - name: 香港-故转
+    type: fallback
+    interval: 300
+    lazy: false
+    proxies:
+      - 香港-智选
+      - 台湾-智选
+      - 新加坡-智选
+      - 美国-智选
+  
   - name: 香港-智选
     type: smart
     include-all: true
@@ -199,6 +213,16 @@ proxy-groups:
     filter: "(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*$"
  
   # 台湾组
+  - name: 台湾-故转
+    type: fallback
+    interval: 300
+    lazy: false
+    proxies:
+      - 台湾-智选
+      - 香港-智选
+      - 新加坡-智选
+      - 美国-智选
+
   - name: 台湾-智选
     type: smart
     include-all: true
@@ -207,6 +231,26 @@ proxy-groups:
     collectdata: true
     interval: 300
     filter: "(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+
+  # 新加坡组
+  - name: 新加坡-故转
+    type: fallback
+    interval: 300
+    lazy: false
+    proxies:
+      - 新加坡-智选      
+      - 香港-智选
+      - 台湾-智选
+      - 美国-智选
+
+  - name: 新加坡-智选
+    type: smart
+    include-all: true
+#   policy-priority: "牛逼:0.8"
+    uselightgbm: true
+    collectdata: true
+    interval: 300
+    filter: "(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
 
   # 日本组
   - name: 日本-智选
@@ -217,16 +261,6 @@ proxy-groups:
     collectdata: true
     interval: 300
     filter: "(?=.*(广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan)).*$"
-
-  # 新加坡组
-  - name: 新加坡-智选
-    type: smart
-    include-all: true
-#   policy-priority: "牛逼:0.8"
-    uselightgbm: true
-    collectdata: true
-    interval: 300
-    filter: "(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
 
   # 韩国组
   - name: 韩国-智选
@@ -239,6 +273,16 @@ proxy-groups:
     filter: "(?=.*(广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea)).*$"
 
   # 美国组
+  - name: 美国-故转
+    type: fallback
+    interval: 300
+    lazy: false
+    proxies:
+      - 美国-智选      
+      - 香港-智选
+      - 台湾-智选
+      - 新加坡-智选
+
   - name: 美国-智选
     type: smart
     include-all: true
