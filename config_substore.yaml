@@ -79,7 +79,7 @@ default: &default
 proxy-groups:
 
   # 业务分流组
-  - {name: Global Direct, <<: *default}
+  - {name: Global Direct, icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Direct.png, <<: *default}
   - {name: GoogleFCM, <<: *default}
   - {name: PT, <<: *default}
   - {name: Outlook, <<: *default}
@@ -101,11 +101,13 @@ proxy-groups:
   - {name: Final, <<: *default}
 
   - name: Select
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Proxy.png
     type: select
     include-all: true
     filter: "^((?!(直连|拒绝)).)*$"
 
   - name: Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Auto.png
     type: smart 
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
@@ -116,6 +118,7 @@ proxy-groups:
 
   # 香港组
   - name: HK Fallback
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Hong_Kong.png
     type: fallback
     interval: 300
     lazy: false
@@ -126,6 +129,7 @@ proxy-groups:
       - US Smart
   
   - name: HK Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Hong_Kong.png
     type: smart
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
@@ -136,6 +140,7 @@ proxy-groups:
  
   # 台湾组
   - name: TW Fallback
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Taiwan.png
     type: fallback
     interval: 300
     lazy: false
@@ -146,6 +151,7 @@ proxy-groups:
       - US Smart
 
   - name: TW Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Taiwan.png
     type: smart
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
@@ -156,6 +162,7 @@ proxy-groups:
 
   # 新加坡组
   - name: SG Fallback
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Singapore.png
     type: fallback
     interval: 300
     lazy: false
@@ -166,6 +173,7 @@ proxy-groups:
       - US Smart
 
   - name: SG Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Singapore.png
     type: smart
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
@@ -176,6 +184,7 @@ proxy-groups:
 
   # 日本组
   - name: JP Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Japan.png
     type: smart
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
@@ -186,6 +195,7 @@ proxy-groups:
 
   # 韩国组
   - name: KR Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Korea.png
     type: smart
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
@@ -196,6 +206,7 @@ proxy-groups:
 
   # 美国组
   - name: US Fallback
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/United_States.png
     type: fallback
     interval: 300
     lazy: false
@@ -206,6 +217,7 @@ proxy-groups:
       - SG Smart
 
   - name: US Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/United_States.png
     type: smart
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
@@ -216,6 +228,7 @@ proxy-groups:
 
   # 英国组
   - name: UK Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/United_Kingdom.png
     type: smart
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
@@ -226,6 +239,7 @@ proxy-groups:
 
   # 其他组
   - name: Others Smart
+    icon: https://github.com/Koolson/Qure/blob/master/IconSet/Color/Auto.png
     type: smart
     include-all: true
     policy-priority: "NX:1.2;CNIX:0.6"
