@@ -79,33 +79,35 @@ default: &default
 proxy-groups:
 
   # 业务分流组
-  - {name: Global Direct, <<: *default}
-  - {name: GoogleFCM, <<: *default}
-  - {name: PT, <<: *default}
-  - {name: Outlook, <<: *default}
-  - {name: X, <<: *default}
-  - {name: Youtube, <<: *default}
-  - {name: Disney, <<: *default}
-  - {name: Netflix, <<: *default}
-  - {name: Cryptocurrency, <<: *default}
-  - {name: AI, <<: *default}
-  - {name: GamesCN, <<: *default}
-  - {name: GamesDownload, <<: *default}
-  - {name: Games, <<: *default}
-  - {name: Google, <<: *default}
-  - {name: MicrosoftCN, <<: *default}
-  - {name: Microsoft, <<: *default}
-  - {name: AppleCN, <<: *default}
-  - {name: Apple, <<: *default}
-  - {name: China Direct, <<: *default}
-  - {name: Final, <<: *default}
+  - {name: Global Direct, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Direct.png, <<: *default}
+  - {name: GoogleFCM, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png, <<: *default}
+  - {name: PT, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Download.png, <<: *default}
+  - {name: Outlook, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png, <<: *default}
+  - {name: X, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/X.png, <<: *default}
+  - {name: Youtube, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png, <<: *default}
+  - {name: Disney, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Disney+.png, <<: *default}
+  - {name: Netflix, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png, <<: *default}
+  - {name: Cryptocurrency, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Cryptocurrency.png, <<: *default}
+  - {name: AI, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png, <<: *default}
+  - {name: GamesCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
+  - {name: GamesDownload, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
+  - {name: Games, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
+  - {name: Google, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png, <<: *default}
+  - {name: MicrosoftCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png,<<: *default}
+  - {name: Microsoft, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png,<<: *default}
+  - {name: AppleCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png, <<: *default}
+  - {name: Apple, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png,<<: *default}
+  - {name: China Direct, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png,<<: *default}
+  - {name: Final, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png, <<: *default}
 
   - name: Select
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Proxy.png
     type: select
     include-all: true
     filter: "^((?!(直连|拒绝)).)*$"
 
   - name: Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Auto.png
     type: url-test 
     include-all: true
     interval: 300
@@ -113,6 +115,7 @@ proxy-groups:
 
   # 香港组
   - name: HK Fallback
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png
     type: fallback
     interval: 300
     lazy: false
@@ -123,6 +126,7 @@ proxy-groups:
       - US Smart
   
   - name: HK Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png
     type: url-test
     include-all: true
     interval: 300
@@ -130,6 +134,7 @@ proxy-groups:
  
   # 台湾组
   - name: TW Fallback
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Taiwan.png
     type: fallback
     interval: 300
     lazy: false
@@ -140,6 +145,7 @@ proxy-groups:
       - US Smart
 
   - name: TW Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Taiwan.png
     type: url-test
     include-all: true
     interval: 300
@@ -147,6 +153,7 @@ proxy-groups:
 
   # 新加坡组
   - name: SG Fallback
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Singapore.png
     type: fallback
     interval: 300
     lazy: false
@@ -157,6 +164,7 @@ proxy-groups:
       - US Smart
 
   - name: SG Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Singapore.png
     type: url-test
     include-all: true
     interval: 300
@@ -164,6 +172,7 @@ proxy-groups:
 
   # 日本组
   - name: JP Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Japan.png
     type: url-test
     include-all: true
     interval: 300
@@ -171,6 +180,7 @@ proxy-groups:
 
   # 韩国组
   - name: KR Smart
+   icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Korea.png
     type: url-test
     include-all: true
     interval: 300
@@ -178,6 +188,7 @@ proxy-groups:
 
   # 美国组
   - name: US Fallback
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/United_States.png
     type: fallback
     interval: 300
     lazy: false
@@ -188,6 +199,7 @@ proxy-groups:
       - SG Smart
 
   - name: US Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/United_States.png
     type: url-test
     include-all: true
     interval: 300
@@ -195,6 +207,7 @@ proxy-groups:
 
   # 英国组
   - name: UK Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/United_Kingdom.png
     type: url-test
     include-all: true
     interval: 300
@@ -202,12 +215,14 @@ proxy-groups:
 
   # 其他组
   - name: Others Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Auto.png
     type: url-test
     include-all: true
     interval: 300
     filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|美|US|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|拉斯|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
 
   - name: Direct
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Direct.png
     type: select
     proxies:
       - DIRECT
