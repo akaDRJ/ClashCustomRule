@@ -84,9 +84,9 @@ proxy-groups:
   - {name: PT, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Download.png, <<: *default}
   - {name: Outlook, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png, <<: *default}
   - {name: X, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/X.png, <<: *default}
-  - {name: Youtube, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Youtube.png, <<: *default}
+  - {name: Youtube, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png, <<: *default}
   - {name: Disney, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Disney+.png, <<: *default}
-  - {name: Netflix, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netfilx.png, <<: *default}
+  - {name: Netflix, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png, <<: *default}
   - {name: Cryptocurrency, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Cryptocurrency.png, <<: *default}
   - {name: AI, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png, <<: *default}
   - {name: GamesCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
