@@ -110,7 +110,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Auto.png
     type: smart 
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -132,7 +132,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png
     type: smart
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -154,7 +154,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Taiwan.png
     type: smart
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -176,7 +176,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Singapore.png
     type: smart
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -187,7 +187,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Japan.png
     type: smart
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -198,7 +198,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Korea.png
     type: smart
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -220,7 +220,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/United_States.png
     type: smart
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
@@ -231,7 +231,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/United_Kingdom.png
     type: smart
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true    
     interval: 300
@@ -242,7 +242,7 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Auto.png
     type: smart
     include-all: true
-    policy-priority: "NX:1.2;CNIX:0.6"
+    policy-priority: "NX:1.2;CNIX:0.8;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
