@@ -90,7 +90,6 @@ default: &default
     - SG Fallback
     - US Fallback
     - HK Smart
-    - HK Smart
     - SG Smart
     - JP Smart
     - KR Smart
