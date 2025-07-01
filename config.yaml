@@ -6,16 +6,6 @@
 
 proxy-providers:
 
-  Nexitally:
-    url: ""
-    type: http
-    interval: 86400
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 300
-    proxy: 直连 
-    
   CNIX:
     url: ""
     type: http
@@ -26,19 +16,9 @@ proxy-providers:
       interval: 300
     proxy: 直连    
 
-  DRJ Cloud:
-    url: ""
-    type: http
-    interval: 86400
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 300
-    proxy: 直连    
-
 proxies:
-  - {name: 直连, type: direct}
-  - {name: 拒绝, type: reject}
+  - {name: Direct, type: direct}
+  - {name: Reject, type: reject}
 
 # ========================
 # 主要端口设置
@@ -102,176 +82,190 @@ profile:
 default: &default
   type: select
   proxies:
-    - 直连
-    - 所有-手动
-    - 所有-智选
-    - 香港-故转
-    - 台湾-故转
-    - 新加坡-故转
-    - 美国-故转
-    - 香港-智选
-    - 台湾-智选
-    - 新加坡-智选
-    - 日本-智选
-    - 韩国-智选
-    - 美国-智选
-    - 英国-智选
-    - 其他-智选
-    - 拒绝
+    - Direct
+    - Select
+    - Smart
+    - HK Fallback
+    - TW Fallback
+    - SG Fallback
+    - US Fallback
+    - HK Smart
+    - HK Smart
+    - SG Smart
+    - JP Smart
+    - KR Smart
+    - US Smart
+    - UK Smart
+    - Others Smart
+    - Reject
 
 proxy-groups:
 
   # 业务分流组
-  - {name: Global Direct, <<: *default}
-  - {name: GoogleFCM, <<: *default}
-  - {name: PT, <<: *default}
-  - {name: Outlook, <<: *default}
-  - {name: X, <<: *default}
-  - {name: Youtube, <<: *default}
-  - {name: Disney, <<: *default}
-  - {name: Netflix, <<: *default}
-  - {name: Cryptocurrency, <<: *default}
-  - {name: AI, <<: *default}
-  - {name: GamesCN, <<: *default}
-  - {name: GamesDownload, <<: *default}
-  - {name: Games, <<: *default}
-  - {name: Google, <<: *default}
-  - {name: MicrosoftCN, <<: *default}
-  - {name: Microsoft, <<: *default}
-  - {name: AppleCN, <<: *default}
-  - {name: Apple, <<: *default}
-  - {name: China Direct, <<: *default}
-  - {name: Final, <<: *default}
+  - {name: Global Direct, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Direct.png, <<: *default}
+  - {name: GoogleFCM, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png, <<: *default}
+  - {name: PT, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Download.png, <<: *default}
+  - {name: Outlook, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png, <<: *default}
+  - {name: X, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/X.png, <<: *default}
+  - {name: Youtube, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png, <<: *default}
+  - {name: Disney, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Disney+.png, <<: *default}
+  - {name: Netflix, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png, <<: *default}
+  - {name: Cryptocurrency, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Cryptocurrency.png, <<: *default}
+  - {name: AI, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AI.png, <<: *default}
+  - {name: GamesCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
+  - {name: GamesDownload, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
+  - {name: Games, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
+  - {name: Google, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png, <<: *default}
+  - {name: MicrosoftCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png,<<: *default}
+  - {name: Microsoft, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png,<<: *default}
+  - {name: AppleCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png, <<: *default}
+  - {name: Apple, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png,<<: *default}
+  - {name: China Direct, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png,<<: *default}
+  - {name: Final, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png, <<: *default}
 
-  - name: 所有-手动
+  - name: Select
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Proxy.png
     type: select
     include-all: true
     filter: "^((?!(直连|拒绝)).)*$"
 
-  - name: 所有-智选
-    type: smart
+  - name: Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Auto.png
+    type: smart 
     include-all: true
-#   policy-priority: "香港:1.2;牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
     filter: "^((?!(直连|拒绝)).)*$"
 
   # 香港组
-  - name: 香港-故转
+  - name: HK Fallback
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png
     type: fallback
     interval: 300
     lazy: false
     proxies:
-      - 香港-智选
-      - 台湾-智选
-      - 新加坡-智选
-      - 美国-智选
+      - HK Smart
+      - TW Smart
+      - SG Smart
+      - US Smart
   
-  - name: 香港-智选
+  - name: HK Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png
     type: smart
     include-all: true
-#   policy-priority: "牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
     filter: "(?=.*(广港|香港|HK|Hong Kong|🇭🇰|HongKong)).*$"
  
   # 台湾组
-  - name: 台湾-故转
+  - name: TW Fallback
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Taiwan.png
     type: fallback
     interval: 300
     lazy: false
     proxies:
-      - 台湾-智选
-      - 香港-智选
-      - 新加坡-智选
-      - 美国-智选
+      - TW Smart
+      - HK Smart
+      - SG Smart
+      - US Smart
 
-  - name: 台湾-智选
+  - name: TW Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Taiwan.png
     type: smart
     include-all: true
-#   policy-priority: "牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
     filter: "(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
 
   # 新加坡组
-  - name: 新加坡-故转
+  - name: SG Fallback
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Singapore.png
     type: fallback
     interval: 300
     lazy: false
     proxies:
-      - 新加坡-智选      
-      - 香港-智选
-      - 台湾-智选
-      - 美国-智选
+      - SG Smart      
+      - HK Smart
+      - TW Smart
+      - US Smart
 
-  - name: 新加坡-智选
+  - name: SG Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Singapore.png
     type: smart
     include-all: true
-#   policy-priority: "牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
     filter: "(?=.*(广新|新加坡|SG|坡|狮城|🇸🇬|Singapore)).*$"
 
   # 日本组
-  - name: 日本-智选
+  - name: JP Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Japan.png
     type: smart
     include-all: true
-#   policy-priority: "牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
     filter: "(?=.*(广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan)).*$"
 
   # 韩国组
-  - name: 韩国-智选
+  - name: KR Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Korea.png
     type: smart
     include-all: true
-#   policy-priority: "牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
     filter: "(?=.*(广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea)).*$"
 
   # 美国组
-  - name: 美国-故转
+  - name: US Fallback
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/United_States.png
     type: fallback
     interval: 300
     lazy: false
     proxies:
-      - 美国-智选      
-      - 香港-智选
-      - 台湾-智选
-      - 新加坡-智选
+      - US Smart      
+      - HK Smart
+      - TW Smart 
+      - SG Smart
 
-  - name: 美国-智选
+  - name: US Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/United_States.png
     type: smart
     include-all: true
-#   policy-priority: "牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
     filter: "(?=.*(广美|美|US|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|拉斯|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States)).*$"
 
   # 英国组
-  - name: 英国-智选
+  - name: UK Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/United_Kingdom.png
     type: smart
     include-all: true
-#   policy-priority: "牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
-    collectdata: true
+    collectdata: true    
     interval: 300
     filter: "(?=.*(英国|英|伦敦|UK|United Kingdom|🇬🇧|London)).*$"
 
   # 其他组
-  - name: 其他-智选
+  - name: Others Smart
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Auto.png
     type: smart
     include-all: true
-#   policy-priority: "牛逼:0.8"
+    policy-priority: "NX:1.2;CNIX:1.0;MJ:0.7"
     uselightgbm: true
     collectdata: true
     interval: 300
