@@ -42,7 +42,7 @@ ipv6: false
 # TUN 模块
 # ========================
 tun:
-  enable: true
+  enable: false
   stack: gvisor
   device: utun
   endpoint-independent-nat: true
