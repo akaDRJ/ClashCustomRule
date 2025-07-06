@@ -43,7 +43,7 @@ ipv6: false
 # ========================
 tun:
   enable: false
-  stack: gvisor
+  stack: system
   device: utun
   endpoint-independent-nat: true
   auto-route: false
