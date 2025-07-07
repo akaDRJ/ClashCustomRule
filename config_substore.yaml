@@ -29,9 +29,9 @@ dns:
   nameserver:
     - 223.5.5.5
   fake-ip-filter:
-    - +.lan
-    - +.local
-    - +.drj028.com
+    - "+.lan"
+    - "+.local"
+    - "+.drj028.com"
     - geosite:cn
     - geosite:private
     - geosite:apple-cn
@@ -260,33 +260,33 @@ proxy-groups:
 # ========================
 rules:
 
-  - GEOSITE,private,Global Direct
-  - GEOIP,private,Global Direct,no-resolve
-  - GEOSITE,googlefcm,GoogleFCM
+  - RULE-SET,private,Global Direct
+  - RULE-SET,privateip,Global Direct
+  - RULE-SET,googlefcm,GoogleFCM
   - RULE-SET,pt,PT
   - RULE-SET,outlook,Outlook
-  - GEOSITE,x,X
-  - GEOSITE,youtube,Youtube
-  - GEOSITE,disney,Disney
-  - GEOSITE,netflix,Netflix
-  - GEOSITE,binance,Cryptocurrency
-  - GEOSITE,gateio,Cryptocurrency
-  - GEOSITE,category-cryptocurrency,Cryptocurrency
+  - RULE-SET,x,X
+  - RULE-SET,youtube,Youtube
+  - RULE-SET,disney,Disney
+  - RULE-SET,netflix,Netflix
+  - RULE-SET,binance,Cryptocurrency
+  - RULE-SET,gateio,Cryptocurrency
+  - RULE-SET,category-cryptocurrency,Cryptocurrency
   - RULE-SET,crypto,Cryptocurrency
-  - GEOSITE,openai,AI
-  - GEOSITE,category-ai-chat-!cn,AI
-  - GEOSITE,steam@cn,GamesCN
-  - GEOSITE,category-games@cn,GamesCN
-  - GEOSITE,category-game-platforms-download,GamesDownload
-  - GEOSITE,category-games,Games
-  - GEOSITE,google,Google
-  - GEOSITE,microsoft@cn,MicrosoftCN
-  - GEOSITE,microsoft,Microsoft
-  - GEOSITE,apple@cn,AppleCN
-  - GEOSITE,apple,Apple
+  - RULE-SET,openai,AI
+  - RULE-SET,category-ai-chat-!cn,AI
+  - RULE-SET,steam@cn,GamesCN
+  - RULE-SET,category-games@cn,GamesCN
+  - RULE-SET,category-game-platforms-download,GamesDownload
+  - RULE-SET,category-games,Games
+  - RULE-SET,google,Google
+  - RULE-SET,microsoft@cn,MicrosoftCN
+  - RULE-SET,microsoft,Microsoft
+  - RULE-SET,apple@cn,AppleCN
+  - RULE-SET,apple,Apple
   - RULE-SET,china,China Direct
-  - GEOSITE,CN,China Direct
-  - GEOIP,CN,China Direct,no-resolve
+  - RULE-SET,cn,China Direct
+  - RULE-SET,cnip,China Direct
   - MATCH,Final
 
 # ========================
@@ -298,10 +298,31 @@ rule-anchor:
   classical: &classical {type: http, interval: 86400, behavior: classical, format: yaml}
 
 rule-providers:
+  private: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.yaml"}
+  privateip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.yaml"}
+  googlefcm: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/googlefcm.yaml"}
+  x: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.yaml"}
+  youtube: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml"}
+  disney: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.yaml"}
+  netflix: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml"}
+  binance: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/binance.yaml"}
+  gateio: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gateio.yaml"}
+  category-cryptocurrency: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-cryptocurrency.yaml"}
+  openai: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml"}
+  category-ai-chat-!cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-chat-!cn.yaml"}
+  steam@cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.yaml"}
+  category-games@cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games@cn.yaml"}
+  category-game-platforms-download: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-game-platforms-download.yaml"}
+  category-games: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.yaml"}
+  google: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml"}
+  microsoft@cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft@cn.yaml"}
+  microsoft: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml"}
+  apple@cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml"}
+  apple: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml"}
+  cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.yaml"}
+  cnip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.yaml"}
+
   pt: {<<: *domain, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml"}
   outlook: {<<: *domain, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml"}
   crypto: {<<: *domain, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.yaml"}
   china: {<<: *classical, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Direct/Direct.yaml"}
-
-
-  
