@@ -29,9 +29,9 @@ dns:
   nameserver:
     - 223.5.5.5
   fake-ip-filter:
-    - +.lan
-    - +.local
-    - +.drj028.com
+    - "+.lan"
+    - "+.local"
+    - "+.drj028.com"
     - geosite:cn
     - geosite:private
     - geosite:apple-cn
