@@ -235,28 +235,28 @@ rules:
 
   - GEOSITE,private,Global Direct
   - GEOIP,private,Global Direct,no-resolve
-  - GEOSITE,googlefcm,GoogleFCM
+  - RULE-SET,googlefcm,GoogleFCM
   - RULE-SET,pt,PT
   - RULE-SET,outlook,Outlook
-  - GEOSITE,x,X
-  - GEOSITE,youtube,Youtube
-  - GEOSITE,disney,Disney
-  - GEOSITE,netflix,Netflix
-  - GEOSITE,binance,Cryptocurrency
-  - GEOSITE,gateio,Cryptocurrency
-  - GEOSITE,category-cryptocurrency,Cryptocurrency
+  - RULE-SET,x,X
+  - RULE-SET,youtube,Youtube
+  - RULE-SET,disney,Disney
+  - RULE-SET,netflix,Netflix
+  - RULE-SET,binance,Cryptocurrency
+  - RULE-SET,gateio,Cryptocurrency
+  - RULE-SET,category-cryptocurrency,Cryptocurrency
   - RULE-SET,crypto,Cryptocurrency
-  - GEOSITE,openai,AI
-  - GEOSITE,category-ai-chat-!cn,AI
-  - GEOSITE,steam@cn,GamesCN
-  - GEOSITE,category-games@cn,GamesCN
-  - GEOSITE,category-game-platforms-download,GamesDownload
-  - GEOSITE,category-games,Games
-  - GEOSITE,google,Google
-  - GEOSITE,microsoft@cn,MicrosoftCN
-  - GEOSITE,microsoft,Microsoft
-  - GEOSITE,apple@cn,AppleCN
-  - GEOSITE,apple,Apple
+  - RULE-SET,openai,AI
+  - RULE-SET,category-ai-chat-!cn,AI
+  - RULE-SET,steam@cn,GamesCN
+  - RULE-SET,category-games@cn,GamesCN
+  - RULE-SET,category-game-platforms-download,GamesDownload
+  - RULE-SET,category-games,Games
+  - RULE-SET,google,Google
+  - RULE-SET,microsoft@cn,MicrosoftCN
+  - RULE-SET,microsoft,Microsoft
+  - RULE-SET,apple@cn,AppleCN
+  - RULE-SET,apple,Apple
   - RULE-SET,china,China Direct
   - GEOSITE,CN,China Direct
   - GEOIP,CN,China Direct,no-resolve
