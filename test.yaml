@@ -233,8 +233,8 @@ proxy-groups:
 # ========================
 rules:
 
-  - GEOSITE,private,Global Direct
-  - GEOIP,private,Global Direct,no-resolve
+  - RULE-SET,private,Global Direct
+  - RULE-SET,privateip,Global Direct,no-resolve
   - RULE-SET,googlefcm,GoogleFCM
   - RULE-SET,pt,PT
   - RULE-SET,outlook,Outlook
@@ -258,8 +258,8 @@ rules:
   - RULE-SET,apple@cn,AppleCN
   - RULE-SET,apple,Apple
   - RULE-SET,china,China Direct
-  - GEOSITE,CN,China Direct
-  - GEOIP,CN,China Direct,no-resolve
+  - RULE-SET,cn,China Direct
+  - RULE-SET,cnip,China Direct,no-resolve
   - MATCH,Final
 
 # ========================
@@ -271,6 +271,8 @@ rule-anchor:
   classical: &classical {type: http, interval: 86400, behavior: classical, format: yaml}
 
 rule-providers:
+  private: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.yaml"}
+  privateip: {<<: *ipcidr, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.yaml"}
   googlefcm: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/googlefcm.yaml"}
   x: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.yaml"}
   youtube: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml"}
@@ -289,8 +291,9 @@ rule-providers:
   microsoft@cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft@cn.yaml"}
   microsoft: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml"}
   apple@cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml"}
-  apple: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml"}
-  
+  cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.yaml"}
+  cnip: {<<: *ipcidr, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.yaml"}
+
   pt: {<<: *domain, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml"}
   outlook: {<<: *domain, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml"}
   crypto: {<<: *domain, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.yaml"}
