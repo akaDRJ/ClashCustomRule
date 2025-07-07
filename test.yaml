@@ -290,7 +290,6 @@ rule-providers:
   microsoft: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml"}
   apple@cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple@cn.yaml"}
   apple: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml"}
-  apple: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml"}
   
   pt: {<<: *domain, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml"}
   outlook: {<<: *domain, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml"}
