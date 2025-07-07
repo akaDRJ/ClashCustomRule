@@ -234,7 +234,7 @@ proxy-groups:
 rules:
 
   - RULE-SET,private,Global Direct
-  - RULE-SET,privateip,Global Direct,no-resolve
+  - RULE-SET,privateip,Global Direct
   - RULE-SET,googlefcm,GoogleFCM
   - RULE-SET,pt,PT
   - RULE-SET,outlook,Outlook
@@ -259,7 +259,7 @@ rules:
   - RULE-SET,apple,Apple
   - RULE-SET,china,China Direct
   - RULE-SET,cn,China Direct
-  - RULE-SET,cnip,China Direct,no-resolve
+  - RULE-SET,cnip,China Direct
   - MATCH,Final
 
 # ========================
