@@ -94,11 +94,11 @@ proxy-groups:
   - {name: GamesDownload, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
   - {name: Games, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png,<<: *default}
   - {name: Google, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png, <<: *default}
-  - {name: MicrosoftCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png,<<: *default}
-  - {name: Microsoft, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png,<<: *default}
+  - {name: MicrosoftCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png, <<: *default}
+  - {name: Microsoft, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png, <<: *default}
   - {name: AppleCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png, <<: *default}
-  - {name: Apple, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png,<<: *default}
-  - {name: China Direct, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png,<<: *default}
+  - {name: Apple, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png, <<: *default}
+  - {name: China Direct, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png, <<: *default}
   - {name: Final, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png, <<: *default}
 
   - name: Select
