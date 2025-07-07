@@ -236,6 +236,7 @@ rules:
   - RULE-SET,private,Global Direct
   - RULE-SET,privateip,Global Direct
   - RULE-SET,googlefcm,GoogleFCM
+  - RULE-SET,category-pt,PT
   - RULE-SET,pt,PT
   - RULE-SET,outlook,Outlook
   - RULE-SET,x,X
@@ -274,6 +275,7 @@ rule-anchor:
 rule-providers:
   private: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
   privateip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"}
+  category-pt: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-pt.mrs"}
   googlefcm: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/googlefcm.mrs"}
   x: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.mrs"}
   youtube: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"}
