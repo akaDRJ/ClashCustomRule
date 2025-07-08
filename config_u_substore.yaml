@@ -263,6 +263,7 @@ rules:
   - RULE-SET,cnip,China Direct
   - DST-PORT,80,Final
   - DST-PORT,443,Final
+  - DST-PORT,9999,Final
   - MATCH,DIRECT
 
 # ========================
