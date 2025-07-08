@@ -288,7 +288,10 @@ rules:
 # - RULE-SET,china,China Direct
   - RULE-SET,cn,China Direct
   - RULE-SET,cnip,China Direct
-  - MATCH,Final
+  - DST-PORT,80,Final
+  - DST-PORT,443,Final
+  - DST-PORT,9999,Final
+  - MATCH,DIRECT
 
 # ========================
 # 规则集提供者
