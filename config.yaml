@@ -6,7 +6,7 @@
 
 proxy-providers:
 
-  CNIX:
+  Nexitally:
     url: ""
     type: http
     interval: 86400
@@ -14,7 +14,7 @@ proxy-providers:
       enable: true
       url: https://www.gstatic.com/generate_204
       interval: 300
-    proxy: 直连    
+    proxy: Direct    
 
 proxies:
   - {name: Direct, type: direct}
@@ -51,8 +51,9 @@ dns:
   nameserver:
     - 223.5.5.5
   fake-ip-filter:
-    - +.lan
-    - +.local
+    - "+.lan"
+    - "+.local"
+    - "+.drj028.com"
     - geosite:cn
     - geosite:private
     - geosite:apple-cn
