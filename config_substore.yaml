@@ -32,9 +32,10 @@ dns:
     - "+.lan"
     - "+.local"
     - "+.drj028.com"
-    - geosite:cn
-    - geosite:private
-    - geosite:apple-cn
+    - "rule-set:cn"
+    - "rule-set:private"
+    - "rule-set:apple@cn"
+    - "rule-set:category-pt"
 
 ipv6: false
 
