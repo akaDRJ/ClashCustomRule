@@ -225,7 +225,8 @@ proxy-groups:
   - name: Direct
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Direct.png
     type: select
-    proxies: direct
+    proxies: 
+      - direct
 
 # ========================
 # 规则引擎（rules）
