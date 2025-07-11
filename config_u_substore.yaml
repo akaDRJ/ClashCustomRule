@@ -34,7 +34,7 @@ dns:
     - "+.drj028.com"
     - "rule-set:cn"
     - "rule-set:private"
-    - "rule-set:apple-cn"
+    - "rule-set:apple@cn"
     - "rule-set:category-pt"
 
 ipv6: false
