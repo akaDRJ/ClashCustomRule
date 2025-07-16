@@ -100,6 +100,7 @@ proxy-groups:
   - {name: Microsoft, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Microsoft.png,<<: *default}
   - {name: AppleCN, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png, <<: *default}
   - {name: Apple, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png,<<: *default}
+  - {name: Mining, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Cryptocurrency_3.png,<<: *default}
   - {name: China Direct, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png,<<: *default}
   - {name: Final, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png, <<: *default}
 
@@ -282,12 +283,12 @@ rules:
   - RULE-SET,microsoft,Microsoft
   - RULE-SET,apple@cn,AppleCN
   - RULE-SET,apple,Apple
+  - RULE-SET,mining,Mining  
 # - RULE-SET,china,China Direct
   - RULE-SET,cn,China Direct
   - RULE-SET,cnip,China Direct
   - DST-PORT,80,Final
   - DST-PORT,443,Final
-  - DST-PORT,9999,Final
   - MATCH,DIRECT
 
 # ========================
@@ -329,4 +330,5 @@ rule-providers:
   pt: {<<: *domain_yaml, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml"}
   outlook: {<<: *domain_yaml, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml"}
   crypto: {<<: *domain_yaml, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.yaml"}
+  mining: {<<: *domain_yaml, url: "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/mining.yaml"}
 # china: {<<: *classical, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Direct/Direct.yaml"}
