@@ -258,7 +258,7 @@ proxy-groups:
 rules:
 
   - RULE-SET,private,Global Direct
-  - RULE-SET,privateip,Global Direct
+  - RULE-SET,privateip,Global Direct,no-resolve
   - RULE-SET,googlefcm,GoogleFCM
   - RULE-SET,category-pt,PT
   - RULE-SET,pt,PT
@@ -286,7 +286,7 @@ rules:
   - RULE-SET,mining,Mining  
 # - RULE-SET,china,China Direct
   - RULE-SET,cn,China Direct
-  - RULE-SET,cnip,China Direct
+  - RULE-SET,cnip,China Direct,no-resolve
   - DST-PORT,80,Final
   - DST-PORT,443,Final
   - MATCH,DIRECT
