@@ -260,6 +260,10 @@ rules:
 # - RULE-SET,china,China Direct
   - RULE-SET,cn,China Direct
   - RULE-SET,cnip,China Direct,no-resolve
+  - DST-PORT,65200,Final
+  - DST-PORT,2086,Final
+  - DST-PORT,26256,Final
+  - DST-PORT,41133,Final
   - DST-PORT,80,Final
   - DST-PORT,443,Final
   - MATCH,DIRECT
