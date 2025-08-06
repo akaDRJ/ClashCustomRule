@@ -259,6 +259,7 @@ proxy-groups:
 # ========================
 rules:
 
+  - PROTOCOL,bittorrent,DIRECT
   - RULE-SET,private,Global Direct
   - RULE-SET,privateip,Global Direct,no-resolve
   - RULE-SET,googlefcm,GoogleFCM
