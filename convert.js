@@ -440,13 +440,6 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
             "proxies": defaultProxies,
         },
         {
-            "name": "静态资源",
-            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png",
-            "type": "select",
-            "include-all": true,
-            "proxies": defaultProxies,
-        },
-        {
             "name": "全球直连",
             "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Direct.png",
             "type": "select",
