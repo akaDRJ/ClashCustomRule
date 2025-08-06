@@ -70,6 +70,7 @@ const ruleProviders = {
 }
 
 const rules = [
+    "GEOSITE,CATEGORY-PT,全球直连",
     "GEOSITE,PAYPAL@CN,全球直连",
     "GEOSITE,PAYPAL,PayPal",
     "GEOSITE,GOOGLE-PLAY@CN,全球直连",
@@ -102,6 +103,7 @@ const rules = [
     "GEOSITE,GOOGLE,Google",
     "GEOSITE,CN,全球直连",
     "GEOSITE,PRIVATE,全球直连",
+    
     "GEOIP,NETFLIX,Netflix,no-resolve",
     "GEOIP,GOOGLE,Google,no-resolve",
     "GEOIP,TELEGRAM,Telegram,no-resolve",
