@@ -447,14 +447,6 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
                 "DIRECT", "节点选择"
             ]
         },
-        {
-            "name": "广告拦截",
-            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png",
-            "type": "select",
-            "proxies": [
-                "REJECT", "全球直连"
-            ]
-        },
         ...countryProxyGroups,
         {
             "name": "GLOBAL",
