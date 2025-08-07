@@ -139,31 +139,38 @@ const snifferConfig = {
 };
 
 const dnsConfig = {
-    "enable": true,
-    "ipv6": ipv6Enabled,
-    "prefer-h3": true,
-    "enhanced-mode": "redir-host",
-    "default-nameserver": [
-        "119.29.29.29",
-        "223.5.5.5",
-    ],
-    "nameserver": [
-        "system",
-        "quic://223.5.5.5",
-        "tls://dot.pub",
-        "tls://dns.alidns.com",
-    ],
-    "fallback": [
-        "quic://dns0.eu",
-        "https://dns.cloudflare.com/dns-query",
-        "https://dns.sb/dns-query",
-        "tcp://208.67.222.222",
-        "tcp://8.26.56.2"
-    ],
-    "proxy-server-nameserver": [
-        "quic://223.5.5.5",
-        "tls://dot.pub",
+  enable: true,
+  ipv6: ipv6Enabled,
+  prefer-h3: true,
+  enhanced-mode: "redir-host",
+
+  // 本地默认解析器
+  "default-nameserver": [
+    "119.29.29.29",
+    "223.5.5.5"
+  ],
+
+  // 新 nameserver 列表
+  nameserver: [
+    "https://1.1.1.1/dns-query",
+    "https://8.8.8.8/dns-query",
+    "1.1.1.1",
+    "8.8.8.8"
+  ],
+
+  // 分域名策略
+  "nameserver-policy": {
+    "geosite:cn": [
+      "https://1.12.12.12/dns-query",
+      "https://223.5.5.5/dns-query"
     ]
+  },
+
+  // 代理链上游解析器
+  "proxy-server-nameserver": [
+    "https://1.12.12.12/dns-query",
+    "https://223.5.5.5/dns-query"
+  ]
 };
 
 const geoxURL = {
