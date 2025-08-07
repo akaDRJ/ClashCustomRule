@@ -151,7 +151,7 @@ const dnsConfig = {
   ],
 
   // 新 nameserver 列表
-  nameserver: [
+  "nameserver": [
     "https://1.1.1.1/dns-query",
     "https://8.8.8.8/dns-query",
     "1.1.1.1",
