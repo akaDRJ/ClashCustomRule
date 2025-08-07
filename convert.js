@@ -148,16 +148,21 @@ const dnsConfig = {
         "223.5.5.5",
     ],
     "nameserver": [
-        "https://dns.google/dns-query",
-        "https://cloudflare-dns.com/dns-query",
+        "system",
+        "quic://223.5.5.5",
+        "tls://dot.pub",
+        "tls://dns.alidns.com",
+    ],
+    "fallback": [
+        "quic://dns0.eu",
+        "https://dns.cloudflare.com/dns-query",
+        "https://dns.sb/dns-query",
+        "tcp://208.67.222.222",
+        "tcp://8.26.56.2"
     ],
     "proxy-server-nameserver": [
-        "https://dns.alidns.com/dns-query",
-        "https://doh.pub/dns-query",
-    ],
-    "direct-nameserver": [
-        "https://dns.alidns.com/dns-query",
-        "https://doh.pub/dns-query",
+        "quic://223.5.5.5",
+        "tls://dot.pub",
     ]
 };
 
