@@ -160,7 +160,7 @@ const dnsConfig = {
 
   // 分域名策略
   "nameserver-policy": {
-    "geosite:cn": [
+    "\"geosite:cn\"": [
       "https://1.12.12.12/dns-query",
       "https://223.5.5.5/dns-query"
     ]
