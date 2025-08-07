@@ -142,20 +142,28 @@ const dnsConfig = {
     "enable": true,
     "ipv6": ipv6Enabled,
     "prefer-h3": true,
-    "enhanced-mode": "fake-ip",
-    "fake-ip-range": "198.20.0.1/16",
-    "fake-ip-filter": [  
-        "+.lan",
-        "+.local",
-        "+.drj028.com",
-        "geosite:cn",
-        "geosite:private",
-        "geosite:category-pt",
-        "geoip:cn"
-    ],
-    "nameserver": [
+    "enhanced-mode": "redir-host",
+    "default-nameserver": [
+        "119.29.29.29",
         "223.5.5.5",
     ],
+    "nameserver": [
+        "system",
+        "quic://223.5.5.5",
+        "tls://dot.pub",
+        "tls://dns.alidns.com",
+    ],
+    "fallback": [
+        "quic://dns0.eu",
+        "https://dns.cloudflare.com/dns-query",
+        "https://dns.sb/dns-query",
+        "tcp://208.67.222.222",
+        "tcp://8.26.56.2"
+    ],
+    "proxy-server-nameserver": [
+        "quic://223.5.5.5",
+        "tls://dot.pub",
+    ]
 };
 
 const geoxURL = {
