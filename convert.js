@@ -150,10 +150,11 @@ const dnsConfig = {
         "+.drj028.com",
         "geosite:cn",
         "geosite:private",
-        "geosite:category-pt"
+        "geosite:category-pt",
+        "geoip:cn"
     ],
     "nameserver": [
-    "223.5.5.5"
+        "223.5.5.5",
     ],
 };
 
