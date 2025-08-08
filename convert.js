@@ -142,19 +142,18 @@ const dnsConfig = {
     "enable": true,
     "ipv6": ipv6Enabled,
     "prefer-h3": true,
-    "enhanced-mode": "fake-ip",      // 与 mihomo YAML 保持一致
-    "fake-ip-range": "198.20.0.1/16",// 原配置里的 /16 池
-    "fake-ip-filter": [              // 原有过滤列表
+    "enhanced-mode": "fake-ip",
+    "fake-ip-range": "198.20.0.1/16",
+    "fake-ip-filter": [   
         "+.lan",
         "+.local",
         "+.drj028.com",
         "geosite:cn",
         "geosite:private",
         "geosite:apple@cn",
-        "geosite:zoom",
         "geosite:category-pt"
     ],
-    "nameserver": [                  // 主解析服务器
+    "nameserver": [
         "223.5.5.5"
     ],
 };
