@@ -157,11 +157,6 @@ const dnsConfig = {
     "nameserver": [                  // 主解析服务器
         "223.5.5.5"
     ],
-    "nameserver-policy": {           // 特定域名走特定 DNS
-        "+.drj028.com": [
-            "114.114.114.114"
-        ]
-    }
 };
 
 const geoxURL = {
