@@ -142,28 +142,21 @@ const dnsConfig = {
     "enable": true,
     "ipv6": ipv6Enabled,
     "prefer-h3": true,
-    "enhanced-mode": "redir-host",
-    "default-nameserver": [
-        "119.29.29.29",
-        "223.5.5.5",
+    "enhanced-mode": "fake-ip",      // 与 mihomo YAML 保持一致
+    "fake-ip-range": "198.20.0.1/16",// 原配置里的 /16 池
+    "fake-ip-filter": [              // 原有过滤列表
+        "+.lan",
+        "+.local",
+        "+.drj028.com",
+        "geosite:cn",
+        "geosite:private",
+        "geosite:apple@cn",
+        "geosite:zoom",
+        "geosite:category-pt"
     ],
-    "nameserver": [
-        "system",
-        "quic://223.5.5.5",
-        "tls://dot.pub",
-        "tls://dns.alidns.com",
-    ],
-    "fallback": [
-        "quic://dns0.eu",
-        "https://dns.cloudflare.com/dns-query",
-        "https://dns.sb/dns-query",
-        "tcp://208.67.222.222",
-        "tcp://8.26.56.2"
-    ],
-    "proxy-server-nameserver": [
-        "quic://223.5.5.5",
-        "tls://dot.pub",
-    ]
+    "nameserver": [                    // 主解析服务器
+        "223.5.5.5"
+  ],
 };
 
 const geoxURL = {
