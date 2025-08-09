@@ -29,7 +29,7 @@ const defaultSelector = [
     "手动切换", "故障转移", "DIRECT"
 ];
 
-const defaultFallback = [];
+const defaultFallback = ["故障转移"];
 
 const globalProxies = [
     "节点选择", "手动切换", "故障转移", "静态资源", "人工智能", "加密货币", "PayPal", "Telegram", "Microsoft", "Apple", "Google", "YouTube", "Disney", "Netflix", "Spotify", "Twitter(X)", "学术资源", "开发者资源", "游戏平台", "Speedtest", 
@@ -280,9 +280,9 @@ function buildCountryProxyGroups(countryList) {
 
     const countryProxyGroups = [];
 
-    // 为实际存在的国家创建节点组
+    // 为实际存在的地区创建节点组
     for (const country of countryList) {
-        // 确保国家名称在预设的国家配置中存在
+        // 确保地区名称在预设的地区配置中存在
         if (countryRegex[country]) {
             const groupName = `${country}节点`;
             const pattern = countryRegex[country];
@@ -298,6 +298,7 @@ function buildCountryProxyGroups(countryList) {
 
             if (!loadBalance) {
                 Object.assign(groupConfig, {
+                    "url": "https://cp.cloudflare.com/generate_204",
                     "interval": 180,
                     "tolerance": 20,
                     "lazy": false
