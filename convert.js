@@ -66,10 +66,23 @@ const ruleProviders = {
         "interval": 86400,
         "url": "https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/mining.yaml",
         "path": "./ruleset/mining.yaml"
-    }  
+    },
+    "cdn": {
+        "type": "http",
+        "behavior": "classical",
+        "format": "text",
+        "interval": 86400,
+        "url": "https://ruleset.skk.moe/Clash/non_ip/cdn.txt",
+        "path": "./ruleset/cdn.txt"
+    },
 }
 
 const rules = [
+
+
+    "RULE-SET,outlook,全球直连",
+    "RULE-SET,cdn,静态资源",    
+    "RULE-SET,pt,全球直连",    
     "GEOSITE,CATEGORY-PT,全球直连",
     "GEOSITE,PAYPAL@CN,全球直连",
     "GEOSITE,PAYPAL,PayPal",
@@ -90,11 +103,8 @@ const rules = [
     "GEOSITE,CATEGORY-SCHOLAR-!CN,学术资源",
     "GEOSITE,CATEGORY-SCHOLAR-CN,全球直连",
     "GEOSITE,CATEGORY-CRYPTOCURRENCY,加密货币",
-
     "RULE-SET,crypto,加密货币",
-    "RULE-SET,mining,加密货币",
-    "RULE-SET,pt,全球直连",
-    "RULE-SET,outlook,全球直连",
+    "RULE-SET,mining,加密货币",    
 
     "GEOSITE,APPLE@CN,全球直连",
     "GEOSITE,APPLE,Apple",
@@ -334,6 +344,13 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
             "interval": 300,
             "tolerance": 20,
             "lazy": false
+        },
+        {
+            "name": "静态资源",
+            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png",
+            "type": "select",
+            "include-all": true,
+            "proxies": defaultProxies,
         },
         {
             "name": "人工智能",
