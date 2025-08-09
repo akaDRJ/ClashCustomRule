@@ -16,6 +16,7 @@ const loadBalance = parseBool(inArg.loadbalance) || false,
     fullConfig = parseBool(inArg.full) || false,
     enableKeepAlive = parseBool(inArg.keepalive) || false;
 
+
 // 生成默认代理组
 const defaultProxies = [
     "节点选择", "手动切换", "全球直连"
@@ -313,27 +314,27 @@ function buildCountryProxyGroups(countryList) {
 }
 
 function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
-    // 查看是否有特定国家的节点
+    // 查看是否有特定地区的节点
     const hasTW = countryList.includes("台湾");
     const hasHK = countryList.includes("香港");
     const hasUS = countryList.includes("美国");
     return [
         {
             "name": "节点选择",
-            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png",
+            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png",
             "type": "select",
             "proxies": defaultSelector
         },
         (landing) ? {
             "name": "落地节点",
-            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
+            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
             "type": "select",
             "include-all": true,
             "filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
         } : null,
         (landing) ? {
             "name": "前置代理",
-            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png",
+            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png",
             "type": "select",
             "include-all": true,
             "exclude-filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
@@ -341,14 +342,14 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
         } : null,
         (lowCost) ? {
             "name": "低倍率节点",
-            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
+            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
             "type": (loadBalance) ? "load-balance" : "url-test",
             "include-all": true,
             "filter": "(?i)0\.[0-5]|低倍率|省流|大流量|实验性"
         } : null,
         {
             "name": "手动切换",
-            "icon": "https://fastly.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png",
+            "icon": "https://cdn.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png",
             "include-all": true,
             "type": "select"
         },
