@@ -29,6 +29,8 @@ const defaultSelector = [
     "手动切换", "故障转移", "DIRECT"
 ];
 
+const defaultFallback = [];
+
 const globalProxies = [
     "节点选择", "手动切换", "故障转移", "静态资源", "人工智能", "加密货币", "PayPal", "Telegram", "Microsoft", "Apple", "Google", "YouTube", "Disney", "Netflix", "Spotify", "Twitter(X)", "学术资源", "开发者资源", "游戏平台", "Speedtest", 
     "全球直连"
