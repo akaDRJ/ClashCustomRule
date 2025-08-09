@@ -30,7 +30,7 @@ const defaultSelector = [
 ];
 
 const globalProxies = [
-    "节点选择", "手动切换", "自动选择", "人工智能", "加密货币", "PayPal", "Telegram", "Microsoft", "Apple", "Google", "YouTube", "Disney", "Netflix", "Spotify", "Twitter(X)", "学术资源", "开发者资源", "游戏平台", "Speedtest", 
+    "节点选择", "手动切换", "自动选择", "静态资源", "人工智能", "加密货币", "PayPal", "Telegram", "Microsoft", "Apple", "Google", "YouTube", "Disney", "Netflix", "Spotify", "Twitter(X)", "学术资源", "开发者资源", "游戏平台", "Speedtest", 
     "全球直连"
 ];
 
