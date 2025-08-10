@@ -19,7 +19,7 @@ const loadBalance = parseBool(inArg.loadbalance) || false,
 
 // 生成默认代理组
 const defaultProxies = [
-    "节点选择", "手动切换", "全球直连"
+    "节点选择", "自动选择", "手动切换", "全球直连"
 ];
 
 const defaultProxiesDirect = [
@@ -27,7 +27,7 @@ const defaultProxiesDirect = [
 ]
 
 const defaultSelector = [
-    "手动切换", "故障转移", "DIRECT"
+    "自动选择", "手动切换", "DIRECT"
 ];
 
 const globalProxies = [
