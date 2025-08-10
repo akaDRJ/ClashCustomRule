@@ -487,7 +487,7 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
 
 function main(config) {
     // 查看当前有哪些地区的节点
-    const countryList = parseCountries(config);
+    const countryInfo = parseCountries(config);
     const lowCost = hasLowCost(config);
     const countryProxies = [];
 
@@ -497,7 +497,7 @@ function main(config) {
     
     // 修改默认代理组
     const targetCountryList = [];
-    for (const { country, count } of countryList) {
+    for (const { country, count } of countryInfo) {
         if (count > 2) {
             // 仅为节点数大于 2 的地区创建节点组
             const groupName = `${country}节点`;
