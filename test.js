@@ -508,27 +508,29 @@ function main(config) {
     }
 
     if (lowCost) {
+        idx = globalProxies.indexOf("自动选择");
+        globalProxies.splice(idx, 0, "低倍率节点");
         countryProxies.push("低倍率节点");     // 懒得再搞一个低倍率节点组了
     }
 
-    // 将地区代理组插入默认代理组
-    defaultProxies.splice(0, 0, ...countryProxies); // 插入节点选择的后面
-    defaultSelector.splice(1, 0, ...countryProxies); // 在第二个位置插入
+    defaultProxies.splice(1, 0, ...countryProxies);
+    defaultSelector.splice(1, 0, ...countryProxies);
     defaultProxiesDirect.splice(2, 0, ...countryProxies);
 
     // 处理落地
     if (landing) {
-        idx = defaultProxies.indexOf("节点选择");
-        defaultProxies.splice(idx + 1, 0, "落地节点");  //插入到节点选择之后
+        idx = defaultProxies.indexOf("自动选择");
+        defaultProxies.splice(idx, 0, "落地节点");
 
         defaultSelector.unshift("落地节点");
 
-        idx = globalProxies.indexOf("节点选择");
-        globalProxies.splice(idx + 1, 0, ...["落地节点", "前置代理"]);    //插入到节点选择之后
+        idx = globalProxies.indexOf("自动选择");
+        globalProxies.splice(idx, 0, ...["落地节点", "前置代理"]);
     }
-    const countryProxyGroups = buildCountryProxyGroups(targetCountryList);
+    // 生成国家节点组
+    const countryProxyGroups = buildCountryProxyGroups(countryList);
     // 生成代理组
-    const proxyGroups = buildProxyGroups(targetCountryList, countryProxyGroups, lowCost);
+    const proxyGroups = buildProxyGroups(countryList, countryProxyGroups, lowCost);
 
     if (fullConfig) Object.assign(config, {
         "mixed-port": 7890,
