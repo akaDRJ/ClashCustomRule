@@ -512,7 +512,7 @@ function main(config) {
     }
 
     // 将地区代理组插入默认代理组
-    defaultProxies.splice(1, 0, ...countryProxies); // 插入节点选择的后面
+    defaultProxies.splice(0, 0, ...countryProxies); // 插入节点选择的后面
     defaultSelector.splice(1, 0, ...countryProxies); // 在第二个位置插入
     defaultProxiesDirect.splice(2, 0, ...countryProxies);
 
