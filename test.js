@@ -497,7 +497,7 @@ function main(config) {
     
     // 修改默认代理组
     const targetCountryList = [];
-    for (const { country, count } of countryInfo) {
+    for (const { country, count } of countryList) {
         if (count > 2) {
             // 仅为节点数大于 2 的地区创建节点组
             const groupName = `${country}节点`;
