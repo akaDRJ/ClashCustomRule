@@ -30,10 +30,8 @@ const defaultSelector = [
     "手动切换", "故障转移", "DIRECT"
 ];
 
-const defaultFallback = [];
-
 const globalProxies = [
-    "节点选择", "手动切换", "故障转移", "静态资源", "人工智能", "加密货币", "PayPal", "Telegram", "Microsoft", "Apple", "Google", "YouTube", "Disney", "Netflix", "Spotify", "Twitter(X)", "学术资源", "开发者资源", "游戏平台", "Speedtest", 
+    "节点选择", "手动切换", "自动选择", "静态资源", "人工智能", "加密货币", "PayPal", "Telegram", "Microsoft", "Apple", "Google", "YouTube", "Disney", "Netflix", "Spotify", "Twitter(X)", "学术资源", "开发者资源", "游戏平台", "Speedtest", 
     "全球直连"
 ];
 
@@ -354,12 +352,12 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
             "type": "select"
         },
         {
-            "name": "故障转移",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bypass.png",
-            "type": "fallback",
-            "url": "https://cp.cloudflare.com/generate_204",
-            "proxies": defaultFallback,
-            "interval": 180,
+            "name": "自动选择",
+            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png",
+            "type": "url-test",
+            "include-all": true,
+            "exclude-filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
+            "interval": 300,
             "tolerance": 20,
             "lazy": false
         },
@@ -514,7 +512,6 @@ function main(config) {
     }
 
     // 将地区代理组插入默认代理组
-    defaultFallback.splice(0, 0, ...countryProxies);
     defaultProxies.splice(1, 0, ...countryProxies); // 插入节点选择的后面
     defaultSelector.splice(1, 0, ...countryProxies); // 在第二个位置插入
     defaultProxiesDirect.splice(2, 0, ...countryProxies);
@@ -525,7 +522,6 @@ function main(config) {
         defaultProxies.splice(idx + 1, 0, "落地节点");  //插入到节点选择之后
 
         defaultSelector.unshift("落地节点");
-        defaultFallback.unshift("落地节点");
 
         idx = globalProxies.indexOf("节点选择");
         globalProxies.splice(idx + 1, 0, ...["落地节点", "前置代理"]);    //插入到节点选择之后
