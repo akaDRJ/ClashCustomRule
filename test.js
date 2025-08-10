@@ -487,7 +487,7 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
 
 function main(config) {
     // 查看当前有哪些地区的节点
-    const countryInfo = parseCountries(config);
+    const countryList = parseCountries(config);
     const lowCost = hasLowCost(config);
     const countryProxies = [];
 
