@@ -78,66 +78,48 @@ const ruleProviders = {
 }
 
 const rules = [
-  // 1) 精确业务与特化集合（域名类）
   "rule-set,outlook,全球直连",
   "rule-set,cdn,静态资源",
   "rule-set,pt,全球直连",
   "geosite,category-pt,全球直连",
-
-  // 2) 支付与商店，先本地再全球
   "geosite,paypal@cn,全球直连",
-  "geosite,paypal,paypal",
+  "geosite,paypal,PayPal",
   "geosite,google-play@cn,全球直连",
-
-  // 3) 即时通讯与流媒体，先特化子集再母集
-  "geosite,telegram,telegram",
+  "geosite,telegram,Telegram",
+  "geosite,category-ai-chat-!cn,人工智能",
   "geosite,youtube@cn,全球直连",
-  "geosite,youtube,youtube",
-  "geosite,disney,disney",
-  "geosite,netflix,netflix",
-  "geosite,spotify,spotify",
-  "geosite,twitter,twitter(x)",
-  "geosite,ookla-speedtest,speedtest",
-
-  // 4) 开发者与游戏类，子集在前
+  "geosite,youtube,YouTube",
+  "geosite,disney,Disney",
+  "geosite,netflix,Netflix",
+  "geosite,spotify,Spotify",
+  "geosite,twitter,Twitter(X)",
+  "geosite,ookla-speedtest,Speedtest",
   "geosite,category-dev,开发者资源",
   "geosite,category-games@cn,全球直连",
   "geosite,category-game-platforms-download,全球直连",
   "geosite,category-games,游戏平台",
-
-  // 5) 学术类，境外优先于境内直连
   "geosite,category-scholar-!cn,学术资源",
   "geosite,category-scholar-cn,全球直连",
-
-  // 6) 加密货币，先 geosite 再自定义 rule-set
   "geosite,category-cryptocurrency,加密货币",
   "rule-set,crypto,加密货币",
   "rule-set,mining,加密货币",
 
-  // 7) 平台生态，先本地后全球
   "geosite,apple@cn,全球直连",
-  "geosite,apple,apple",
+  "geosite,apple,Apple",
   "geosite,microsoft@cn,全球直连",
-  "geosite,microsoft,microsoft",
-  "geosite,google,google",
-
-  // 8) 国家与私有域直连收口
+  "geosite,microsoft,Microsoft",
+  "geosite,google,Google",
   "geosite,cn,全球直连",
   "geosite,private,全球直连",
 
-  // 9) IP 集合在域名规则之后
-  "geoip,netflix,netflix,no-resolve",
-  "geoip,google,google,no-resolve",
-  "geoip,telegram,telegram,no-resolve",
+  "geoip,netflix,Netflix,no-resolve",
+  "geoip,google,Google,no-resolve",
+  "geoip,telegram,Telegram,no-resolve",
   "geoip,cn,全球直连,no-resolve",
   "geoip,lan,全球直连,no-resolve",
   "geoip,private,全球直连,no-resolve",
-
-  // 10) 兜底
   "match,节点选择"
 ];
-
-
 
 const snifferConfig = {
     "sniff": {
