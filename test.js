@@ -78,50 +78,66 @@ const ruleProviders = {
 }
 
 const rules = [
+  // 1) 精确业务与特化集合（域名类）
+  "rule-set,outlook,全球直连",
+  "rule-set,cdn,静态资源",
+  "rule-set,pt,全球直连",
+  "geosite,category-pt,全球直连",
 
+  // 2) 支付与商店，先本地再全球
+  "geosite,paypal@cn,全球直连",
+  "geosite,paypal,paypal",
+  "geosite,google-play@cn,全球直连",
 
-    "RULE-SET,outlook,全球直连",
-    "RULE-SET,cdn,静态资源",    
-    "RULE-SET,pt,全球直连",    
-    "GEOSITE,CATEGORY-PT,全球直连",
-    "GEOSITE,PAYPAL@CN,全球直连",
-    "GEOSITE,PAYPAL,PayPal",
-    "GEOSITE,GOOGLE-PLAY@CN,全球直连",
-    "GEOSITE,TELEGRAM,Telegram",
-    "GEOSITE,CATEGORY-AI-CHAT-!CN,人工智能",
-    "GEOSITE,YOUTUBE@CN,全球直连",
-    "GEOSITE,YOUTUBE,YouTube",
-    "GEOSITE,DISNEY,Disney",  
-    "GEOSITE,NETFLIX,Netflix",
-    "GEOSITE,SPOTIFY,Spotify",
-    "GEOSITE,TWITTER,Twitter(X)",
-    "GEOSITE,OOKLA-SPEEDTEST,Speedtest",
-    "GEOSITE,CATEGORY-DEV,开发者资源",
-    "GEOSITE,CATEGORY-GAMES@CN,全球直连",
-    "GEOSITE,CATEGORY-GAME-PLATFORMS-DOWNLOAD,全球直连",
-    "GEOSITE,CATEGORY-GAMES,游戏平台",
-    "GEOSITE,CATEGORY-SCHOLAR-!CN,学术资源",
-    "GEOSITE,CATEGORY-SCHOLAR-CN,全球直连",
-    "GEOSITE,CATEGORY-CRYPTOCURRENCY,加密货币",
-    "RULE-SET,crypto,加密货币",
-    "RULE-SET,mining,加密货币",    
+  // 3) 即时通讯与流媒体，先特化子集再母集
+  "geosite,telegram,telegram",
+  "geosite,youtube@cn,全球直连",
+  "geosite,youtube,youtube",
+  "geosite,disney,disney",
+  "geosite,netflix,netflix",
+  "geosite,spotify,spotify",
+  "geosite,twitter,twitter(x)",
+  "geosite,ookla-speedtest,speedtest",
 
-    "GEOSITE,APPLE@CN,全球直连",
-    "GEOSITE,APPLE,Apple",
-    "GEOSITE,MICROSOFT@CN,全球直连",
-    "GEOSITE,MICROSOFT,Microsoft",
-    "GEOSITE,GOOGLE,Google",
-    "GEOSITE,CN,全球直连",
-    "GEOSITE,PRIVATE,全球直连",
-    
-    "GEOIP,NETFLIX,Netflix,no-resolve",
-    "GEOIP,GOOGLE,Google,no-resolve",
-    "GEOIP,TELEGRAM,Telegram,no-resolve",
-    "GEOIP,CN,全球直连,no-resolve",
-    "GEOIP,LAN,全球直连,no-resolve",
-    "GEOIP,PRIVATE,全球直连,no-resolve",
-    "MATCH,节点选择"
+  // 4) 开发者与游戏类，子集在前
+  "geosite,category-dev,开发者资源",
+  "geosite,category-games@cn,全球直连",
+  "geosite,category-game-platforms-download,全球直连",
+  "geosite,category-games,游戏平台",
+
+  // 5) 学术类，境外优先于境内直连
+  "geosite,category-scholar-!cn,学术资源",
+  "geosite,category-scholar-cn,全球直连",
+
+  // 6) 加密货币，先 geosite 再自定义 rule-set
+  "geosite,category-cryptocurrency,加密货币",
+  "rule-set,crypto,加密货币",
+  "rule-set,mining,加密货币",
+
+  // 7) 平台生态，先本地后全球
+  "geosite,apple@cn,全球直连",
+  "geosite,apple,apple",
+  "geosite,microsoft@cn,全球直连",
+  "geosite,microsoft,microsoft",
+  "geosite,google,google",
+
+  // 8) 国家与私有域直连收口
+  "geosite,cn,全球直连",
+  "geosite,private,全球直连",
+
+  // 9) IP 集合在域名规则之后
+  "geoip,netflix,netflix,no-resolve",
+  "geoip,google,google,no-resolve",
+  "geoip,telegram,telegram,no-resolve",
+  "geoip,cn,全球直连,no-resolve",
+  "geoip,lan,全球直连,no-resolve",
+  "geoip,private,全球直连,no-resolve",
+
+  // 10) 兜底
+  "match,节点选择"
 ];
+
+
 
 const snifferConfig = {
     "sniff": {
