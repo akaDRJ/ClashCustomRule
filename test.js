@@ -1,19 +1,25 @@
-/* powerfullz 的 Substore 订阅转换脚本（优雅整合版） */
+/*
+powerfullz 的 Substore 订阅转换脚本（无智能兜底版）
+要点：
+- 去掉“智能低倍率兜底”功能，不做任何回填
+- 国家组恒定仅排除家宽/落地等 ISP 关键词
+- 规则关键字与集合标识统一小写；第三段保留策略组名大小写
+- 克隆基础数组避免多次运行污染；统一 ICON/Geo 源；正则工具化
+*/
+
+// ===== 运行参数 =====
 const inArg = $arguments || {};
-const loadBalance = parseBool(inArg.loadbalance) || false;
-const landing = parseBool(inArg.landing) || false;
-const ipv6Enabled = parseBool(inArg.ipv6) || false;
-const fullConfig = parseBool(inArg.full) || false;
+const loadBalance     = parseBool(inArg.loadbalance) || false;
+const landing         = parseBool(inArg.landing) || false;
+const ipv6Enabled     = parseBool(inArg.ipv6) || false;
+const fullConfig      = parseBool(inArg.full) || false;
 const enableKeepAlive = parseBool(inArg.keepalive) || false;
 
-// 智能低倍率兜底（国家组仅有低倍率时也保留它们）；不想要就保持 false
-const SMART_LOW_COST_FALLBACK = false;
-
 // ===== 基础数组（只读基线，运行时克隆） =====
-const defaultProxiesBase = Object.freeze(['节点选择','自动选择','手动切换','全球直连']);
+const defaultProxiesBase       = Object.freeze(['节点选择','自动选择','手动切换','全球直连']);
 const defaultProxiesDirectBase = Object.freeze(['全球直连','节点选择','手动切换']);
-const defaultSelectorBase = Object.freeze(['自动选择','手动切换','DIRECT']);
-const globalProxiesBase = Object.freeze([
+const defaultSelectorBase      = Object.freeze(['自动选择','手动切换','DIRECT']);
+const globalProxiesBase        = Object.freeze([
   '节点选择','手动切换','自动选择','静态资源','人工智能','加密货币','PayPal','Telegram',
   'Microsoft','Apple','Google','YouTube','Disney','Netflix','Spotify','Twitter(X)',
   '学术资源','开发者资源','游戏平台','Speedtest','全球直连'
@@ -185,23 +191,16 @@ function parseCountries(config){
   return res;
 }
 
-// ===== 国家组 =====
+// ===== 国家组（无智能兜底，固定排除 ISP/落地） =====
 function buildCountryProxyGroups(countryList, config){
-  const proxies = config.proxies || [];
   const groups = [];
   for(const c of countryList){
     if(!countryRegex[c]) continue;
     const pat = countryRegex[c];
-    const jsPattern = makeRegex(pat);
-    const hasNonLow = SMART_LOW_COST_FALLBACK
-      ? proxies.some(x => jsPattern.test(x.name||'') && !isIspName(x.name||'') && !isLowCostName(x.name||''))
-      : true;
-    const excl = SMART_LOW_COST_FALLBACK && !hasNonLow
-      ? '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地'
-      : '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地';
     const g = {
       name: `${c}节点`, icon: countryIconURLs[c],
-      'include-all': true, filter: pat, 'exclude-filter': excl,
+      'include-all': true, filter: pat,
+      'exclude-filter': '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地',
       type: loadBalance ? 'load-balance' : 'url-test'
     };
     if(!loadBalance) Object.assign(g,{ interval: 300, tolerance: 20, lazy: false });
