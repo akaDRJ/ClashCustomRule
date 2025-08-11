@@ -1,8 +1,8 @@
 /*
-powerfullz 的 Substore 订阅转换脚本（全声明式版，含直连）
+powerfullz 的 Substore 订阅转换脚本（全声明式版，无权重，含直连）
 特性：
-- 所有策略组与直连规则都由 FEATURE_GROUPS 声明式生成（规则与分组三联动）
-- 第一、二段强制小写；第三段保留策略组名大小写（你的强迫症命名继续活着）
+- 所有策略组与直连规则都由 FEATURE_GROUPS 顺序生成（谁在前面，谁先生成）
+- 第一、二段强制小写；第三段保留策略组名大小写
 - rule-providers 工厂函数；数组克隆防污染；统一 ICON/CDN；正则工具化
 */
 
@@ -37,85 +37,83 @@ const ruleProviders = {
 const defaultProxiesBase       = Object.freeze(['节点选择','自动选择','手动切换','全球直连']);
 const defaultProxiesDirectBase = Object.freeze(['全球直连','节点选择','手动切换']);
 const defaultSelectorBase      = Object.freeze(['自动选择','手动切换','DIRECT']);
-const globalProxiesBase        = Object.freeze(['节点选择','手动切换','自动选择','全球直连']); // 其他由 FEATURE_GROUPS 注入
+const globalProxiesBase        = Object.freeze(['节点选择','手动切换','自动选择','全球直连']); // 其余由 FEATURE_GROUPS 注入
 
-// ===== 声明式目录：增删只改这里 =====
-// createProxyGroup: false 表示只生成规则，不创建可选分组（直连类就用这个）
+// ===== 声明式目录：按写的顺序生成（enabled=false 即可临时关闭） =====
+// createProxyGroup: false 表示只生成规则，不创建可选分组（直连类就这样）
 // proxiesOverride: 为特定分组改用自定义候选（默认用 defaultProxies）
 const FEATURE_GROUPS = [
   // 1) 精确业务与特化集合
-  { key:'outlook', name:'全球直连', icon:'Direct.png', enabled:true, order:10, createProxyGroup:false,
+  { key:'outlook', name:'全球直连', icon:'Direct.png', enabled:true, createProxyGroup:false,
     ruleEntries:[ ['rule-set','outlook','全球直连'] ] },
-  { key:'cdn', name:'静态资源', icon:'Cloudflare.png', enabled:true, order:11, createProxyGroup:true,
+  { key:'cdn', name:'静态资源', icon:'Cloudflare.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['rule-set','cdn','静态资源'] ] },
-  { key:'pt', name:'全球直连', icon:'Direct.png', enabled:true, order:12, createProxyGroup:false,
+  { key:'pt', name:'全球直连', icon:'Direct.png', enabled:true, createProxyGroup:false,
     ruleEntries:[ ['rule-set','pt','全球直连'], ['geosite','category-pt','全球直连'] ] },
 
   // 2) 支付与商店
-  { key:'paypal-cn', name:'全球直连', icon:'Direct.png', enabled:true, order:20, createProxyGroup:false,
+  { key:'paypal-cn', name:'全球直连', icon:'Direct.png', enabled:true, createProxyGroup:false,
     ruleEntries:[ ['geosite','paypal@cn','全球直连'] ] },
-  { key:'paypal', name:'PayPal', icon:'PayPal.png', enabled:true, order:21, createProxyGroup:true,
+  { key:'paypal', name:'PayPal', icon:'PayPal.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','paypal','PayPal'] ] },
-  { key:'gplay-cn', name:'全球直连', icon:'Direct.png', enabled:true, order:22, createProxyGroup:false,
+  { key:'gplay-cn', name:'全球直连', icon:'Direct.png', enabled:true, createProxyGroup:false,
     ruleEntries:[ ['geosite','google-play@cn','全球直连'] ] },
 
-  // 3) 通讯与流媒体
-  { key:'telegram', name:'Telegram', icon:'Telegram.png', enabled:true, order:30, createProxyGroup:true,
+  // 3) 通讯与流媒体（AI 放在 Telegram 之后、YouTube 之前）
+  { key:'telegram', name:'Telegram', icon:'Telegram.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','telegram','Telegram'], ['geoip','telegram','Telegram','no-resolve'] ] },
-  { key:'youtube', name:'YouTube', icon:'YouTube.png', enabled:true, order:31, createProxyGroup:true,
+  { key:'ai', name:'人工智能', icon:'Bot.png', enabled:true, createProxyGroup:true,
+    ruleEntries:[ ['geosite','category-ai-chat-!cn','人工智能'] ] },
+  { key:'youtube', name:'YouTube', icon:'YouTube.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','youtube@cn','全球直连'], ['geosite','youtube','YouTube'] ] },
-  { key:'disney', name:'Disney', icon:'Disney+.png', enabled:true, order:32, createProxyGroup:true,
+  { key:'disney', name:'Disney', icon:'Disney+.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','disney','Disney'] ] },
-  { key:'netflix', name:'Netflix', icon:'Netflix.png', enabled:true, order:33, createProxyGroup:true,
+  { key:'netflix', name:'Netflix', icon:'Netflix.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','netflix','Netflix'], ['geoip','netflix','Netflix','no-resolve'] ] },
-  { key:'spotify', name:'Spotify', icon:'Spotify.png', enabled:true, order:34, createProxyGroup:true,
+  { key:'spotify', name:'Spotify', icon:'Spotify.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','spotify','Spotify'] ] },
-  { key:'twitter', name:'Twitter(X)', icon:'Twitter.png', enabled:true, order:35, createProxyGroup:true,
+  { key:'twitter', name:'Twitter(X)', icon:'Twitter.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','twitter','Twitter(X)'] ] },
-  { key:'speedtest', name:'Speedtest', icon:'Speedtest.png', enabled:true, order:36, createProxyGroup:true,
+  { key:'speedtest', name:'Speedtest', icon:'Speedtest.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','ookla-speedtest','Speedtest'] ] },
 
   // 4) 开发者与游戏
-  { key:'dev', name:'开发者资源', icon:'GitHub.png', enabled:true, order:40, createProxyGroup:true,
+  { key:'dev', name:'开发者资源', icon:'GitHub.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','category-dev','开发者资源'] ] },
-  { key:'game-cn', name:'全球直连', icon:'Direct.png', enabled:true, order:41, createProxyGroup:false,
+  { key:'game-cn', name:'全球直连', icon:'Direct.png', enabled:true, createProxyGroup:false,
     ruleEntries:[ ['geosite','category-games@cn','全球直连'], ['geosite','category-game-platforms-download','全球直连'] ] },
-  { key:'games', name:'游戏平台', icon:'Game.png', enabled:true, order:42, createProxyGroup:true,
+  { key:'games', name:'游戏平台', icon:'Game.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','category-games','游戏平台'] ] },
 
   // 5) 学术
-  { key:'scholar-foreign', name:'学术资源', icon:'Scholar.png', enabled:true, order:50, createProxyGroup:true,
+  { key:'scholar-foreign', name:'学术资源', icon:'Scholar.png', enabled:true, createProxyGroup:true,
     proxiesOverride:['节点选择','手动切换','全球直连'],
     ruleEntries:[ ['geosite','category-scholar-!cn','学术资源'] ] },
-  { key:'scholar-cn', name:'全球直连', icon:'Direct.png', enabled:true, order:51, createProxyGroup:false,
+  { key:'scholar-cn', name:'全球直连', icon:'Direct.png', enabled:true, createProxyGroup:false,
     ruleEntries:[ ['geosite','category-scholar-cn','全球直连'] ] },
 
   // 6) 加密货币
-  { key:'crypto', name:'加密货币', icon:'Cryptocurrency_3.png', enabled:true, order:60, createProxyGroup:true,
+  { key:'crypto', name:'加密货币', icon:'Cryptocurrency_3.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','category-cryptocurrency','加密货币'], ['rule-set','crypto','加密货币'], ['rule-set','mining','加密货币'] ] },
 
   // 7) 平台生态
-  { key:'apple', name:'Apple', icon:'Apple_2.png', enabled:true, order:70, createProxyGroup:true,
+  { key:'apple', name:'Apple', icon:'Apple_2.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','apple@cn','全球直连'], ['geosite','apple','Apple'] ] },
-  { key:'microsoft', name:'Microsoft', icon:'Microsoft.png', enabled:true, order:71, createProxyGroup:true,
+  { key:'microsoft', name:'Microsoft', icon:'Microsoft.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','microsoft@cn','全球直连'], ['geosite','microsoft','Microsoft'] ] },
-  { key:'google', name:'Google', icon:'Google_Search.png', enabled:true, order:72, createProxyGroup:true,
+  { key:'google', name:'Google', icon:'Google_Search.png', enabled:true, createProxyGroup:true,
     ruleEntries:[ ['geosite','google','Google'], ['geoip','google','Google','no-resolve'] ] },
 
   // 8) 国家与私有域直连
-  { key:'cn-domains', name:'全球直连', icon:'Direct.png', enabled:true, order:80, createProxyGroup:false,
+  { key:'cn-domains', name:'全球直连', icon:'Direct.png', enabled:true, createProxyGroup:false,
     ruleEntries:[ ['geosite','cn','全球直连'], ['geosite','private','全球直连'] ] },
-  { key:'cn-ip', name:'全球直连', icon:'Direct.png', enabled:true, order:81, createProxyGroup:false,
+  { key:'cn-ip', name:'全球直连', icon:'Direct.png', enabled:true, createProxyGroup:false,
     ruleEntries:[ ['geoip','cn','全球直连','no-resolve'], ['geoip','lan','全球直连','no-resolve'], ['geoip','private','全球直连','no-resolve'] ] },
-
-  // 9) 人工智能（放在最后一段的前面，权重自行调）
-  { key:'ai', name:'人工智能', icon:'Bot.png', enabled:true, order:37, createProxyGroup:true,
-    ruleEntries:[ ['geosite','category-ai-chat-!cn','人工智能'] ] },
 ];
 
-// ===== 动态生成：规则、分组、GLOBAL 注入 =====
+// ===== 动态生成：规则、分组、GLOBAL 注入（按数组顺序） =====
 function buildFeatureRules() {
-  const on = FEATURE_GROUPS.filter(g=>g.enabled).sort((a,b)=>a.order-b.order);
+  const on = FEATURE_GROUPS.filter(g=>g.enabled);
   const out = [];
   for (const g of on) {
     for (const r of g.ruleEntries) {
@@ -128,7 +126,7 @@ function buildFeatureRules() {
   return out;
 }
 function buildFeatureProxyGroups(defaultProxies){
-  const on = FEATURE_GROUPS.filter(g=>g.enabled && g.createProxyGroup).sort((a,b)=>a.order-b.order);
+  const on = FEATURE_GROUPS.filter(g=>g.enabled && g.createProxyGroup);
   return on.map(g => ({
     name: g.name,
     icon: ICON(g.icon),
@@ -137,7 +135,7 @@ function buildFeatureProxyGroups(defaultProxies){
   }));
 }
 function extendGlobalProxies(globalProxies){
-  const on = FEATURE_GROUPS.filter(g=>g.enabled && g.createProxyGroup).sort((a,b)=>a.order-b.order);
+  const on = FEATURE_GROUPS.filter(g=>g.enabled && g.createProxyGroup);
   for (const g of on) if (!globalProxies.includes(g.name)) insertAfter(globalProxies,'手动切换',g.name);
 }
 
@@ -193,12 +191,10 @@ const snifferConfig = { sniff:{ TLS:{ports:[443,8443],'override-destination':tru
 const dnsConfigBase = { enable:true, ipv6:ipv6Enabled, 'prefer-h3':true, 'enhanced-mode':'fake-ip', 'fake-ip-range':'198.20.0.1/16', 'fake-ip-filter':['+.lan','+.local','+.drj028.com','geosite:cn','geosite:private','geosite:apple@cn','geosite:category-pt'], nameserver:['223.5.5.5'] };
 const geoxURL = { geoip:`${CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat`, geosite:`${CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat`, mmdb:`${CDN}/gh/Loyalsoldier/geoip@release/Country.mmdb`, asn:`${CDN}/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb` };
 
-// ===== 规则拼装：固定极少量前置（若需要），其余全来自 FEATURE_GROUPS =====
+// ===== 规则拼装：由目录产出 + 末尾 match 固定 =====
 function buildRules() {
-  // 这里不再硬编码一长串；直接由目录产出
   const list = buildFeatureRules();
-  // 最后的兜底不可动
-  list.push('match,节点选择');
+  list.push('match,节点选择'); // 兜底，别动
   return list;
 }
 
@@ -206,7 +202,7 @@ function buildRules() {
 function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
   const { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies } = defaults;
 
-  // 扩展 GLOBAL 候选
+  // 扩展 GLOBAL 候选（按目录顺序注入）
   extendGlobalProxies(globalProxies);
 
   // 国家组名注入候选
@@ -224,17 +220,16 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
   defaultSelector.splice(1,0,...countryProxies);
   defaultProxiesDirect.splice(2,0,...countryProxies);
 
-  // 落地链路
   const groups = [
     { name:'节点选择', icon:ICON('Proxy.png'), type:'select', proxies: defaultSelector },
     landing ? { name:'落地节点', icon:ICON('Airport.png'), type:'select', 'include-all':true, filter:'(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地' } : null,
     landing ? { name:'前置代理', icon:ICON('Area.png'), type:'select', 'include-all':true, 'exclude-filter':'(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地', proxies: defaultSelector } : null,
-    (configHasLowCost() ? { name:'低倍率节点', icon:ICON('Lab.png'), type: loadBalance ? 'load-balance' : 'url-test', 'include-all':true, filter:'(?i)0\\.[0-5]|低倍率|省流|大流量|实验性' } : null),
+    lowCost ? { name:'低倍率节点', icon:ICON('Lab.png'), type: loadBalance ? 'load-balance' : 'url-test', 'include-all':true, filter:'(?i)0\\.[0-5]|低倍率|省流|大流量|实验性' } : null,
 
-    // 静态资源固定放前，以免母集抢路由
+    // 静态资源放前以免母集抢路由
     { name:'静态资源', icon:ICON('Cloudflare.png'), type:'select', proxies: defaultProxies },
 
-    // 声明式的业务分组
+    // 声明式业务分组（按目录顺序）
     ...buildFeatureProxyGroups(defaultProxies),
 
     // 直连、国家组与 GLOBAL
@@ -245,7 +240,6 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
 
   return groups;
 }
-function configHasLowCost(){ return false; /* 低倍率分组是否出现交给上层 lowCost 判定，这里关掉主动检测 */ }
 
 // ===== 主入口 =====
 function main(config){
