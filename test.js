@@ -1,4 +1,38 @@
-/*
+/* ==========================================================================
+ Sub-Store 转换脚本（可读性与可维护性增强版）
+ ---------------------------------------------------------------------------
+ 目的：
+   1) 根据机场提供的节点名称自动识别国家/地区，并生成对应分组；
+   2) 提供清晰的可编辑入口（正则/分组策略/开关）；
+   3) 防止误判导致的“空分组”，并在生成后自动清理空组。
+
+ 核心工作流（概览）：
+   [1] 扫描 config.proxies 里的节点名
+   [2] 按 countryRegex 的正则表命中国家清单
+   [3] 按命中的国家清单调用 buildProxyGroups 构造分组
+   [4] 运行 cleanEmptyGroups 删除没节点可用的空分组，并清空无效引用
+
+ 快速上手：
+   - 修改或新增国家识别：编辑 countryRegex（见下）；
+   - 新增关键字分组：在 buildProxyGroups 中扩展规则；
+   - 成品里不想出现空组：保留 cleanEmptyGroups（默认已启用）。
+
+ 正则书写约定：
+   - 使用 (?i) 表示忽略大小写；
+   - 对于两字母/三字母代码（如 UK/GB/GBR），必须加单词边界：\\bUK\\b；
+   - 对于英文多词，如 United Kingdom、Great Britain，空格写成 \\s* 以提升兼容性；
+   - 城市名是强信号（如 London），谨慎添加，避免因“落地”“回程”类字样误判。
+
+ 常见坑位：
+   - “UK” 极易误伤（JP-UK、US-UK、解锁UK），已在本脚本中**收紧为单词边界**；
+   - “US” 会被 “AUS” 误触，若有需要可将 US 也改为 \\bUS\\b（权衡容错率）。
+
+ 调试建议：
+   - 可临时在 main 里 console.log(countryList, proxyGroups) 查看效果；
+   - 如果机场实际无某国节点，但名称里带有该国字样，请优先收紧对应正则。
+
+ 本文件仅优化注释与结构性说明，算法与默认输出保持与原版一致。
+ ========================================================================== */\n\n/*
 powerfullz 的 Substore 订阅转换脚本
 https://github.com/powerfullz/override-rules
 传入参数：
@@ -174,6 +208,16 @@ const geoxURL = {
     "mmdb": "https://fastly.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb",
     "asn": "https://fastly.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
 };
+// ---------------------------------------------------------------------------
+// 国家识别表（Country Regex Map）
+// 规则：键为中文国家名；值为正则（字符串）。
+// 建议写法：
+//   - 使用 (?i) 忽略大小写；
+//   - 城市名尽量精确，避免与“落地”“回程”“解锁”之类混淆；
+//   - 两字母/三字母代码加单词边界（例如 \bUK\b、\bGB\b、\bGBR\b）；
+// 扩展：在此新增条目即可自动参与识别与分组生成。
+// ---------------------------------------------------------------------------
+
 
 const countryRegex = {
     "香港": "(?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong",
@@ -184,7 +228,7 @@ const countryRegex = {
     "韩国": "(?i)KR|Korea|KOR|首尔|韩|韓",
     "美国": "(?i)美国|美|US|United States",
     "加拿大": "(?i)加拿大|Canada|CA",
-    "英国": "(?i)(英国|United\s*Kingdom|伦敦|London|\bUK\b|\bGB\b|\bGBR\b|Great\s*Britain)",
+    "英国": "(?i)(英国|United\s*Kingdom|伦敦|London|\bUK\b|\bGB\b|\bGBR\b|Great\s*Britain)",  // 英国规则加固：使用 \bUK\b/\bGB\b/\bGBR\b，避免误判
     "澳大利亚": "(?i)澳洲|澳大利亚|AU|Australia",
     "德国": "(?i)德国|德|DE|Germany",
     "法国": "(?i)法国|法|FR|France",
@@ -294,6 +338,18 @@ function buildCountryProxyGroups(countryList) {
 
     return countryProxyGroups;
 }
+/**
+ * 构建国家/地区分组以及其他策略分组
+ * @param {string[]} countryList 识别到的国家清单（来自 countryRegex 命中）
+ * @param {Object<string,any>} countryProxyGroups 国家分组模板/规则
+ * @param {boolean} lowCost 是否启用低成本策略（若你有相关逻辑）
+ * @returns {Array<Object>} 按 Sub-Store schema 输出的 proxy-groups 数组
+ *
+ * 编辑入口：
+ *   - 想新增“关键字分组”“地区合集分组”，在此函数中扩展模板。
+ *   - 想改变分组显示名称、图标、筛选器，改模板即可，其他逻辑无需改动。
+ */
+
 
 function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
     // 查看是否有特定国家的节点
@@ -470,6 +526,16 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
 }
 
 
+/** 
+ * 清理空分组并修复跨组引用
+ * 处理逻辑：
+ *   1) 检查每个分组是否能匹配到至少一个节点；
+ *   2) 删除匹配不到任何节点的分组；
+ *   3) 对剩余分组，移除对“已删除分组”或“无此节点”的引用；
+ *   4) 如因引用清理导致某分组为空，再次删除之。
+ * 安全性：
+ *   - 对于无法解析的 filter 正则，默认保留该组（避免误删）。
+ */
 function cleanEmptyGroups(config, proxyGroups) {
     const proxies = Array.isArray(config && config.proxies) ? config.proxies : [];
     const proxyNameSet = new Set(proxies.map(p => p && p.name).filter(Boolean));
@@ -539,9 +605,19 @@ function cleanEmptyGroups(config, proxyGroups) {
 }
 
 
+/**
+ * 入口函数
+ * 你最常编辑的地方：
+ *   - countryRegex：国家识别词典（新增/微调匹配词）
+ *   - buildProxyGroups：分组模板与生成逻辑（新增合集、排序、图标）
+ *   - cleanEmptyGroups：保持成品干净（不需要改，除非你要改清理策略）
+ */
 function main(config) {
     // 查看当前有哪些国家的节点
     const countryList = parseCountries(config);
+// 成本策略的开关/阈值等可调参数（按需）
+// 例：将低倍率节点单独分组或优先级提升
+
     const lowCost = hasLowCost(config);
     const countryProxies = [];
     
