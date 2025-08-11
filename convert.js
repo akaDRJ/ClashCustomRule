@@ -74,15 +74,7 @@ const ruleProviders = {
         "interval": 86400,
         "url": "https://ruleset.skk.moe/Clash/non_ip/cdn.txt",
         "path": "./ruleset/cdn.txt"
-    },
-    "fakeip-filter": {
-        "type": "http",
-        "behavior": "domain",
-        "format": "mrs",
-        "interval": 86400,
-        "url": "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs",
-        "path": "./ruleset/fakeip-filter.mrs"
-    },    
+    },   
 }
 
 const rules = [
@@ -163,12 +155,13 @@ const dnsConfig = {
     "enhanced-mode": "fake-ip",
     "fake-ip-range": "198.20.0.1/16",
     "fake-ip-filter": [   
+        "+.lan",
+        "+.local",
         "+.drj028.com",
         "geosite:cn",
         "geosite:private",
         "geosite:apple@cn",
-        "geosite:category-pt"
-        "rule-set:fakeip-filter"        
+        "geosite:category-pt"       
     ],
     "nameserver": [
         "223.5.5.5"
