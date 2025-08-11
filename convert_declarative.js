@@ -109,7 +109,7 @@ const FEATURE_GROUPS = [
     ruleEntries:[ ['geoip','cn','全球直连','no-resolve'], ['geoip','lan','全球直连','no-resolve'], ['geoip','private','全球直连','no-resolve'] ] },
 
   // 9) 人工智能（放在最后一段的前面，权重自行调）
-  { key:'ai', name:'人工智能', icon:'Bot.png', enabled:true, order:90, createProxyGroup:true,
+  { key:'ai', name:'人工智能', icon:'Bot.png', enabled:true, order:37, createProxyGroup:true,
     ruleEntries:[ ['geosite','category-ai-chat-!cn','人工智能'] ] },
 ];
 
