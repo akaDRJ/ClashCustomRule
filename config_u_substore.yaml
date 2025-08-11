@@ -66,6 +66,7 @@ default: &default
     - DIRECT
     - Select
     - Smart
+    - Landing
     - HK Fallback
     - TW Fallback
     - SG Fallback
@@ -110,15 +111,20 @@ proxy-groups:
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Proxy.png
     type: select
     include-all: true
-    filter: "^((?!(直连|拒绝)).)*$"
 
   - name: Smart
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Auto.png
     type: url-test
     include-all: true
     interval: 300
-    filter: "^((?!(直连|拒绝)).)*$"
 
+  - name: Landing
+    icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Airport.png
+    type: url-test
+    include-all: true
+    interval: 300
+    filter: "(?=.*落地).*$"
+  
   # 香港组
   - name: HK Fallback
     icon: https://raw.github.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png
@@ -155,7 +161,7 @@ proxy-groups:
     type: url-test
     include-all: true
     interval: 300
-    filter: "(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
+    filter: "filter: "^(?!.*台湾落地)(?=.*(广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan)).*$"
 
   # 新加坡组
   - name: SG Fallback
