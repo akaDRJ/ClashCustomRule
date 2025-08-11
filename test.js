@@ -16,7 +16,6 @@ const loadBalance = parseBool(inArg.loadbalance) || false,
     fullConfig = parseBool(inArg.full) || false,
     enableKeepAlive = parseBool(inArg.keepalive) || false;
 
-
 // 生成默认代理组
 const defaultProxies = [
     "节点选择", "自动选择", "手动切换", "全球直连"
@@ -75,7 +74,7 @@ const ruleProviders = {
         "interval": 86400,
         "url": "https://ruleset.skk.moe/Clash/non_ip/cdn.txt",
         "path": "./ruleset/cdn.txt"
-    },
+    },  
 }
 
 const rules = [
@@ -185,7 +184,7 @@ const countryRegex = {
     "韩国": "(?i)KR|Korea|KOR|首尔|韩|韓",
     "美国": "(?i)美国|美|US|United States",
     "加拿大": "(?i)加拿大|Canada|CA",
-    "英国": "(?i)英国|United Kingdom|UK|伦敦|London",
+    "英国": "(?i)(英国|United\s*Kingdom|伦敦|London|\bUK\b|\bGB\b|\bGBR\b|Great\s*Britain)",
     "澳大利亚": "(?i)澳洲|澳大利亚|AU|Australia",
     "德国": "(?i)德国|德|DE|Germany",
     "法国": "(?i)法国|法|FR|France",
@@ -216,44 +215,30 @@ function hasLowCost(config) {
 }
 
 function parseCountries(config) {
-    const proxies = config.proxies || [];
-    const ispRegex = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;   // 需要排除的关键字
+    const proxies = config["proxies"];
+    const ispRegex = new RegExp(/家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/, 'i');    // 排除落地节点
+    const result = [];
+    const seen = new Set(); // 用于去重
 
-    // 用来累计各国节点数
-    const countryCounts = Object.create(null);
-
-    // 构建地区正则表达式，去掉 (?i) 前缀
-    const compiledRegex = {};
     for (const [country, pattern] of Object.entries(countryRegex)) {
-        compiledRegex[country] = new RegExp(
+        // 创建正则表达式（去掉 (?i) 前缀并添加 'i' 标志）
+        const regex = new RegExp(
             pattern.replace(/^\(\?i\)/, ''),
             'i'
         );
-    }
 
-    // 逐个节点进行匹配与统计
-    for (const proxy of proxies) {
-        const name = proxy.name || '';
-
-        // 过滤掉不想统计的 ISP 节点
-        if (ispRegex.test(name)) continue;
-
-        // 找到第一个匹配到的地区就计数并终止本轮
-        for (const [country, regex] of Object.entries(compiledRegex)) {
-            if (regex.test(name)) {
-                countryCounts[country] = (countryCounts[country] || 0) + 1;
-                break;    // 避免一个节点同时累计到多个地区
+        for (const proxy of proxies) {
+            const name = proxy.name;
+            if (regex.test(name) && !ispRegex.test(name)) {
+                // 防止重复添加国家名称
+                if (!seen.has(country)) {
+                    seen.add(country);
+                    result.push(country);
+                }
             }
         }
     }
-
-    // 将结果对象转成数组形式
-    const result = [];
-    for (const [country, count] of Object.entries(countryCounts)) {
-        result.push({ country, count });
-    }
-
-    return result;   // [{ country: 'Japan', count: 12 }, ...]
+    return result;
 }
 
 function buildCountryProxyGroups(countryList) {
@@ -279,9 +264,9 @@ function buildCountryProxyGroups(countryList) {
 
     const countryProxyGroups = [];
 
-    // 为实际存在的地区创建节点组
+    // 为实际存在的国家创建节点组
     for (const country of countryList) {
-        // 确保地区名称在预设的地区配置中存在
+        // 确保国家名称在预设的国家配置中存在
         if (countryRegex[country]) {
             const groupName = `${country}节点`;
             const pattern = countryRegex[country];
@@ -297,8 +282,7 @@ function buildCountryProxyGroups(countryList) {
 
             if (!loadBalance) {
                 Object.assign(groupConfig, {
-                    "url": "https://cp.cloudflare.com/generate_204",
-                    "interval": 180,
+                    "interval": 300,
                     "tolerance": 20,
                     "lazy": false
                 });
@@ -312,27 +296,27 @@ function buildCountryProxyGroups(countryList) {
 }
 
 function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
-    // 查看是否有特定地区的节点
+    // 查看是否有特定国家的节点
     const hasTW = countryList.includes("台湾");
     const hasHK = countryList.includes("香港");
     const hasUS = countryList.includes("美国");
     return [
         {
             "name": "节点选择",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png",
+            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png",
             "type": "select",
             "proxies": defaultSelector
         },
         (landing) ? {
             "name": "落地节点",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
+            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
             "type": "select",
             "include-all": true,
             "filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
         } : null,
         (landing) ? {
             "name": "前置代理",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png",
+            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Area.png",
             "type": "select",
             "include-all": true,
             "exclude-filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
@@ -340,14 +324,14 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
         } : null,
         (lowCost) ? {
             "name": "低倍率节点",
-            "icon": "https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
+            "icon": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png",
             "type": (loadBalance) ? "load-balance" : "url-test",
             "include-all": true,
             "filter": "(?i)0\.[0-5]|低倍率|省流|大流量|实验性"
         } : null,
         {
             "name": "手动切换",
-            "icon": "https://cdn.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png",
+            "icon": "https://fastly.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png",
             "include-all": true,
             "type": "select"
         },
@@ -485,26 +469,87 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost) {
     ].filter(Boolean); // 过滤掉 null 值
 }
 
+
+function cleanEmptyGroups(config, proxyGroups) {
+    const proxies = Array.isArray(config && config.proxies) ? config.proxies : [];
+    const proxyNameSet = new Set(proxies.map(p => p && p.name).filter(Boolean));
+
+    function matchesAny(group) {
+        // If explicit proxies array exists, check length after filtering invalid refs
+        if (Array.isArray(group.proxies)) {
+            const kept = group.proxies.filter(x => {
+                if (typeof x !== 'string') return true;
+                if (x === 'DIRECT' || x === 'REJECT' || x === '自动选择') return true;
+                // keep if refers to a real proxy (node) or will be another group name (we'll validate later)
+                return proxyNameSet.has(x);
+            });
+            return kept.length > 0;
+        }
+        // If it's an include-all+filter style group, evaluate the filter against node names
+        if (group["include-all"] && group["filter"]) {
+            try {
+                const pat = String(group["filter"]).replace(/^\(\?i\)/, '');
+                const regex = new RegExp(pat, 'i');
+                let ex = null;
+                if (group["exclude-filter"]) {
+                    const exPat = String(group["exclude-filter"]).replace(/^\(\?i\)/, '');
+                    ex = new RegExp(exPat, 'i');
+                }
+                return proxies.some(p => {
+                    const name = p && p.name || "";
+                    return regex.test(name) && !(ex && ex.test(name));
+                });
+            } catch (e) {
+                // In doubt, keep the group to avoid over-deletion
+                return true;
+            }
+        }
+        return true;
+    }
+
+    // First pass: drop groups that have zero matches/nodes
+    let keptGroups = proxyGroups.filter(g => matchesAny(g));
+
+    // Build set of remaining group names for cross-ref cleanup
+    const keptGroupNameSet = new Set(keptGroups.map(g => g && g.name).filter(Boolean));
+
+    // Second pass: for groups with proxies arrays, remove references to dropped groups or non-existent nodes
+    keptGroups = keptGroups.map(g => {
+        if (Array.isArray(g.proxies)) {
+            const newList = g.proxies.filter(x => {
+                if (typeof x !== 'string') return true;
+                if (x === 'DIRECT' || x === 'REJECT' || x === '自动选择') return true;
+                // keep if it's an existing group name
+                if (keptGroupNameSet.has(x)) return true;
+                // or a real node name
+                return proxyNameSet.has(x);
+            });
+            return Object.assign({}, g, { proxies: Array.from(new Set(newList)) });
+        }
+        return g;
+    });
+
+    // Final pass: remove any groups that became empty after reference cleanup
+    keptGroups = keptGroups.filter(g => {
+        if (Array.isArray(g.proxies)) return g.proxies.length > 0;
+        return true;
+    });
+
+    return keptGroups;
+}
+
+
 function main(config) {
-    // 查看当前有哪些地区的节点
-    const countryInfo = parseCountries(config);
+    // 查看当前有哪些国家的节点
+    const countryList = parseCountries(config);
     const lowCost = hasLowCost(config);
     const countryProxies = [];
-
-    if (lowCost) {
-        globalProxies.push("低倍率节点");     // 懒得再搞一个低倍率节点组了
-    }
     
     // 修改默认代理组
-    const targetCountryList = [];
-    for (const { country, count } of countryInfo) {
-        if (count > 2) {
-            // 仅为节点数大于 2 的地区创建节点组
-            const groupName = `${country}节点`;
-            globalProxies.push(groupName);
-            countryProxies.push(groupName);
-            targetCountryList.push(country);
-        }
+    for (const country of countryList) {
+        const groupName = `${country}节点`;
+        globalProxies.push(groupName);
+        countryProxies.push(groupName);
     }
 
     if (lowCost) {
@@ -531,7 +576,7 @@ function main(config) {
     const countryProxyGroups = buildCountryProxyGroups(countryList);
     // 生成代理组
     const proxyGroups = buildProxyGroups(countryList, countryProxyGroups, lowCost);
-
+    const proxyGroupsCleaned = cleanEmptyGroups(config, proxyGroups);
     if (fullConfig) Object.assign(config, {
         "mixed-port": 7890,
         "redir-port": 7892,
@@ -553,7 +598,7 @@ function main(config) {
     });
 
     Object.assign(config, {
-        "proxy-groups": proxyGroups,
+        "proxy-groups": proxyGroupsCleaned,
         "rule-providers": ruleProviders,
         "rules": rules,
         "sniffer": snifferConfig,
