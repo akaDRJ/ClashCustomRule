@@ -184,7 +184,7 @@ const countryRegex = {
     "韩国": "(?i)KR|Korea|KOR|首尔|韩|韓",
     "美国": "(?i)美国|美|US|United States",
     "加拿大": "(?i)加拿大|Canada|CA",
-    "英国": "(?i)(英国|United\\s*Kingdom|伦敦|London|\\bUK\\b|\\bGB\\b|\\bGBR\\b|Great\\s*Britain)",
+    "英国": "(?i)英国|United Kingdom|UK|伦敦|London",
     "澳大利亚": "(?i)澳洲|澳大利亚|AU|Australia",
     "德国": "(?i)德国|德|DE|Germany",
     "法国": "(?i)法国|法|FR|France",
@@ -276,7 +276,7 @@ function buildCountryProxyGroups(countryList) {
                 "icon": countryIconURLs[country],
                 "include-all": true,
                 "filter": pattern,
-                "exclude-filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地|0\.[0-5]|低倍率|省流|大流量|实验性",
+                "exclude-filter": "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地",
                 "type": (loadBalance) ? "load-balance" : "url-test",
             };
 
