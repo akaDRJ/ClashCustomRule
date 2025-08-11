@@ -238,7 +238,7 @@ const countryRegex = {
     "韩国": "(?i)KR|Korea|KOR|首尔|韩|韓",
     "美国": "(?i)美国|美|US|United States",
     "加拿大": "(?i)加拿大|Canada|CA",
-    "英国": "(?i)(英国|United\s*Kingdom|伦敦|London|\bUK\b|\bGB\b|\bGBR\b|Great\s*Britain)",  // 英国规则加固：使用 \bUK\b/\bGB\b/\bGBR\b，避免误判
+    "英国": "(?i)(英国|United\\s*Kingdom|伦敦|London|\\bUK\\b|\\bGB\\b|\\bGBR\\b|Great\\s*Britain)",  // 英国规则加固：使用 \bUK\b/\bGB\b/\bGBR\b，避免误判
     "澳大利亚": "(?i)澳洲|澳大利亚|AU|Australia",
     "德国": "(?i)德国|德|DE|Germany",
     "法国": "(?i)法国|法|FR|France",
