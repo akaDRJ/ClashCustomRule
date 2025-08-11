@@ -1,9 +1,11 @@
 /*
-powerfullz 的 Substore 订阅转换脚本（全声明式版，无权重，含直连）
-特性：
-- 所有策略组与直连规则都由 FEATURE_GROUPS 顺序生成（谁在前面，谁先生成）
-- 第一、二段强制小写；第三段保留策略组名大小写
-- rule-providers 工厂函数；数组克隆防污染；统一 ICON/CDN；正则工具化
+powerfullz 的 Substore 订阅转换脚本（全声明式版，无权重，含直连；已清除共性问题）
+共性问题已处理：
+- 去除“静态资源”手写重复，避免 duplicate group name（仅由 FEATURE_GROUPS 生成）
+- 统一大小写：规则前两段小写，第三段保留策略组名大小写
+- rule-providers 与所有使用到的 rule-set 一一对应
+- 克隆数组防污染；按 FEATURE_GROUPS 顺序生成；match 固定压轴
+- 国家组仅排除家宽/落地，不做智能兜底；低倍率只作为独立组（出现与否由节点名决定）
 */
 
 const inArg = $arguments || {};
@@ -208,7 +210,7 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
   // 国家组名注入候选
   const countryProxies = [];
   for (const c of countryList) {
-    const gname = `${c}节点`;
+    const gname = `${c}节点`
     if (!globalProxies.includes(gname)) globalProxies.push(gname);
     countryProxies.push(gname);
   }
@@ -225,9 +227,6 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
     landing ? { name:'落地节点', icon:ICON('Airport.png'), type:'select', 'include-all':true, filter:'(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地' } : null,
     landing ? { name:'前置代理', icon:ICON('Area.png'), type:'select', 'include-all':true, 'exclude-filter':'(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地', proxies: defaultSelector } : null,
     lowCost ? { name:'低倍率节点', icon:ICON('Lab.png'), type: loadBalance ? 'load-balance' : 'url-test', 'include-all':true, filter:'(?i)0\\.[0-5]|低倍率|省流|大流量|实验性' } : null,
-
-    // 静态资源放前以免母集抢路由
-    { name:'静态资源', icon:ICON('Cloudflare.png'), type:'select', proxies: defaultProxies },
 
     // 声明式业务分组（按目录顺序）
     ...buildFeatureProxyGroups(defaultProxies),
