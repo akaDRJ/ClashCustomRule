@@ -234,7 +234,7 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
     landing ? { name:'落地节点', icon:ICON('Airport.png'), type:'select', 'include-all':true, filter:'(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地' } : null,
     landing ? { name:'前置代理', icon:ICON('Area.png'), type:'select', 'include-all':true, 'exclude-filter':'(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地', proxies: defaultSelector } : null,
     lowCost ? { name:'低倍率节点', icon:ICON('Lab.png'), type: loadBalance ? 'load-balance' : 'url-test', 'include-all':true, filter:'(?i)0\\.[0-5]|低倍率|省流|大流量|实验性' } : null,
-    { name:'手动切换', icon:'https://fastly.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/select.png', 'include-all':true, type:'select' },
+    { name:'手动切换', icon:ICON('Proxy.png'), 'include-all':true, type:'select' },
     { name:'自动选择', icon:ICON('Auto.png'), type:'url-test', 'include-all':true, 'exclude-filter':'(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地', interval:300, tolerance:20, lazy:false },
     { name:'静态资源', icon:ICON('Cloudflare.png'), type:'select', proxies: defaultProxies },
     { name:'人工智能', icon:ICON('Bot.png'), type:'select', proxies: defaultProxies },
