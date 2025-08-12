@@ -20,7 +20,7 @@ const defaultProxiesBase       = Object.freeze(['节点选择','自动选择','�
 const defaultProxiesDirectBase = Object.freeze(['全球直连','节点选择','手动切换']);
 const defaultSelectorBase      = Object.freeze(['自动选择','手动切换','DIRECT']);
 const globalProxiesBase        = Object.freeze([
-  '节点选择','手动切换','自动选择','静态资源','人工智能','加密货币','PayPal','Telegram',
+  '节点选择','手动切换','自动选择','强制代理','静态资源','人工智能','加密货币','PayPal','Telegram',
   'Microsoft','Apple','Google','YouTube','Disney','Netflix','Spotify','Twitter(X)',
   '学术资源','开发者资源','游戏平台','Speedtest','全球直连'
 ]);
@@ -29,6 +29,7 @@ const globalProxiesBase        = Object.freeze([
 const rules = [
   'rule-set,outlook,全球直连',
   'rule-set,cdn,静态资源',
+  'rule-set,forceproxy,强制代理',
   'rule-set,pt,全球直连',
   'geosite,category-pt,全球直连',
   'geosite,paypal@cn,全球直连',
@@ -98,6 +99,7 @@ const ruleProviders = {
   pt:      yamlProvider('pt',      'akaDRJ/ClashCustomRule/master/pt.yaml'),
   crypto:  yamlProvider('crypto',  'akaDRJ/ClashCustomRule/master/crypto.yaml'),
   mining:  yamlProvider('mining',  'akaDRJ/ClashCustomRule/master/mining.yaml'),
+  forceproxy: yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
   cdn:     textProvider('cdn',     'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
@@ -233,6 +235,7 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
     lowCost ? { name: '低倍率节点', icon: ICON('Lab.png'), type: loadBalance ? 'load-balance' : 'url-test', 'include-all': true, filter: '(?i)0\\.[0-5]|低倍率|省流|大流量|实验性' } : null,
     { name: '手动切换', icon: ICON('Proxy.png'), 'include-all': true, type: 'select' },
     { name: '自动选择', icon: ICON('Auto.png'), type: 'url-test', 'include-all': true, 'exclude-filter': '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地', interval: 300, tolerance: 20, lazy: false },
+    { name: '强制代理', icon: ICON('Proxy.png'), type: 'select', proxies: ['节点选择','手动切换','全球直连'] },
     { name: '静态资源', icon: ICON('Cloudflare.png'), type: 'select', proxies: defaultProxies },
     { name: '人工智能', icon: ICON('Bot.png'), type: 'select', proxies: defaultProxies },
     { name: '加密货币', icon: ICON('Cryptocurrency_3.png'), type: 'select', proxies: defaultProxies },
