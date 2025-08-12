@@ -21,7 +21,6 @@ const SMART_LOW_COST_FALLBACK = false;
 
 // ===== 基础数组 =====
 const defaultProxiesBase = Object.freeze(['节点选择','自动选择','手动切换','全球直连']);
-const defaultProxiesDirectBase = Object.freeze(['全球直连','节点选择','手动切换']);
 const defaultSelectorBase = Object.freeze(['自动选择','手动切换','DIRECT']);
 const globalProxiesBase = Object.freeze([
   '节点选择','手动切换','自动选择','静态资源','人工智能','加密货币','PayPal','Telegram',
@@ -167,21 +166,45 @@ const countryIconURLs = {
 };
 
 // ===== 工具 =====
-function parseBool(v){ if(typeof v==='boolean')return v; if(typeof v==='string')return v.toLowerCase()==='true'||v==='1'; return false; }
-function makeRegex(p){ return new RegExp(String(p).replace(/^\(\?i\)/,''),'i'); }
-function isLowCostName(n){ return /0\.[0-5]|低倍率|省流|大流量|实验性/i.test(n); }
-function isIspName(n){ return /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i.test(n); }
-function insertAfter(arr, target, item){ const i = arr.indexOf(target); if(i>=0) arr.splice(i+1,0,item); else arr.push(item); }
+function parseBool(v) {
+  if (typeof v === 'boolean') return v;
+  if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
+  return false;
+}
+
+function makeRegex(p) {
+  return new RegExp(String(p).replace(/^\(\?i\)/, ''), 'i');
+}
+
+function isLowCostName(n) {
+  return /0\.[0-5]|低倍率|省流|大流量|实验性/i.test(n);
+}
+
+function isIspName(n) {
+  return /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i.test(n);
+}
+
+// Insert item after target; return true when insertion succeeds
+function insertAfter(arr, target, item) {
+  const i = arr.indexOf(target);
+  if (i < 0) return false;
+  arr.splice(i + 1, 0, item);
+  return true;
+}
 
 // ===== 国家解析 =====
 function parseCountries(config){
   const proxies = config.proxies || [];
   const res = [], seen = new Set();
-  for(const [c, pat] of Object.entries(countryRegex)){
+  for (const [c, pat] of Object.entries(countryRegex)) {
     const r = makeRegex(pat);
-    for(const p of proxies){
+    for (const p of proxies) {
       const n = p.name || '';
-      if(r.test(n) && !isIspName(n) && !seen.has(c)){ seen.add(c); res.push(c); }
+      if (r.test(n) && !isIspName(n) && !seen.has(c)) {
+        seen.add(c);
+        res.push(c);
+        break; // found a match; no need to continue scanning
+      }
     }
   }
   return res;
@@ -213,21 +236,31 @@ function buildCountryProxyGroups(countryList, config){
 }
 
 // ===== 代理组 =====
-function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
-  const { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies } = defaults;
+function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults) {
+  const { defaultProxies, defaultSelector, globalProxies } = defaults;
   const countryProxies = [];
   for(const c of countryList){
     const g = `${c}节点`; globalProxies.push(g); countryProxies.push(g);
   }
-  if(lowCost){ insertAfter(globalProxies,'自动选择','低倍率节点'); countryProxies.push('低倍率节点'); }
-  defaultProxies.splice(1,0,...countryProxies);
-  defaultSelector.splice(1,0,...countryProxies);
-  defaultProxiesDirect.splice(2,0,...countryProxies);
-  if(landing){
-    insertAfter(defaultProxies,'自动选择','落地节点');
+  if (lowCost) {
+    if (!insertAfter(globalProxies, '自动选择', '低倍率节点')) {
+      globalProxies.push('低倍率节点');
+    }
+    countryProxies.push('低倍率节点');
+  }
+  defaultProxies.splice(1, 0, ...countryProxies);
+  defaultSelector.splice(1, 0, ...countryProxies);
+  if (landing) {
+    if (!insertAfter(defaultProxies, '自动选择', '落地节点')) {
+      defaultProxies.push('落地节点');
+    }
     defaultSelector.unshift('落地节点');
-    insertAfter(globalProxies,'自动选择','落地节点');
-    insertAfter(globalProxies,'落地节点','前置代理');
+    if (!insertAfter(globalProxies, '自动选择', '落地节点')) {
+      globalProxies.push('落地节点');
+    }
+    if (!insertAfter(globalProxies, '落地节点', '前置代理')) {
+      globalProxies.push('前置代理');
+    }
   }
   const groups = [
     { name:'节点选择', icon:ICON('Proxy.png'), type:'select', proxies: defaultSelector },
@@ -264,7 +297,6 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults){
 function main(config){
   const defaultProxies = [...defaultProxiesBase];
   const defaultSelector = [...defaultSelectorBase];
-  const defaultProxiesDirect = [...defaultProxiesDirectBase];
   const globalProxies = [...globalProxiesBase];
   const dnsConfig = { ...dnsConfigBase, ipv6: ipv6Enabled };
 
@@ -272,7 +304,7 @@ function main(config){
   const lowCost = (config.proxies||[]).some(p => isLowCostName(p.name||''));
   const countryProxyGroups = buildCountryProxyGroups(countryList, config);
   const proxyGroups = buildProxyGroups(countryList, countryProxyGroups, lowCost, {
-    defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies
+    defaultProxies, defaultSelector, globalProxies
   });
 
   if(fullConfig){
@@ -296,3 +328,5 @@ function main(config){
   });
   return config;
 }
+
+module.exports = main;
