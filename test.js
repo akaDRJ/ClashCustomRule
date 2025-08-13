@@ -95,12 +95,12 @@ function textProvider(name, hostPath) {
   };
 }
 const ruleProviders = {
-  outlook: yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
-  pt:      yamlProvider('pt',      'akaDRJ/ClashCustomRule/master/pt.yaml'),
-  crypto:  yamlProvider('crypto',  'akaDRJ/ClashCustomRule/master/crypto.yaml'),
-  mining:  yamlProvider('mining',  'akaDRJ/ClashCustomRule/master/mining.yaml'),
+  outlook:    yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
+  pt:         yamlProvider('pt',      'akaDRJ/ClashCustomRule/master/pt.yaml'),
+  crypto:     yamlProvider('crypto',  'akaDRJ/ClashCustomRule/master/crypto.yaml'),
+  mining:     yamlProvider('mining',  'akaDRJ/ClashCustomRule/master/mining.yaml'),
   forceproxy: yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
-  cdn:     textProvider('cdn',     'ruleset.skk.moe/Clash/non_ip/cdn.txt')
+  cdn:        textProvider('cdn',     'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
 // ===== 其余配置 =====
