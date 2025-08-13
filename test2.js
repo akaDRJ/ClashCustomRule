@@ -257,10 +257,10 @@ function buildCountryProxyGroups(countryList, config) {
     const g = {
       name: `${c}节点`,
       icon: countryIconURLs[c],
+      type: loadBalance ? 'load-balance' : 'url-test',
       'include-all': true,
       filter: pat,
-      'exclude-filter': '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地',
-      type: loadBalance ? 'load-balance' : 'url-test'
+      'exclude-filter': '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地'
     };
 
     if (!loadBalance) {
@@ -306,7 +306,12 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults) {
   }
 
   const groups = [
-    { name: '节点选择', icon: ICON('Proxy.png'), type: 'select', proxies: defaultSelector },
+    {
+      name: '节点选择',
+      icon: ICON('Proxy.png'),
+      type: 'select',
+      proxies: defaultSelector
+    },
 
     landing
       ? {
@@ -339,7 +344,12 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults) {
         }
       : null,
 
-    { name: '手动切换', icon: ICON('Proxy.png'), 'include-all': true, type: 'select' },
+    {
+      name: '手动切换',
+      icon: ICON('Proxy.png'),
+      type: 'select',
+      'include-all': true
+    },
 
     {
       name: '自动选择',
@@ -352,31 +362,148 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults) {
       lazy: false
     },
 
-    { name: '强制代理', icon: ICON('Proxy.png'), type: 'select', proxies: ['节点选择', '手动切换', '全球直连'] },
-    { name: '静态资源', icon: ICON('Cloudflare.png'), type: 'select', proxies: defaultProxies },
-    { name: '人工智能', icon: ICON('Bot.png'), type: 'select', proxies: defaultProxies },
-    { name: '加密货币', icon: ICON('Cryptocurrency_3.png'), type: 'select', proxies: defaultProxies },
-    { name: 'PayPal', icon: ICON('PayPal.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Telegram', icon: ICON('Telegram.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Microsoft', icon: ICON('Microsoft.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Apple', icon: ICON('Apple_2.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Google', icon: ICON('Google_Search.png'), type: 'select', proxies: defaultProxies },
-    { name: 'YouTube', icon: ICON('YouTube.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Disney', icon: ICON('Disney+.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Netflix', icon: ICON('Netflix.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Spotify', icon: ICON('Spotify.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Twitter(X)', icon: ICON('Twitter.png'), type: 'select', proxies: defaultProxies },
+    {
+      name: '强制代理',
+      icon: ICON('Proxy.png'),
+      type: 'select',
+      proxies: ['节点选择', '手动切换', '全球直连']
+    },
 
-    { name: '学术资源', icon: ICON('Scholar.png'), type: 'select', proxies: ['节点选择', '手动切换', '全球直连'] },
-    { name: '开发者资源', icon: ICON('GitHub.png'), type: 'select', proxies: defaultProxies },
-    { name: '游戏平台', icon: ICON('Game.png'), type: 'select', proxies: defaultProxies },
-    { name: 'Speedtest', icon: ICON('Speedtest.png'), type: 'select', proxies: defaultProxies },
+    {
+      name: '静态资源',
+      icon: ICON('Cloudflare.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
 
-    { name: '全球直连', icon: ICON('Direct.png'), type: 'select', proxies: ['DIRECT', '节点选择'] },
+    {
+      name: '人工智能',
+      icon: ICON('Bot.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: '加密货币',
+      icon: ICON('Cryptocurrency_3.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'PayPal',
+      icon: ICON('PayPal.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Telegram',
+      icon: ICON('Telegram.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Microsoft',
+      icon: ICON('Microsoft.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Apple',
+      icon: ICON('Apple_2.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Google',
+      icon: ICON('Google_Search.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'YouTube',
+      icon: ICON('YouTube.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Disney',
+      icon: ICON('Disney+.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Netflix',
+      icon: ICON('Netflix.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Spotify',
+      icon: ICON('Spotify.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Twitter(X)',
+      icon: ICON('Twitter.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: '学术资源',
+      icon: ICON('Scholar.png'),
+      type: 'select',
+      proxies: ['节点选择', '手动切换', '全球直连']
+    },
+
+    {
+      name: '开发者资源',
+      icon: ICON('GitHub.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: '游戏平台',
+      icon: ICON('Game.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: 'Speedtest',
+      icon: ICON('Speedtest.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+
+    {
+      name: '全球直连',
+      icon: ICON('Direct.png'),
+      type: 'select',
+      proxies: ['DIRECT', '节点选择']
+    },
 
     ...countryProxyGroups,
 
-    { name: 'GLOBAL', icon: ICON('Global.png'), 'include-all': true, type: 'select', proxies: globalProxies }
+    {
+      name: 'GLOBAL',
+      icon: ICON('Global.png'),
+      type: 'select',
+      'include-all': true,
+      proxies: globalProxies
+    }
   ].filter(Boolean);
 
   return groups;
