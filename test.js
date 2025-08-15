@@ -147,7 +147,7 @@ const dnsConfigBase = {
   'fake-ip-filter': [
     '*.lan',
     '*.local',
-    '+.drj028.com',
+    '*.drj028.com',
     'geosite:cn',
     'geosite:private',
     'geosite:apple@cn',
