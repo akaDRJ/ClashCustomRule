@@ -49,6 +49,7 @@ const globalProxiesBase = Object.freeze([
 const rules = [
   'rule-set,outlook,全球直连',
   'rule-set,cdn,静态资源',
+  'rule-set,forcedirect,全球直连',  
   'rule-set,forceproxy,强制代理',
   'rule-set,pt,全球直连',
   'geosite,category-pt,全球直连',
@@ -122,6 +123,7 @@ const ruleProviders = {
   crypto:     yamlProvider('crypto', 'akaDRJ/ClashCustomRule/master/crypto.yaml'),
   mining:     yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
   forceproxy: yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
+  forcedirect:yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
   cdn:        textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
