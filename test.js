@@ -92,7 +92,7 @@ const rules = [
 ];
 
 // ======================= 统一资源与图标 =======================
-const CDN = 'https://fastly.jsdelivr.net';
+const CDN = 'https://cdn.jsdelivr.net';
 const ICON = (p) => `${CDN}/gh/Koolson/Qure@master/IconSet/Color/${p}`;
 
 // ================= rule-providers（工厂） =================
