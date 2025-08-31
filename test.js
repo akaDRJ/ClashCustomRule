@@ -66,6 +66,7 @@ const rules = [
   'geosite,ookla-speedtest,Speedtest',
   'geosite,category-dev,开发者资源',
   'geosite,category-ai-chat-!cn,人工智能',
+  'geosite,steam@cn,全球直连',  
   'geosite,category-games@cn,全球直连',
   'geosite,category-game-platforms-download,全球直连',
   'geosite,category-games,游戏平台',
