@@ -53,6 +53,7 @@ const rules = [
   'rule-set,cdn,静态资源',
   'rule-set,pt,全球直连',
   'geosite,category-pt,全球直连',
+  'geosite,googlefcm,全球直连',
   'geosite,google-play@cn,全球直连',
   'geosite,youtube@cn,全球直连',
   'geosite,youtube,YouTube',
