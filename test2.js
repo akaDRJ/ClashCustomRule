@@ -47,39 +47,43 @@ const globalProxiesBase = Object.freeze([
 
 // ============== 规则（第一二段小写，第三段保留） ==============
 const rules = [
+  'rule-set,forcedirect,全球直连',
+  'rule-set,forceproxy,强制代理',
   'rule-set,outlook,全球直连',
   'rule-set,cdn,静态资源',
-  'rule-set,forceproxy,强制代理',
   'rule-set,pt,全球直连',
   'geosite,category-pt,全球直连',
-  'geosite,paypal@cn,全球直连',
-  'geosite,paypal,PayPal',
   'geosite,google-play@cn,全球直连',
-  'geosite,telegram,Telegram',
-  'geosite,category-ai-chat-!cn,人工智能',
   'geosite,youtube@cn,全球直连',
   'geosite,youtube,YouTube',
+  'geosite,paypal@cn,全球直连',
+  'geosite,paypal,PayPal',
+  'geosite,telegram,Telegram',
   'geosite,disney,Disney',
   'geosite,netflix,Netflix',
   'geosite,spotify,Spotify',
   'geosite,twitter,Twitter(X)',
   'geosite,ookla-speedtest,Speedtest',
   'geosite,category-dev,开发者资源',
+  'geosite,category-ai-chat-!cn,人工智能',
+  'geosite,steam@cn,全球直连',  
   'geosite,category-games@cn,全球直连',
   'geosite,category-game-platforms-download,全球直连',
   'geosite,category-games,游戏平台',
-  'geosite,category-scholar-!cn,学术资源',
   'geosite,category-scholar-cn,全球直连',
-  'geosite,category-cryptocurrency,加密货币',
+  'geosite,category-scholar-!cn,学术资源',
   'rule-set,crypto,加密货币',
   'rule-set,mining,加密货币',
+  'geosite,category-cryptocurrency,加密货币',
   'geosite,apple@cn,全球直连',
   'geosite,apple,Apple',
   'geosite,microsoft@cn,全球直连',
   'geosite,microsoft,Microsoft',
   'geosite,google,Google',
   'geosite,cn,全球直连',
+  'rule-set,cnsite,全球直连'
   'geosite,private,全球直连',
+
   'geoip,netflix,Netflix,no-resolve',
   'geoip,google,Google,no-resolve',
   'geoip,telegram,Telegram,no-resolve',
@@ -90,7 +94,7 @@ const rules = [
 ];
 
 // ======================= 统一资源与图标 =======================
-const CDN = 'https://fastly.jsdelivr.net';
+const CDN = 'https://cdn.jsdelivr.net';
 const ICON = (p) => `${CDN}/gh/Koolson/Qure@master/IconSet/Color/${p}`;
 
 // ================= rule-providers（工厂） =================
@@ -102,6 +106,17 @@ function yamlProvider(name, repoPath) {
     interval: 86400,
     url: `https://raw.githubusercontent.com/${repoPath}`,
     path: `./ruleset/${name}.yaml`
+  };
+}
+
+function mrsProvider(name, repoPath) {
+  return {
+    type: 'http',
+    behavior: 'domain',
+    format: 'mrs',
+    interval: 86400,
+    url: `https://raw.githubusercontent.com/${repoPath}`,
+    path: `./ruleset/${name}.mrs`
   };
 }
 
@@ -117,12 +132,15 @@ function textProvider(name, hostPath) {
 }
 
 const ruleProviders = {
-  outlook:    yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
-  pt:         yamlProvider('pt', 'akaDRJ/ClashCustomRule/master/pt.yaml'),
-  crypto:     yamlProvider('crypto', 'akaDRJ/ClashCustomRule/master/crypto.yaml'),
-  mining:     yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
-  forceproxy: yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
-  cdn:        textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
+  outlook:       yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
+  pt:            yamlProvider('pt', 'akaDRJ/ClashCustomRule/master/pt.yaml'),
+  crypto:        yamlProvider('crypto', 'akaDRJ/ClashCustomRule/master/crypto.yaml'),
+  mining:        yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
+  forceproxy:    yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
+  forcedirect:   yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
+  fakeip-filter: mrsProvider('fakeip-filter', 'DustinWin/ruleset_geodata/fakeip-filter.mrs'),
+  cnsite:        mrsProvider('cnsite', 'DustinWin/ruleset_geodata/cn.mrs'),
+  cdn:           textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
 // ======================== 其余配置 ========================
@@ -147,11 +165,11 @@ const dnsConfigBase = {
   'fake-ip-filter': [
     '*.lan',
     '*.local',
-    '+.drj028.com',
+    '*.drj028.com',
     'geosite:cn',
     'geosite:private',
     'geosite:apple@cn',
-    'geosite:category-pt'
+    'geosite:category-pt'    
   ],
   nameserver: ['223.5.5.5']
 };
