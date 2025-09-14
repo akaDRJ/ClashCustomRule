@@ -81,7 +81,7 @@ const rules = [
   'geosite,microsoft,Microsoft',
   'geosite,google,Google',
   'geosite,cn,全球直连',
-  'rule-set,cnsite,全球直连'
+  'rule-set,cnsite,全球直连',
   'geosite,private,全球直连',
 
   'geoip,netflix,Netflix,no-resolve',
