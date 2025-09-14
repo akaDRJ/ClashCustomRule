@@ -81,7 +81,7 @@ const rules = [
   'geosite,microsoft,Microsoft',
   'geosite,google,Google',
   'geosite,cn,全球直连',
-  'rule-set,cn,全球直连'
+  'rule-set,cnsite,全球直连'
   'geosite,private,全球直连',
 
   'geoip,netflix,Netflix,no-resolve',
@@ -132,14 +132,14 @@ function textProvider(name, hostPath) {
 }
 
 const ruleProviders = {
-  outlook:    yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
-  pt:         yamlProvider('pt', 'akaDRJ/ClashCustomRule/master/pt.yaml'),
-  crypto:     yamlProvider('crypto', 'akaDRJ/ClashCustomRule/master/crypto.yaml'),
-  mining:     yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
-  forceproxy: yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
-  forcedirect:yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
-  fakeip:     mrsProvider('fakeip', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'),
-  cn:         mrsProvider('cn', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'),
+  outlook:       yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
+  pt:            yamlProvider('pt', 'akaDRJ/ClashCustomRule/master/pt.yaml'),
+  crypto:        yamlProvider('crypto', 'akaDRJ/ClashCustomRule/master/crypto.yaml'),
+  mining:        yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
+  forceproxy:    yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
+  forcedirect:   yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
+  fakeip-filter: mrsProvider('fakeip', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'),
+  cnsite:         mrsProvider('cn', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'),
   cdn:        textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
@@ -167,11 +167,11 @@ const dnsConfigBase = {
     '*.local',
     '*.drj028.com',
     'geosite:cn',
-    'rule-set:cn',
+    'rule-set:cnsite',
     'geosite:private',
     'geosite:apple@cn',
     'geosite:category-pt',
-    'rule-set:fakeip'
+    'rule-set:fakeip-filter'
     
   ],
   nameserver: ['223.5.5.5']
