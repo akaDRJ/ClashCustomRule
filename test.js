@@ -139,8 +139,8 @@ const ruleProviders = {
   forceproxy:    yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
   forcedirect:   yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
   fakeip-filter: mrsProvider('fakeip-filter', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'),
-  cnsite:         mrsProvider('cnsite', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'),
-  cdn:        textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
+  cnsite:        mrsProvider('cnsite', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'),
+  cdn:           textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
 // ======================== 其余配置 ========================
