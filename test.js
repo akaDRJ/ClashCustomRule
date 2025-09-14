@@ -167,12 +167,9 @@ const dnsConfigBase = {
     '*.local',
     '*.drj028.com',
     'geosite:cn',
-    'rule-set:cnsite',
     'geosite:private',
     'geosite:apple@cn',
-    'geosite:category-pt',
-    'rule-set:fakeip-filter'
-    
+    'geosite:category-pt'    
   ],
   nameserver: ['223.5.5.5']
 };
