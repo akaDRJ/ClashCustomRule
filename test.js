@@ -81,6 +81,7 @@ const rules = [
   'geosite,microsoft,Microsoft',
   'geosite,google,Google',
   'geosite,cn,全球直连',
+  'rule-set,cnsite,全球直连',
   'geosite,private,全球直连',
 
   'geoip,netflix,Netflix,no-resolve',
@@ -108,6 +109,17 @@ function yamlProvider(name, repoPath) {
   };
 }
 
+function mrsProvider(name, repoPath) {
+  return {
+    type: 'http',
+    behavior: 'domain',
+    format: 'mrs',
+    interval: 86400,
+    url: `https://raw.githubusercontent.com/${repoPath}`,
+    path: `./ruleset/${name}.mrs`
+  };
+}
+
 function textProvider(name, hostPath) {
   return {
     type: 'http',
@@ -126,6 +138,8 @@ const ruleProviders = {
   mining:        yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
   forceproxy:    yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
   forcedirect:   yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
+  fakeipfilter: mrsProvider('fakeipfilter', 'DustinWin/ruleset_geodata/fakeip-filter.mrs'),
+  cnsite:        mrsProvider('cnsite', 'DustinWin/ruleset_geodata/cn.mrs'),
   cdn:           textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
@@ -149,13 +163,10 @@ const dnsConfigBase = {
   'enhanced-mode': 'fake-ip',
   'fake-ip-range': '198.20.0.1/16',
   'fake-ip-filter': [
-    '*.lan',
-    '*.local',
-    '*.drj028.com',
+    '+.drj028.com',
     'geosite:cn',
-    'geosite:private',
-    'geosite:apple@cn',
-    'geosite:category-pt'    
+    'rule-set:cnsite',
+    'rule-set:fakeipfilter'
   ],
   nameserver: ['223.5.5.5']
 };
