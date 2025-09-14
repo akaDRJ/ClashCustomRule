@@ -163,13 +163,10 @@ const dnsConfigBase = {
   'enhanced-mode': 'fake-ip',
   'fake-ip-range': '198.20.0.1/16',
   'fake-ip-filter': [
-    '*.lan',
-    '*.local',
-    '*.drj028.com',
+    '+.drj028.com',
     'geosite:cn',
-    'geosite:private',
-    'geosite:apple@cn',
-    'geosite:category-pt'    
+    'rule-set:cnsite',
+    'rule-set:fakeipfilter'
   ],
   nameserver: ['223.5.5.5']
 };
