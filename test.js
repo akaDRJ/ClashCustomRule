@@ -40,6 +40,7 @@ const globalProxiesBase = Object.freeze([
   'Twitter(X)',
   '学术资源',
   '开发者资源',
+  '游戏下载',
   '游戏平台',
   'Speedtest',
   '全球直连'
@@ -68,7 +69,7 @@ const rules = [
   'geosite,category-ai-chat-!cn,人工智能',
   'geosite,steam@cn,全球直连',  
   'geosite,category-games@cn,全球直连',
-  'geosite,category-game-platforms-download,全球直连',
+  'geosite,category-game-platforms-download,游戏下载',
   'geosite,category-games,游戏平台',
   'geosite,category-scholar-cn,全球直连',
   'geosite,category-scholar-!cn,学术资源',
@@ -489,6 +490,13 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults) {
       proxies: defaultProxies
     },
 
+    {
+      name: '游戏下载',
+      icon: ICON('Game.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+    
     {
       name: '游戏平台',
       icon: ICON('Game.png'),
