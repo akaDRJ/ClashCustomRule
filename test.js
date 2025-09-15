@@ -139,8 +139,8 @@ const ruleProviders = {
   mining:        yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
   forceproxy:    yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
   forcedirect:   yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
-  fakeipfilter:  mrsProvider('fakeipfilter', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'),
-  cnsite:        mrsProvider('cnsite', 'DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'),
+  fakeipfilter:  mrsProvider('fakeipfilter', 'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'),
+  cnsite:        mrsProvider('cnsite', 'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'),
   cdn:           textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
