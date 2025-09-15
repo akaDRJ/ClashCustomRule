@@ -89,7 +89,6 @@ const rules = [
   'geoip,google,Google,no-resolve',
   'geoip,telegram,Telegram,no-resolve',
   'geoip,cn,全球直连,no-resolve',
-  'geoip,lan,全球直连,no-resolve',
   'geoip,private,全球直连,no-resolve',
   'match,节点选择'
 ];
