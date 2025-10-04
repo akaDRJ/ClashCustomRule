@@ -168,7 +168,8 @@ const dnsConfigBase = {
     'rule-set:cnsite',
     'rule-set:fakeipfilter'
   ],
-  nameserver: ['223.5.5.5']
+  nameserver: ['223.5.5.5'],
+  'proxy-server-nameserver': ['https://45.249.245.247:5443/3Dpkw8yxNEw/dns-query']
 };
 
 const geoxURL = {
@@ -582,4 +583,4 @@ function main(config) {
   });
 
   return config;
-}
+} 
