@@ -25,72 +25,18 @@ const globalProxiesBase = Object.freeze([
   '手动切换',
   '自动选择',
   '强制代理',
-  '静态资源',
-  '人工智能',
-  '加密货币',
-  'PayPal',
-  'Telegram',
-  'Microsoft',
-  'Apple',
-  'Google',
-  'YouTube',
-  'Disney',
-  'Netflix',
-  'Spotify',
-  'Twitter(X)',
-  '学术资源',
-  '开发者资源',
-  '游戏下载',
-  '游戏平台',
-  'Speedtest',
   '全球直连'
 ]);
 
 // ============== 规则（第一二段小写，第三段保留） ==============
 const rules = [
-  'rule-set,forcedirect,全球直连',
-  'rule-set,forceproxy,强制代理',
-  'rule-set,outlook,全球直连',
-  'rule-set,cdn,静态资源',
-  'rule-set,pt,全球直连',
-  'geosite,category-pt,全球直连',
-  'geosite,google-play@cn,全球直连',
-  'geosite,youtube@cn,全球直连',
-  'geosite,youtube,YouTube',
-  'geosite,paypal@cn,全球直连',
-  'geosite,paypal,PayPal',
-  'geosite,telegram,Telegram',
-  'geosite,disney,Disney',
-  'geosite,netflix,Netflix',
-  'geosite,spotify,Spotify',
-  'geosite,twitter,Twitter(X)',
-  'geosite,ookla-speedtest,Speedtest',
-  'geosite,category-dev,开发者资源',
-  'geosite,category-ai-chat-!cn,人工智能',
-  'geosite,steam@cn,全球直连',  
-  'geosite,category-games@cn,全球直连',
-  'geosite,category-game-platforms-download,游戏下载',
-  'geosite,category-games,游戏平台',
-  'geosite,category-scholar-cn,全球直连',
-  'geosite,category-scholar-!cn,学术资源',
-  'rule-set,crypto,加密货币',
-  'rule-set,mining,加密货币',
-  'geosite,category-cryptocurrency,加密货币',
-  'geosite,apple@cn,全球直连',
-  'geosite,apple,Apple',
-  'geosite,microsoft@cn,全球直连',
-  'geosite,microsoft,Microsoft',
-  'geosite,google,Google',
-  'geosite,cn,全球直连',
-  'rule-set,cnsite,全球直连',
+  'geosite,cn,强制代理',
+  'rule-set,cnsite,强制代理',
   'geosite,private,全球直连',
 
-  'geoip,netflix,Netflix,no-resolve',
-  'geoip,google,Google,no-resolve',
-  'geoip,telegram,Telegram,no-resolve',
-  'geoip,cn,全球直连,no-resolve',
+  'geoip,cn,强制代理,no-resolve',
   'geoip,private,全球直连,no-resolve',
-  'match,节点选择'
+  'match,全球直连'
 ];
 
 // ======================= 统一资源与图标 =======================
@@ -382,132 +328,6 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults) {
       icon: ICON('Proxy.png'),
       type: 'select',
       proxies: ['节点选择', '手动切换', '全球直连']
-    },
-
-    {
-      name: '静态资源',
-      icon: ICON('Cloudflare.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '人工智能',
-      icon: ICON('Bot.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '加密货币',
-      icon: ICON('Cryptocurrency_3.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'PayPal',
-      icon: ICON('PayPal.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Telegram',
-      icon: ICON('Telegram.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Microsoft',
-      icon: ICON('Microsoft.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Apple',
-      icon: ICON('Apple_2.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Google',
-      icon: ICON('Google_Search.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'YouTube',
-      icon: ICON('YouTube.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Disney',
-      icon: ICON('Disney+.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Netflix',
-      icon: ICON('Netflix.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Spotify',
-      icon: ICON('Spotify.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Twitter(X)',
-      icon: ICON('Twitter.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '学术资源',
-      icon: ICON('Scholar.png'),
-      type: 'select',
-      proxies: ['节点选择', '手动切换', '全球直连']
-    },
-
-    {
-      name: '开发者资源',
-      icon: ICON('GitHub.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '游戏下载',
-      icon: ICON('Game.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-    
-    {
-      name: '游戏平台',
-      icon: ICON('Game.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Speedtest',
-      icon: ICON('Speedtest.png'),
-      type: 'select',
-      proxies: defaultProxies
     },
 
     {
