@@ -40,6 +40,7 @@ const globalProxiesBase = Object.freeze([
   'Twitter(X)',
   '学术资源',
   '开发者资源',
+  '游戏下载',
   '游戏平台',
   'Speedtest',
   '全球直连'
@@ -68,7 +69,7 @@ const rules = [
   'geosite,category-ai-chat-!cn,人工智能',
   'geosite,steam@cn,全球直连',  
   'geosite,category-games@cn,全球直连',
-  'geosite,category-game-platforms-download,全球直连',
+  'geosite,category-game-platforms-download,游戏下载',
   'geosite,category-games,游戏平台',
   'geosite,category-scholar-cn,全球直连',
   'geosite,category-scholar-!cn,学术资源',
@@ -88,7 +89,6 @@ const rules = [
   'geoip,google,Google,no-resolve',
   'geoip,telegram,Telegram,no-resolve',
   'geoip,cn,全球直连,no-resolve',
-  'geoip,lan,全球直连,no-resolve',
   'geoip,private,全球直连,no-resolve',
   'match,节点选择'
 ];
@@ -109,13 +109,13 @@ function yamlProvider(name, repoPath) {
   };
 }
 
-function mrsProvider(name, repoPath) {
+function mrsProvider(name, hostPath) {
   return {
     type: 'http',
     behavior: 'domain',
     format: 'mrs',
     interval: 86400,
-    url: `https://raw.githubusercontent.com/${repoPath}`,
+    url: `https://${hostPath}`,
     path: `./ruleset/${name}.mrs`
   };
 }
@@ -138,8 +138,8 @@ const ruleProviders = {
   mining:        yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
   forceproxy:    yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
   forcedirect:   yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
-  fakeipfilter: mrsProvider('fakeipfilter', 'DustinWin/ruleset_geodata/fakeip-filter.mrs'),
-  cnsite:        mrsProvider('cnsite', 'DustinWin/ruleset_geodata/cn.mrs'),
+  fakeipfilter:  mrsProvider('fakeipfilter', 'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'),
+  cnsite:        mrsProvider('cnsite', 'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'),
   cdn:           textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
@@ -168,7 +168,7 @@ const dnsConfigBase = {
     'rule-set:cnsite',
     'rule-set:fakeipfilter'
   ],
-  nameserver: ['223.5.5.5']
+  'nameserver': ['223.5.5.5']
 };
 
 const geoxURL = {
@@ -490,6 +490,13 @@ function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults) {
     },
 
     {
+      name: '游戏下载',
+      icon: ICON('Game.png'),
+      type: 'select',
+      proxies: defaultProxies
+    },
+    
+    {
       name: '游戏平台',
       icon: ICON('Game.png'),
       type: 'select',
@@ -575,4 +582,4 @@ function main(config) {
   });
 
   return config;
-}
+} 
