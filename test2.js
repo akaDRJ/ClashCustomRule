@@ -115,7 +115,8 @@ const dnsConfigBase = {
     'rule-set:cnsite',
     'rule-set:fakeipfilter'
   ],
-  'nameserver': ['8.8.8.8']
+  'nameserver': ['8.8.8.8'],
+  "fallback": ["223.5.5.5"],
 };
 
 const geoxURL = {
