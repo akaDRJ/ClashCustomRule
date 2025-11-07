@@ -30,6 +30,7 @@ const globalProxiesBase = Object.freeze([
 
 // ============== 规则（第一二段小写，第三段保留） ==============
 const rules = [
+  'rule-set,forcedirect,强制代理'
   'geosite,cn,强制代理',
   'rule-set,cnsite,强制代理',
   'geosite,private,全球直连',
@@ -114,7 +115,7 @@ const dnsConfigBase = {
     'rule-set:cnsite',
     'rule-set:fakeipfilter'
   ],
-  'nameserver': ['223.5.5.5']
+  'nameserver': ['8.8.8.8']
 };
 
 const geoxURL = {
