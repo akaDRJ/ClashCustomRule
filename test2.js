@@ -138,7 +138,7 @@ const dnsConfigBase = {
   // 关键：按域名集合分流到相应权威DNS
   'nameserver-policy': {
     // 国内域名 → 国内权威（尽量使用IP直连的 DoT，避免先解析 doh 主机名）
-    'geosite:cn,rule-set:cnsite,geosite:private': [
+    'geosite:cn,geosite:private': [
       'tls://223.5.5.5:853',     // 阿里 DoT
       'tls://119.29.29.29:853'   // 腾讯 DoT
     ],
