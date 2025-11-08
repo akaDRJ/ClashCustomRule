@@ -115,10 +115,40 @@ const dnsConfigBase = {
     'rule-set:cnsite',
     'rule-set:fakeipfilter'
   ],
+
+  // 不使用 fallback；所有解析都走明确的 nameserver / policy
+  'respect-user-hosts': true,
+
+  // 引导解析（bootstrap）优先用IP形式的 DoT，避免需要先解析主机名
+  'default-nameserver': [
+    'tls://1.1.1.1:853',
+    'tls://223.5.5.5:853'
+  ],
+
+  // 用于解析代理节点本身的域名 —— 放海外，稳定不被国内策略影响
+  'proxy-server-nameserver': [
+    'https://1.1.1.1/dns-query'
+  ],
+
+  // 默认（未命中 policy 时）走海外解析
   'nameserver': [
-    '8.8.8.8',
-    '223.5.5.5'
-  ]
+    'https://1.1.1.1/dns-query'
+  ],
+
+  // 关键：按域名集合分流到相应权威DNS
+  'nameserver-policy': {
+    // 国内域名 → 国内权威（尽量使用IP直连的 DoT，避免先解析 doh 主机名）
+    'geosite:cn,rule-set:cnsite,geosite:private': [
+      'tls://223.5.5.5:853',     // 阿里 DoT
+      'tls://119.29.29.29:853'   // 腾讯 DoT
+    ],
+
+    // 国外域名 → 海外权威
+    'geosite:geolocation-!cn': [
+      'https://1.1.1.1/dns-query',
+      'https://9.9.9.9/dns-query'
+    ]
+  }
 };
 
 const geoxURL = {
