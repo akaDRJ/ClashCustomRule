@@ -168,7 +168,23 @@ const dnsConfigBase = {
     'rule-set:cnsite',
     'rule-set:fakeipfilter'
   ],
-  'nameserver': ['223.5.5.5']
+  'default-nameserver': [
+    'tls://223.5.5.5',
+    'tls://223.6.6.6'
+  ],
+  'nameserver': [
+    'https://1.1.1.1/dns-query',
+    'https://8.8.8.8/dns-query'
+  ],
+  'proxy-server-nameserver': [
+    'https://dns.alidns.com/dns-query',
+    'https://doh.pub/dns-query'
+  ],
+  'direct-nameserver': [
+    'https://dns.alidns.com/dns-query',
+    'https://doh.pub/dns-query'
+  ],
+  'respect-rules': true
 };
 
 const geoxURL = {
