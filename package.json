@@ -1,0 +1,9 @@
+{
+  "name": "clash-custom-rule",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Baseline maintenance tooling for ClashCustomRule",
+  "scripts": {
+    "lint:rules": "node scripts/lint-rules.js"
+  }
+}
