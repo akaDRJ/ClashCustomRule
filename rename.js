@@ -40,7 +40,13 @@
  */
 
 // const inArg = {'blkey':'iplc+GPT>GPTnewName+IPLC', 'flag':true };
-const inArg = $arguments; // console.log(inArg)
+const inArgRaw = $arguments;
+// 参数名大小写不敏感处理
+const inArg = {};
+for (const [k, v] of Object.entries(inArgRaw || {})) {
+  inArg[k.toLowerCase()] = v;
+}
+
 const nx = inArg.nx || false,
   bl = inArg.bl || false,
   nf = inArg.nf || false,
