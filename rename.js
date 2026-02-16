@@ -247,10 +247,9 @@ function operator(pro) {
     // 正则 匹配倍率
     if (bl) {
       const match = e.name.match(
-        /(?:倍率\s*[:：]?\s*)?(?:[Xx×]\s*(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)\s*(?:倍|[Xx×]))/
-      );
+        /(?:倍率\s*[:：]?\s*)?(?:[Xx×]\s*(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)\s*(?:倍|[Xx×])|[\[\(]\s*(\d+(?:\.\d+)?)\s*[\]\)])/);
       if (match) {
-        const rev = match[1] || match[2];
+        const rev = match[1] || match[2] || match[3];
         if (rev && Number(rev) !== 1) {
           const newValue = rev + "×";
           ikey = newValue;
