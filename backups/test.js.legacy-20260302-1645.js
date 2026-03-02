@@ -8,32 +8,17 @@ powerfullz 的 Substore 订阅转换脚本（无智能兜底版）
 */
 
 // ======================== 运行参数 ========================
-const runtimeArgs =
-  typeof $arguments === 'object' && $arguments !== null ? $arguments : {};
-
-const options = Object.freeze({
-  loadBalance: parseBool(runtimeArgs.loadbalance),
-  landing: parseBool(runtimeArgs.landing),
-  ipv6Enabled: parseBool(runtimeArgs.ipv6),
-  fullConfig: parseBool(runtimeArgs.full),
-  enableKeepAlive: parseBool(runtimeArgs.keepalive)
-});
+const inArg = $arguments || {};
+const loadBalance     = parseBool(inArg.loadbalance) || false;
+const landing         = parseBool(inArg.landing) || false;
+const ipv6Enabled     = parseBool(inArg.ipv6) || false;
+const fullConfig      = parseBool(inArg.full) || false;
+const enableKeepAlive = parseBool(inArg.keepalive) || false;
 
 // ==================== 基础数组（只读基线） ====================
-const defaultProxiesBase = Object.freeze([
-  '节点选择',
-  '自动选择',
-  '手动切换',
-  '全球直连'
-]);
-
-const defaultProxiesDirectBase = Object.freeze([
-  '全球直连',
-  '节点选择',
-  '手动切换'
-]);
-
-const defaultSelectorBase = Object.freeze(['自动选择', '手动切换', 'DIRECT']);
+const defaultProxiesBase       = Object.freeze(['节点选择', '自动选择', '手动切换', '全球直连']);
+const defaultProxiesDirectBase = Object.freeze(['全球直连', '节点选择', '手动切换']);
+const defaultSelectorBase      = Object.freeze(['自动选择', '手动切换', 'DIRECT']);
 
 const globalProxiesBase = Object.freeze([
   '节点选择',
@@ -82,7 +67,7 @@ const rules = [
   'geosite,ookla-speedtest,Speedtest',
   'geosite,category-dev,开发者资源',
   'geosite,category-ai-chat-!cn,人工智能',
-  'geosite,steam@cn,全球直连',
+  'geosite,steam@cn,全球直连',  
   'geosite,category-games@cn,全球直连',
   'geosite,category-game-platforms-download,游戏下载',
   'geosite,category-games,游戏平台',
@@ -110,7 +95,7 @@ const rules = [
 
 // ======================= 统一资源与图标 =======================
 const CDN = 'https://gcore.jsdelivr.net';
-const ICON = (path) => `${CDN}/gh/Koolson/Qure@master/IconSet/Color/${path}`;
+const ICON = (p) => `${CDN}/gh/Koolson/Qure@master/IconSet/Color/${p}`;
 
 // ================= rule-providers（工厂） =================
 function yamlProvider(name, repoPath) {
@@ -147,33 +132,21 @@ function textProvider(name, hostPath) {
 }
 
 const ruleProviders = {
-  outlook: yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
-  pt: yamlProvider('pt', 'akaDRJ/ClashCustomRule/master/pt.yaml'),
-  crypto: yamlProvider('crypto', 'akaDRJ/ClashCustomRule/master/crypto.yaml'),
-  mining: yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
-  forceproxy: yamlProvider(
-    'forceproxy',
-    'akaDRJ/ClashCustomRule/master/forceproxy.yaml'
-  ),
-  forcedirect: yamlProvider(
-    'forcedirect',
-    'akaDRJ/ClashCustomRule/master/forcedirect.yaml'
-  ),
-  fakeipfilter: mrsProvider(
-    'fakeipfilter',
-    'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'
-  ),
-  cnsite: mrsProvider(
-    'cnsite',
-    'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'
-  ),
-  cdn: textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
+  outlook:       yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
+  pt:            yamlProvider('pt', 'akaDRJ/ClashCustomRule/master/pt.yaml'),
+  crypto:        yamlProvider('crypto', 'akaDRJ/ClashCustomRule/master/crypto.yaml'),
+  mining:        yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
+  forceproxy:    yamlProvider('forceproxy', 'akaDRJ/ClashCustomRule/master/forceproxy.yaml'),
+  forcedirect:   yamlProvider('forcedirect', 'akaDRJ/ClashCustomRule/master/forcedirect.yaml'),
+  fakeipfilter:  mrsProvider('fakeipfilter', 'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'),
+  cnsite:        mrsProvider('cnsite', 'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'),
+  cdn:           textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
 // ======================== 其余配置 ========================
 const snifferConfig = {
   sniff: {
-    TLS: { ports: [443, 8443], 'override-destination': true },
+    TLS:  { ports: [443, 8443], 'override-destination': true },
     HTTP: { ports: [80, 8080, 8880], 'override-destination': false },
     QUIC: { ports: [443, 8443], 'override-destination': true }
   },
@@ -185,7 +158,7 @@ const snifferConfig = {
 
 const dnsConfigBase = {
   enable: true,
-  ipv6: options.ipv6Enabled,
+  ipv6: ipv6Enabled,
   'prefer-h3': true,
   'enhanced-mode': 'fake-ip',
   'fake-ip-range': '198.20.0.1/16',
@@ -195,178 +168,134 @@ const dnsConfigBase = {
     'rule-set:cnsite',
     'rule-set:fakeipfilter'
   ],
-  'default-nameserver': ['tls://223.5.5.5', 'tls://223.6.6.6'],
-  nameserver: ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']
+  'default-nameserver': [
+    'tls://223.5.5.5',
+    'tls://223.6.6.6'
+  ],
+  'nameserver': [
+    'https://dns.alidns.com/dns-query',
+    'https://doh.pub/dns-query'
+  ]
 };
 
 const geoxURL = {
-  geoip: `${CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat`,
+  geoip:   `${CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat`,
   geosite: `${CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat`,
-  mmdb: `${CDN}/gh/Loyalsoldier/geoip@release/Country.mmdb`,
-  asn: `${CDN}/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb`
+  mmdb:    `${CDN}/gh/Loyalsoldier/geoip@release/Country.mmdb`,
+  asn:     `${CDN}/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb`
 };
 
 // ===================== 国家识别与图标 =====================
 const countryRegex = {
-  香港: '(?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong',
-  澳门: '(?i)澳门|MO|Macau',
-  台湾: '(?i)台|新北|彰化|TW|Taiwan',
-  新加坡: '(?i)新加坡|坡|狮城|SG|Singapore',
-  日本: '(?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan',
-  韩国: '(?i)KR|Korea|KOR|首尔|韩|韓',
-  美国: '(?i)美国|美|US|United States',
-  加拿大: '(?i)加拿大|Canada|CA',
-  英国: '(?i)英国|United Kingdom|UK|伦敦|London',
-  澳大利亚: '(?i)澳洲|澳大利亚|AU|Australia',
-  德国: '(?i)德国|德|DE|Germany',
-  法国: '(?i)法国|法|FR|France',
-  俄罗斯: '(?i)俄罗斯|俄|RU|Russia',
-  泰国: '(?i)泰国|泰|TH|Thailand',
-  印度: '(?i)印度|IN|India',
-  马来西亚: '(?i)马来西亚|马来|MY|Malaysia'
+  '香港': '(?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong',
+  '澳门': '(?i)澳门|MO|Macau',
+  '台湾': '(?i)台|新北|彰化|TW|Taiwan',
+  '新加坡': '(?i)新加坡|坡|狮城|SG|Singapore',
+  '日本': '(?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan',
+  '韩国': '(?i)KR|Korea|KOR|首尔|韩|韓',
+  '美国': '(?i)美国|美|US|United States',
+  '加拿大': '(?i)加拿大|Canada|CA',
+  '英国': '(?i)英国|United Kingdom|UK|伦敦|London',
+  '澳大利亚': '(?i)澳洲|澳大利亚|AU|Australia',
+  '德国': '(?i)德国|德|DE|Germany',
+  '法国': '(?i)法国|法|FR|France',
+  '俄罗斯': '(?i)俄罗斯|俄|RU|Russia',
+  '泰国': '(?i)泰国|泰|TH|Thailand',
+  '印度': '(?i)印度|IN|India',
+  '马来西亚': '(?i)马来西亚|马来|MY|Malaysia'
 };
 
 const countryIconURLs = {
-  香港: ICON('Hong_Kong.png'),
-  台湾: ICON('Taiwan.png'),
-  新加坡: ICON('Singapore.png'),
-  日本: ICON('Japan.png'),
-  韩国: ICON('Korea.png'),
-  美国: ICON('United_States.png'),
-  英国: ICON('United_Kingdom.png'),
-  加拿大: ICON('Canada.png'),
-  澳大利亚: ICON('Australia.png'),
-  德国: ICON('Germany.png'),
-  俄罗斯: ICON('Russia.png'),
-  泰国: ICON('Thailand.png'),
-  印度: ICON('India.png'),
-  马来西亚: ICON('Malaysia.png'),
-  澳门: ICON('Macao.png'),
-  法国: ICON('France.png')
+  '香港': ICON('Hong_Kong.png'),
+  '台湾': ICON('Taiwan.png'),
+  '新加坡': ICON('Singapore.png'),
+  '日本': ICON('Japan.png'),
+  '韩国': ICON('Korea.png'),
+  '美国': ICON('United_States.png'),
+  '英国': ICON('United_Kingdom.png'),
+  '加拿大': ICON('Canada.png'),
+  '澳大利亚': ICON('Australia.png'),
+  '德国': ICON('Germany.png'),
+  '俄罗斯': ICON('Russia.png'),
+  '泰国': ICON('Thailand.png'),
+  '印度': ICON('India.png'),
+  '马来西亚': ICON('Malaysia.png'),
+  '澳门': ICON('Macao.png'),
+  '法国': ICON('France.png')
 };
 
-const ISP_OR_LANDING_RE = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
-const LOW_COST_RE = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
-const COUNTRY_ENTRIES = compileCountryEntries(countryRegex);
-
 // ======================== 工具函数 ========================
-function parseBool(value) {
-  if (typeof value === 'boolean') return value;
-  if (typeof value === 'number') return value === 1;
-  if (typeof value === 'string') {
-    const normalized = value.trim().toLowerCase();
-    return normalized === 'true' || normalized === '1';
-  }
+function parseBool(v) {
+  if (typeof v === 'boolean') return v;
+  if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
   return false;
 }
 
-function compileCountryEntries(source) {
-  const entries = [];
-  for (const [country, pattern] of Object.entries(source)) {
-    try {
-      entries.push({ country, regex: makeRegex(pattern) });
-    } catch (error) {
-      if (typeof console !== 'undefined' && typeof console.warn === 'function') {
-        console.warn(`[test.js] Skip invalid country pattern for ${country}:`, error);
-      }
-    }
-  }
-  return entries;
+function makeRegex(p) {
+  return new RegExp(String(p).replace(/^\(\?i\)/, ''), 'i');
 }
 
-function makeRegex(pattern) {
-  const cleaned = String(pattern || '').replace(/^\(\?i\)/, '');
-  return new RegExp(cleaned, 'i');
+function isLowCostName(n) {
+  return /0\.[0-5]|低倍率|省流|大流量|实验性/i.test(n);
 }
 
-function asString(value) {
-  return typeof value === 'string' ? value : '';
-}
-
-function asPlainObject(value) {
-  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-}
-
-function asArray(value) {
-  return Array.isArray(value) ? value : [];
-}
-
-function normalizeProxyList(config) {
-  return asArray(config.proxies)
-    .filter((proxy) => proxy && typeof proxy === 'object')
-    .map((proxy) => ({ ...proxy, name: asString(proxy.name) }));
-}
-
-function isLowCostName(name) {
-  return LOW_COST_RE.test(asString(name));
-}
-
-function isIspName(name) {
-  return ISP_OR_LANDING_RE.test(asString(name));
+function isIspName(n) {
+  return /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i.test(n);
 }
 
 function insertAfter(arr, target, item) {
-  if (!Array.isArray(arr) || arr.includes(item)) return;
-  const index = arr.indexOf(target);
-  if (index >= 0) {
-    arr.splice(index + 1, 0, item);
-  } else {
-    arr.push(item);
-  }
-}
-
-function insertUniqueAt(arr, index, values) {
-  if (!Array.isArray(arr) || !Array.isArray(values) || values.length === 0) return;
-  const filtered = values.filter((value) => !arr.includes(value));
-  if (filtered.length === 0) return;
-  arr.splice(index, 0, ...filtered);
+  const i = arr.indexOf(target);
+  if (i >= 0) arr.splice(i + 1, 0, item);
+  else arr.push(item);
 }
 
 // ======================== 国家解析 ========================
-function parseCountries(proxies) {
-  const result = [];
+function parseCountries(config) {
+  const proxies = config.proxies || [];
+  const res = [];
   const seen = new Set();
 
-  for (const { country, regex } of COUNTRY_ENTRIES) {
-    for (const proxy of proxies) {
-      if (regex.test(proxy.name) && !isIspName(proxy.name) && !seen.has(country)) {
-        seen.add(country);
-        result.push(country);
+  for (const [c, pat] of Object.entries(countryRegex)) {
+    const r = makeRegex(pat);
+    for (const p of proxies) {
+      const n = p.name || '';
+      if (r.test(n) && !isIspName(n) && !seen.has(c)) {
+        seen.add(c);
+        res.push(c);
       }
     }
   }
-
-  return result;
+  return res;
 }
 
 // ========== 国家组（无智能兜底，固定排除 ISP/落地） ==========
-function buildCountryProxyGroups(countryList) {
+function buildCountryProxyGroups(countryList, config) {
   const groups = [];
 
-  for (const country of countryList) {
-    if (!countryRegex[country]) continue;
+  for (const c of countryList) {
+    if (!countryRegex[c]) continue;
 
-    const group = {
-      name: `${country}节点`,
-      icon: countryIconURLs[country],
-      type: options.loadBalance ? 'load-balance' : 'url-test',
+    const pat = countryRegex[c];
+    const g = {
+      name: `${c}节点`,
+      icon: countryIconURLs[c],
+      type: loadBalance ? 'load-balance' : 'url-test',
       'include-all': true,
-      filter: countryRegex[country],
+      filter: pat,
       'exclude-filter': '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地'
     };
 
-    if (!options.loadBalance) {
-      Object.assign(group, { interval: 300, tolerance: 20, lazy: false });
+    if (!loadBalance) {
+      Object.assign(g, { interval: 300, tolerance: 20, lazy: false });
     }
-
-    groups.push(group);
+    groups.push(g);
   }
 
   return groups;
 }
 
 // ========================= 代理组 =========================
-function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defaults) {
+function buildProxyGroups(countryList, countryProxyGroups, lowCost, defaults) {
   const {
     defaultProxies,
     defaultSelector,
@@ -375,31 +304,30 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
   } = defaults;
 
   const countryProxies = [];
-  for (const country of countryList) {
-    const groupName = `${country}节点`;
-    insertAfter(globalProxies, '全球直连', groupName);
-    countryProxies.push(groupName);
+
+  for (const c of countryList) {
+    const g = `${c}节点`;
+    globalProxies.push(g);
+    countryProxies.push(g);
   }
 
-  if (hasLowCostNodes) {
+  if (lowCost) {
     insertAfter(globalProxies, '自动选择', '低倍率节点');
     countryProxies.push('低倍率节点');
   }
 
-  insertUniqueAt(defaultProxies, 1, countryProxies);
-  insertUniqueAt(defaultSelector, 1, countryProxies);
-  insertUniqueAt(defaultProxiesDirect, 2, countryProxies);
+  defaultProxies.splice(1, 0, ...countryProxies);
+  defaultSelector.splice(1, 0, ...countryProxies);
+  defaultProxiesDirect.splice(2, 0, ...countryProxies);
 
-  if (options.landing) {
+  if (landing) {
     insertAfter(defaultProxies, '自动选择', '落地节点');
-    if (!defaultSelector.includes('落地节点')) {
-      defaultSelector.unshift('落地节点');
-    }
+    defaultSelector.unshift('落地节点');
     insertAfter(globalProxies, '自动选择', '落地节点');
     insertAfter(globalProxies, '落地节点', '前置代理');
   }
 
-  return [
+  const groups = [
     {
       name: '节点选择',
       icon: ICON('Proxy.png'),
@@ -407,7 +335,7 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
       proxies: defaultSelector
     },
 
-    options.landing
+    landing
       ? {
           name: '落地节点',
           icon: ICON('Airport.png'),
@@ -417,7 +345,7 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
         }
       : null,
 
-    options.landing
+    landing
       ? {
           name: '前置代理',
           icon: ICON('Area.png'),
@@ -428,11 +356,11 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
         }
       : null,
 
-    hasLowCostNodes
+    lowCost
       ? {
           name: '低倍率节点',
           icon: ICON('Lab.png'),
-          type: options.loadBalance ? 'load-balance' : 'url-test',
+          type: loadBalance ? 'load-balance' : 'url-test',
           'include-all': true,
           filter: '(?i)0\\.[0-5]|低倍率|省流|大流量|实验性'
         }
@@ -574,7 +502,7 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
       type: 'select',
       proxies: defaultProxies
     },
-
+    
     {
       name: '游戏平台',
       icon: ICON('Game.png'),
@@ -606,70 +534,59 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
       proxies: globalProxies
     }
   ].filter(Boolean);
+
+  return groups;
 }
 
 // ========================= 主入口 =========================
 function main(config) {
-  const safeConfig = asPlainObject(config);
+  // 克隆可变数组，避免多次运行污染
+  const defaultProxies       = [...defaultProxiesBase];
+  const defaultSelector      = [...defaultSelectorBase];
+  const defaultProxiesDirect = [...defaultProxiesDirectBase];
+  const globalProxies        = [...globalProxiesBase];
+  const dnsConfig            = { ...dnsConfigBase, ipv6: ipv6Enabled };
 
-  try {
-    const proxies = normalizeProxyList(safeConfig);
-    const defaultProxies = [...defaultProxiesBase];
-    const defaultSelector = [...defaultSelectorBase];
-    const defaultProxiesDirect = [...defaultProxiesDirectBase];
-    const globalProxies = [...globalProxiesBase];
-    const dnsConfig = { ...dnsConfigBase, ipv6: options.ipv6Enabled };
+  const countryList        = parseCountries(config);
+  const lowCost            = (config.proxies || []).some((p) => isLowCostName(p.name || ''));
+  const countryProxyGroups = buildCountryProxyGroups(countryList, config);
 
-    const countryList = parseCountries(proxies);
-    const hasLowCostNodes = proxies.some((proxy) => isLowCostName(proxy.name));
-    const countryProxyGroups = buildCountryProxyGroups(countryList);
+  const proxyGroups = buildProxyGroups(
+    countryList,
+    countryProxyGroups,
+    lowCost,
+    { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies }
+  );
 
-    const proxyGroups = buildProxyGroups(
-      countryList,
-      countryProxyGroups,
-      hasLowCostNodes,
-      { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies }
-    );
-
-    if (options.fullConfig) {
-      Object.assign(safeConfig, {
-        'mixed-port': 7890,
-        'redir-port': 7892,
-        'tproxy-port': 7893,
-        'routing-mark': 7894,
-        'allow-lan': true,
-        ipv6: options.ipv6Enabled,
-        mode: 'rule',
-        'unified-delay': true,
-        'tcp-concurrent': true,
-        'find-process-mode': 'off',
-        'log-level': 'info',
-        'geodata-loader': 'standard',
-        'external-controller': ':9999',
-        'disable-keep-alive': !options.enableKeepAlive,
-        profile: { 'store-selected': true }
-      });
-    }
-
-    Object.assign(safeConfig, {
-      'proxy-groups': proxyGroups,
-      'rule-providers': ruleProviders,
-      rules,
-      sniffer: snifferConfig,
-      dns: dnsConfig,
-      'geodata-mode': true,
-      'geox-url': geoxURL
+  if (fullConfig) {
+    Object.assign(config, {
+      'mixed-port': 7890,
+      'redir-port': 7892,
+      'tproxy-port': 7893,
+      'routing-mark': 7894,
+      'allow-lan': true,
+      ipv6: ipv6Enabled,
+      mode: 'rule',
+      'unified-delay': true,
+      'tcp-concurrent': true,
+      'find-process-mode': 'off',
+      'log-level': 'info',
+      'geodata-loader': 'standard',
+      'external-controller': ':9999',
+      'disable-keep-alive': !enableKeepAlive,
+      profile: { 'store-selected': true }
     });
-
-    return safeConfig;
-  } catch (error) {
-    if (typeof console !== 'undefined' && typeof console.error === 'function') {
-      console.error('[test.js] Failed to generate config:', error);
-    }
-    return safeConfig;
   }
-}
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { main };
-}
+  Object.assign(config, {
+    'proxy-groups': proxyGroups,
+    'rule-providers': ruleProviders,
+    rules,
+    sniffer: snifferConfig,
+    dns: dnsConfig,
+    'geodata-mode': true,
+    'geox-url': geoxURL
+  });
+
+  return config;
+} 
