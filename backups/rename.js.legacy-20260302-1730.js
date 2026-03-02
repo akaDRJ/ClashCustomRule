@@ -41,48 +41,30 @@
 
 // const inArg = {'blkey':'iplc+GPT>GPTnewName+IPLC', 'flag':true };
 const inArgRaw = $arguments;
-
-function parseBool(value) {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value === 1;
-  if (typeof value === "string") {
-    const normalized = value.trim().toLowerCase();
-    return normalized === "true" || normalized === "1" || normalized === "on";
-  }
-  return false;
-}
-
-function decodeArg(value, fallback = "") {
-  if (value === undefined || value === null) return fallback;
-  try {
-    return decodeURI(String(value));
-  } catch (_error) {
-    return String(value);
-  }
-}
-
+// 参数名大小写不敏感处理
 const inArg = {};
 for (const [k, v] of Object.entries(inArgRaw || {})) {
-  inArg[String(k).toLowerCase()] = v;
+  inArg[k.toLowerCase()] = v;
 }
 
-const nx = parseBool(inArg.nx),
-  bl = parseBool(inArg.bl),
-  nf = parseBool(inArg.nf),
-  key = parseBool(inArg.key),
-  blgd = parseBool(inArg.blgd),
-  blpx = parseBool(inArg.blpx),
-  blnx = parseBool(inArg.blnx),
-  numone = parseBool(inArg.one),
-  clear = parseBool(inArg.clear),
-  addflag = parseBool(inArg.flag),
-  nm = parseBool(inArg.nm);
+const nx = inArg.nx || false,
+  bl = inArg.bl || false,
+  nf = inArg.nf || false,
+  key = inArg.key || false,
+  blgd = inArg.blgd || false,
+  blpx = inArg.blpx || false,
+  blnx = inArg.blnx || false,
+  numone = inArg.one || false,
+  debug = inArg.debug || false,
+  clear = inArg.clear || false,
+  addflag = inArg.flag || false,
+  nm = inArg.nm || false;
 
-const FGF = decodeArg(inArg.fgf, " "),
-  XHFGF = decodeArg(inArg.sn, " "),
-  FNAME = decodeArg(inArg.name, ""),
-  BLKEY = decodeArg(inArg.blkey, ""),
-  blockquic = decodeArg(inArg.blockquic, "").toLowerCase(),
+const FGF = inArg.fgf == undefined ? " " : decodeURI(inArg.fgf),
+  XHFGF = inArg.sn == undefined ? " " : decodeURI(inArg.sn),
+  FNAME = inArg.name == undefined ? "" : decodeURI(inArg.name),
+  BLKEY = inArg.blkey == undefined ? "" : decodeURI(inArg.blkey),
+  blockquic = inArg.blockquic == undefined ? "" : decodeURI(inArg.blockquic),
   nameMap = {
     cn: "cn",
     zh: "cn",
@@ -92,8 +74,8 @@ const FGF = decodeArg(inArg.fgf, " "),
     gq: "gq",
     flag: "gq",
   },
-  inname = nameMap[String(inArg.in || "").toLowerCase()] || "",
-  outputName = nameMap[String(inArg.out || "").toLowerCase()] || "";
+  inname = nameMap[inArg.in] || "",
+  outputName = nameMap[inArg.out] || "";
 // prettier-ignore
 const FG = ['🇭🇰','🇲🇴','🇹🇼','🇯🇵','🇰🇷','🇸🇬','🇺🇸','🇬🇧','🇫🇷','🇩🇪','🇦🇺','🇦🇪','🇦🇫','🇦🇱','🇩🇿','🇦🇴','🇦🇷','🇦🇲','🇦🇹','🇦🇿','🇧🇭','🇧🇩','🇧🇾','🇧🇪','🇧🇿','🇧🇯','🇧🇹','🇧🇴','🇧🇦','🇧🇼','🇧🇷','🇻🇬','🇧🇳','🇧🇬','🇧🇫','🇧🇮','🇰🇭','🇨🇲','🇨🇦','🇨🇻','🇰🇾','🇨🇫','🇹🇩','🇨🇱','🇨🇴','🇰🇲','🇨🇬','🇨🇩','🇨🇷','🇭🇷','🇨🇾','🇨🇿','🇩🇰','🇩🇯','🇩🇴','🇪🇨','🇪🇬','🇸🇻','🇬🇶','🇪🇷','🇪🇪','🇪🇹','🇫🇯','🇫🇮','🇬🇦','🇬🇲','🇬🇪','🇬🇭','🇬🇷','🇬🇱','🇬🇹','🇬🇳','🇬🇾','🇭🇹','🇭🇳','🇭🇺','🇮🇸','🇮🇳','🇮🇩','🇮🇷','🇮🇶','🇮🇪','🇮🇲','🇮🇱','🇮🇹','🇨🇮','🇯🇲','🇯🇴','🇰🇿','🇰🇪','🇰🇼','🇰🇬','🇱🇦','🇱🇻','🇱🇧','🇱🇸','🇱🇷','🇱🇾','🇱🇹','🇱🇺','🇲🇰','🇲🇬','🇲🇼','🇲🇾','🇲🇻','🇲🇱','🇲🇹','🇲🇷','🇲🇺','🇲🇽','🇲🇩','🇲🇨','🇲🇳','🇲🇪','🇲🇦','🇲🇿','🇲🇲','🇳🇦','🇳🇵','🇳🇱','🇳🇿','🇳🇮','🇳🇪','🇳🇬','🇰🇵','🇳🇴','🇴🇲','🇵🇰','🇵🇦','🇵🇾','🇵🇪','🇵🇭','🇵🇹','🇵🇷','🇶🇦','🇷🇴','🇷🇺','🇷🇼','🇸🇲','🇸🇦','🇸🇳','🇷🇸','🇸🇱','🇸🇰','🇸🇮','🇸🇴','🇿🇦','🇪🇸','🇱🇰','🇸🇩','🇸🇷','🇸🇿','🇸🇪','🇨🇭','🇸🇾','🇹🇯','🇹🇿','🇹🇭','🇹🇬','🇹🇴','🇹🇹','🇹🇳','🇹🇷','🇹🇲','🇻🇮','🇺🇬','🇺🇦','🇺🇾','🇺🇿','🇻🇪','🇻🇳','🇾🇪','🇿🇲','🇿🇼','🇦🇩','🇷🇪','🇵🇱','🇬🇺','🇻🇦','🇱🇮','🇨🇼','🇸🇨','🇦🇶','🇬🇮','🇨🇺','🇫🇴','🇦🇽','🇧🇲','🇹🇱']
 // prettier-ignore
@@ -156,267 +138,179 @@ const rurekey = {
   Esnc: /esnc/gi,
 };
 
-const MULTIPLIER_CAPTURE_RE =
-  /(?:倍率\s*[:：]?\s*)?(?:[Xx×]\s*(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)\s*(?:倍|[Xx×])|[\[\(]\s*(\d+(?:\.\d+)?)\s*[\]\)])/;
-const KEY_DIGIT_FILTER_RE = /2|4|6|7/i;
-const BLKEY_RULES = BLKEY
-  ? BLKEY.split("+")
-      .map((raw) => raw.trim())
-      .filter(Boolean)
-      .map((raw) => {
-        const pivot = raw.indexOf(">");
-        if (pivot === -1) {
-          return { raw, source: raw, replacement: "" };
-        }
-        return {
-          raw,
-          source: raw.slice(0, pivot),
-          replacement: raw.slice(pivot + 1),
-        };
-      })
-  : [];
-
-const RULE_REPLACEMENTS = Object.entries(rurekey).map(([target, regex]) => ({
-  target,
-  regex,
-}));
-
-function buildAllMap(inputLists, outList) {
-  const map = {};
-  for (const list of inputLists) {
-    list.forEach((value, index) => {
-      map[value] = outList[index];
-    });
-  }
-  return map;
+let GetK = false, AMK = []
+function ObjKA(i) {
+  GetK = true
+  AMK = Object.entries(i).sort((a, b) => b[0].length - a[0].length)
 }
-
-function buildRegionEntries(allMap) {
-  return Object.entries(allMap)
-    .sort((a, b) => b[0].length - a[0].length)
-    .map(([key, value]) => {
-      const isShortCode = /^[A-Z]{2,3}$/.test(key);
-      return {
-        key,
-        value,
-        shortCodeRegex: isShortCode
-          ? new RegExp(`(^|[^A-Z0-9])${key}([^A-Z0-9]|$)`)
-          : null,
-      };
-    });
-}
-
-function matchRegionKey(name, regionEntries) {
+function matchRegionKey(name) {
   const upperName = name.toUpperCase();
-  for (const entry of regionEntries) {
-    if (entry.shortCodeRegex) {
-      if (entry.shortCodeRegex.test(upperName)) {
-        return entry.value;
-      }
-      continue;
+  return AMK.find(([key]) => {
+    if (/^[A-Z]{2,3}$/.test(key)) {
+      return new RegExp(`(^|[^A-Z0-9])${key}([^A-Z0-9]|$)`).test(upperName);
     }
-    if (name.includes(entry.key)) {
-      return entry.value;
-    }
-  }
-  return "";
-}
-
-function applyRuleReplacements(name) {
-  let nextName = name;
-  for (const item of RULE_REPLACEMENTS) {
-    item.regex.lastIndex = 0;
-    if (item.regex.test(nextName)) {
-      item.regex.lastIndex = 0;
-      nextName = nextName.replace(item.regex, item.target);
-    }
-  }
-  return nextName;
-}
-
-function resolveRetainKey(originalName, normalizedName) {
-  if (BLKEY_RULES.length === 0) return "";
-
-  let replacement = "";
-  for (const rule of BLKEY_RULES) {
-    if (rule.replacement && originalName.includes(rule.source)) {
-      replacement = rule.replacement;
-    }
-  }
-  if (replacement) return replacement;
-
-  const kept = BLKEY_RULES.map((rule) => rule.raw).filter((item) => normalizedName.includes(item));
-  return kept.join(",");
-}
-
-function applyBlockQuic(proxy) {
-  if (blockquic === "on" || blockquic === "off") {
-    proxy["block-quic"] = blockquic;
-  } else {
-    delete proxy["block-quic"];
-  }
-}
-
-function getFixedTag(name) {
-  if (!blgd) return "";
-
-  let tag = "";
-  regexArray.forEach((regex, index) => {
-    regex.lastIndex = 0;
-    if (regex.test(name)) {
-      tag = valueArray[index];
-    }
+    return name.includes(key);
   });
-  return tag;
-}
-
-function getMultiplierTag(name) {
-  if (!bl) return "";
-
-  const match = name.match(MULTIPLIER_CAPTURE_RE);
-  if (!match) return "";
-
-  const value = match[1] || match[2] || match[3];
-  if (!value || Number(value) === 1) return "";
-  return `${value}×`;
 }
 
 function operator(pro) {
-  let proxies = Array.isArray(pro) ? pro.filter((item) => item && typeof item === "object") : [];
-
+  const Allmap = {};
   const outList = getList(outputName);
-  const inputLists = inname !== "" ? [getList(inname)] : [ZH, FG, QC, EN];
-  const allMap = buildAllMap(inputLists, outList);
-  const regionEntries = buildRegionEntries(allMap);
+  let inputList,
+    retainKey = "";
+  if (inname !== "") {
+    inputList = [getList(inname)];
+  } else {
+    inputList = [ZH, FG, QC, EN];
+  }
+
+  inputList.forEach((arr) => {
+    arr.forEach((value, valueIndex) => {
+      Allmap[value] = outList[valueIndex];
+    });
+  });
 
   if (clear || nx || blnx || key) {
-    proxies = proxies.filter((item) => {
-      const name = String(item.name || "");
-      return !(
-        (clear && nameclear.test(name)) ||
-        (nx && namenx.test(name)) ||
-        (blnx && !nameblnx.test(name)) ||
-        (key && !(keya.test(name) && KEY_DIGIT_FILTER_RE.test(name)))
-      );
+    pro = pro.filter((res) => {
+      const resname = res.name;
+      const shouldKeep =
+        !(clear && nameclear.test(resname)) &&
+        !(nx && namenx.test(resname)) &&
+        !(blnx && !nameblnx.test(resname)) &&
+        !(key && !(keya.test(resname) && /2|4|6|7/i.test(resname)));
+      return shouldKeep;
     });
   }
 
-  for (const proxy of proxies) {
-    const sourceName = String(proxy.name || "");
-    let currentName = applyRuleReplacements(sourceName);
+  const BLKEYS = BLKEY ? BLKEY.split("+") : "";
 
-    applyBlockQuic(proxy);
+  pro.forEach((e) => {
+    let bktf = false, ens = e.name
+    // 预处理 防止预判或遗漏
+    Object.keys(rurekey).forEach((ikey) => {
+      if (rurekey[ikey].test(e.name)) {
+        e.name = e.name.replace(rurekey[ikey], ikey);
+      if (BLKEY) {
+        bktf = true
+        let BLKEY_REPLACE = "",
+        re = false;
+      BLKEYS.forEach((i) => {
+        if (i.includes(">") && ens.includes(i.split(">")[0])) {
+          if (rurekey[ikey].test(i.split(">")[0])) {
+              e.name += " " + i.split(">")[0]
+            }
+          if (i.split(">")[1]) {
+            BLKEY_REPLACE = i.split(">")[1];
+            re = true;
+          }
+        } else {
+          if (ens.includes(i)) {
+             e.name += " " + i
+            }
+        }
+        retainKey = re
+        ? BLKEY_REPLACE
+        : BLKEYS.filter((items) => e.name.includes(items));
+      });}
+      }
+    });
+    if (blockquic == "on") {
+      e["block-quic"] = "on";
+    } else if (blockquic == "off") {
+      e["block-quic"] = "off";
+    } else {
+      delete e["block-quic"];
+    }
 
-    const retainKey = resolveRetainKey(sourceName, currentName);
-    const multiplierTag = getMultiplierTag(currentName);
-    const fixedTag = getFixedTag(currentName);
-    const matchedRegion = matchRegionKey(currentName, regionEntries);
+    // 自定义
+    if (!bktf && BLKEY) {
+      let BLKEY_REPLACE = "",
+        re = false;
+      BLKEYS.forEach((i) => {
+        if (i.includes(">") && e.name.includes(i.split(">")[0])) {
+          if (i.split(">")[1]) {
+            BLKEY_REPLACE = i.split(">")[1];
+            re = true;
+          }
+        }
+      });
+      retainKey = re
+        ? BLKEY_REPLACE
+        : BLKEYS.filter((items) => e.name.includes(items));
+    }
 
-    const prefixFirst = nf ? FNAME : "";
-    const prefixSecond = nf ? "" : FNAME;
+    let ikey = "",
+      ikeys = "";
+    // 保留固定格式 倍率
+    if (blgd) {
+      regexArray.forEach((regex, index) => {
+        if (regex.test(e.name)) {
+          ikeys = valueArray[index];
+        }
+      });
+    }
 
-    if (matchedRegion) {
-      let flagValue = "";
-      if (addflag) {
-        const index = outList.indexOf(matchedRegion);
-        if (index !== -1) {
-          flagValue = FG[index] === "🇹🇼" ? "🇨🇳" : FG[index];
+    // 正则 匹配倍率
+    if (bl) {
+      const match = e.name.match(
+        /(?:倍率\s*[:：]?\s*)?(?:[Xx×]\s*(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)\s*(?:倍|[Xx×])|[\[\(]\s*(\d+(?:\.\d+)?)\s*[\]\)])/);
+      if (match) {
+        const rev = match[1] || match[2] || match[3];
+        if (rev && Number(rev) !== 1) {
+          const newValue = rev + "×";
+          ikey = newValue;
         }
       }
-
-      proxy.name = [prefixFirst, flagValue, prefixSecond, matchedRegion, retainKey, multiplierTag, fixedTag]
-        .filter((item) => item !== "")
-        .join(FGF);
-      continue;
     }
 
-    if (!nm) {
-      proxy.name = null;
-      continue;
+    !GetK && ObjKA(Allmap)
+    // 匹配 Allkey 地区
+    const findKey = matchRegionKey(e.name)
+    
+    let firstName = "",
+      nNames = "";
+
+    if (nf) {
+      firstName = FNAME;
+    } else {
+      nNames = FNAME;
     }
-
-    proxy.name = FNAME ? `${FNAME}${FGF}${currentName}` : currentName;
-  }
-
-  proxies = proxies.filter((item) => item.name !== null);
-  jxh(proxies);
-  if (numone) oneP(proxies);
-  if (blpx) proxies = fampx(proxies);
-  if (key) proxies = proxies.filter((item) => !keyb.test(item.name));
-
-  return proxies;
+    if (findKey?.[1]) {
+      const findKeyValue = findKey[1];
+      let keyover = [],
+        usflag = "";
+      if (addflag) {
+        const index = outList.indexOf(findKeyValue);
+        if (index !== -1) {
+          usflag = FG[index];
+          usflag = usflag === "🇹🇼" ? "🇨🇳" : usflag;
+        }
+      }
+      keyover = keyover
+        .concat(firstName, usflag, nNames, findKeyValue, retainKey, ikey, ikeys)
+        .filter((k) => k !== "");
+      e.name = keyover.join(FGF);
+    } else {
+      if (nm) {
+        e.name = FNAME + FGF + e.name;
+      } else {
+        e.name = null;
+      }
+    }
+  });
+  pro = pro.filter((e) => e.name !== null);
+  jxh(pro);
+  numone && oneP(pro);
+  blpx && (pro = fampx(pro));
+  key && (pro = pro.filter((e) => !keyb.test(e.name)));
+  return pro;
 }
 
-function getList(arg) {
-  switch (arg) {
-    case "us":
-      return EN;
-    case "gq":
-      return FG;
-    case "quan":
-      return QC;
-    default:
-      return ZH;
-  }
-}
-
-function jxh(items) {
-  const grouped = new Map();
-  for (const item of items) {
-    const name = item.name;
-    if (!grouped.has(name)) {
-      grouped.set(name, []);
-    }
-    grouped.get(name).push(item);
-  }
-
-  const expanded = [];
-  for (const [name, group] of grouped.entries()) {
-    group.forEach((item, index) => {
-      expanded.push({ ...item, name: `${name}${XHFGF}${String(index + 1).padStart(2, "0")}` });
-    });
-  }
-
-  items.splice(0, items.length, ...expanded);
-  return items;
-}
-
-function oneP(items) {
-  const grouped = new Map();
-  for (const item of items) {
-    const baseName = item.name.replace(/[^A-Za-z0-9\u00C0-\u017F\u4E00-\u9FFF]+\d+$/, "");
-    if (!grouped.has(baseName)) {
-      grouped.set(baseName, []);
-    }
-    grouped.get(baseName).push(item);
-  }
-
-  for (const group of grouped.values()) {
-    if (group.length === 1 && group[0].name.endsWith("01")) {
-      group[0].name = group[0].name.replace(/[^.]01$/, "");
-    }
-  }
-  return items;
-}
-
-function fampx(proxies) {
-  const withSpecial = [];
-  const withoutSpecial = [];
-
-  for (const proxy of proxies) {
-    const rank = specialRegex.findIndex((regex) => {
-      regex.lastIndex = 0;
-      return regex.test(proxy.name);
-    });
-
-    if (rank === -1) {
-      withoutSpecial.push(proxy);
-      continue;
-    }
-    withSpecial.push({ proxy, rank });
-  }
-
-  withSpecial.sort((a, b) => a.rank - b.rank || a.proxy.name.localeCompare(b.proxy.name));
-  return withoutSpecial.concat(withSpecial.map((item) => item.proxy));
-}
-
+// prettier-ignore
+function getList(arg) { switch (arg) { case 'us': return EN; case 'gq': return FG; case 'quan': return QC; default: return ZH; }}
+// prettier-ignore
+function jxh(e) { const n = e.reduce((e, n) => { const t = e.find((e) => e.name === n.name); if (t) { t.count++; t.items.push({ ...n, name: `${n.name}${XHFGF}${t.count.toString().padStart(2, "0")}`, }); } else { e.push({ name: n.name, count: 1, items: [{ ...n, name: `${n.name}${XHFGF}01` }], }); } return e; }, []);const t=(typeof Array.prototype.flatMap==='function'?n.flatMap((e) => e.items):n.reduce((acc, e) => acc.concat(e.items),[])); e.splice(0, e.length, ...t); return e;}
+// prettier-ignore
+function oneP(e) { const t = e.reduce((e, t) => { const n = t.name.replace(/[^A-Za-z0-9\u00C0-\u017F\u4E00-\u9FFF]+\d+$/, ""); if (!e[n]) { e[n] = []; } e[n].push(t); return e; }, {}); for (const e in t) { if (t[e].length === 1 && t[e][0].name.endsWith("01")) {/* const n = t[e][0]; n.name = e;*/ t[e][0].name= t[e][0].name.replace(/[^.]01/, "") } } return e; }
+// prettier-ignore
+function fampx(pro) { const wis = []; const wnout = []; for (const proxy of pro) { const fan = specialRegex.some((regex) => regex.test(proxy.name)); if (fan) { wis.push(proxy); } else { wnout.push(proxy); } } const sps = wis.map((proxy) => specialRegex.findIndex((regex) => regex.test(proxy.name)) ); wis.sort( (a, b) => sps[wis.indexOf(a)] - sps[wis.indexOf(b)] || a.name.localeCompare(b.name) ); wnout.sort((a, b) => pro.indexOf(a) - pro.indexOf(b)); return wnout.concat(wis);}
