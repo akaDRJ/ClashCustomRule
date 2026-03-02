@@ -245,9 +245,34 @@ const countryIconURLs = {
   法国: ICON('France.png')
 };
 
-const ISP_OR_LANDING_RE = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
-const LOW_COST_RE = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
+const ISP_EXCLUDE_PATTERN =
+  '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地';
+const LOW_COST_PATTERN = '(?i)0\\.[0-5]|低倍率|省流|大流量|实验性';
+
+const ISP_OR_LANDING_RE = makeRegex(ISP_EXCLUDE_PATTERN);
+const LOW_COST_RE = makeRegex(LOW_COST_PATTERN);
 const COUNTRY_ENTRIES = compileCountryEntries(countryRegex);
+
+const SERVICE_GROUP_SPECS = Object.freeze([
+  { name: '静态资源', icon: 'Cloudflare.png', source: 'default' },
+  { name: '人工智能', icon: 'Bot.png', source: 'default' },
+  { name: '加密货币', icon: 'Cryptocurrency_3.png', source: 'default' },
+  { name: 'PayPal', icon: 'PayPal.png', source: 'default' },
+  { name: 'Telegram', icon: 'Telegram.png', source: 'default' },
+  { name: 'Microsoft', icon: 'Microsoft.png', source: 'default' },
+  { name: 'Apple', icon: 'Apple_2.png', source: 'default' },
+  { name: 'Google', icon: 'Google_Search.png', source: 'default' },
+  { name: 'YouTube', icon: 'YouTube.png', source: 'default' },
+  { name: 'Disney', icon: 'Disney+.png', source: 'default' },
+  { name: 'Netflix', icon: 'Netflix.png', source: 'default' },
+  { name: 'Spotify', icon: 'Spotify.png', source: 'default' },
+  { name: 'Twitter(X)', icon: 'Twitter.png', source: 'default' },
+  { name: '学术资源', icon: 'Scholar.png', source: 'direct' },
+  { name: '开发者资源', icon: 'GitHub.png', source: 'default' },
+  { name: '游戏下载', icon: 'Game.png', source: 'default' },
+  { name: '游戏平台', icon: 'Game.png', source: 'default' },
+  { name: 'Speedtest', icon: 'Speedtest.png', source: 'default' }
+]);
 
 // ======================== 工具函数 ========================
 function parseBool(value) {
@@ -322,21 +347,32 @@ function insertUniqueAt(arr, index, values) {
   arr.splice(index, 0, ...filtered);
 }
 
+function buildServiceGroups(defaultProxies, directProxies) {
+  return SERVICE_GROUP_SPECS.map(({ name, icon, source }) => ({
+    name,
+    icon: ICON(icon),
+    type: 'select',
+    proxies: source === 'direct' ? directProxies : defaultProxies
+  }));
+}
+
 // ======================== 国家解析 ========================
 function parseCountries(proxies) {
-  const result = [];
-  const seen = new Set();
+  const matched = new Set();
 
-  for (const { country, regex } of COUNTRY_ENTRIES) {
-    for (const proxy of proxies) {
-      if (regex.test(proxy.name) && !isIspName(proxy.name) && !seen.has(country)) {
-        seen.add(country);
-        result.push(country);
+  for (const proxy of proxies) {
+    if (isIspName(proxy.name)) continue;
+
+    for (const { country, regex } of COUNTRY_ENTRIES) {
+      if (!matched.has(country) && regex.test(proxy.name)) {
+        matched.add(country);
       }
     }
   }
 
-  return result;
+  return COUNTRY_ENTRIES.map(({ country }) => country).filter((country) =>
+    matched.has(country)
+  );
 }
 
 // ========== 国家组（无智能兜底，固定排除 ISP/落地） ==========
@@ -352,7 +388,7 @@ function buildCountryProxyGroups(countryList) {
       type: options.loadBalance ? 'load-balance' : 'url-test',
       'include-all': true,
       filter: countryRegex[country],
-      'exclude-filter': '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地'
+      'exclude-filter': ISP_EXCLUDE_PATTERN
     };
 
     if (!options.loadBalance) {
@@ -399,6 +435,9 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
     insertAfter(globalProxies, '落地节点', '前置代理');
   }
 
+  const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
+  const serviceGroups = buildServiceGroups(defaultProxies, directFallbackProxies);
+
   return [
     {
       name: '节点选择',
@@ -413,7 +452,7 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
           icon: ICON('Airport.png'),
           type: 'select',
           'include-all': true,
-          filter: '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地'
+          filter: ISP_EXCLUDE_PATTERN
         }
       : null,
 
@@ -423,7 +462,7 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
           icon: ICON('Area.png'),
           type: 'select',
           'include-all': true,
-          'exclude-filter': '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地',
+          'exclude-filter': ISP_EXCLUDE_PATTERN,
           proxies: defaultSelector
         }
       : null,
@@ -434,7 +473,7 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
           icon: ICON('Lab.png'),
           type: options.loadBalance ? 'load-balance' : 'url-test',
           'include-all': true,
-          filter: '(?i)0\\.[0-5]|低倍率|省流|大流量|实验性'
+          filter: LOW_COST_PATTERN
         }
       : null,
 
@@ -450,7 +489,7 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
       icon: ICON('Auto.png'),
       type: 'url-test',
       'include-all': true,
-      'exclude-filter': '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地',
+      'exclude-filter': ISP_EXCLUDE_PATTERN,
       interval: 300,
       tolerance: 20,
       lazy: false
@@ -463,131 +502,7 @@ function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defa
       proxies: ['节点选择', '手动切换', '全球直连']
     },
 
-    {
-      name: '静态资源',
-      icon: ICON('Cloudflare.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '人工智能',
-      icon: ICON('Bot.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '加密货币',
-      icon: ICON('Cryptocurrency_3.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'PayPal',
-      icon: ICON('PayPal.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Telegram',
-      icon: ICON('Telegram.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Microsoft',
-      icon: ICON('Microsoft.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Apple',
-      icon: ICON('Apple_2.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Google',
-      icon: ICON('Google_Search.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'YouTube',
-      icon: ICON('YouTube.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Disney',
-      icon: ICON('Disney+.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Netflix',
-      icon: ICON('Netflix.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Spotify',
-      icon: ICON('Spotify.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Twitter(X)',
-      icon: ICON('Twitter.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '学术资源',
-      icon: ICON('Scholar.png'),
-      type: 'select',
-      proxies: ['节点选择', '手动切换', '全球直连']
-    },
-
-    {
-      name: '开发者资源',
-      icon: ICON('GitHub.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '游戏下载',
-      icon: ICON('Game.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: '游戏平台',
-      icon: ICON('Game.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
-
-    {
-      name: 'Speedtest',
-      icon: ICON('Speedtest.png'),
-      type: 'select',
-      proxies: defaultProxies
-    },
+    ...serviceGroups,
 
     {
       name: '全球直连',
