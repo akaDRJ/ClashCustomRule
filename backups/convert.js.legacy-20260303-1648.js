@@ -5,7 +5,6 @@ powerfullz 的 Substore 订阅转换脚本（无智能兜底版）
 - 国家组恒定仅排除家宽/落地等 ISP 关键词
 - 规则关键字与集合标识统一小写；第三段保留策略组名大小写
 - 克隆基础数组避免多次运行污染；统一 ICON/Geo 源；正则工具化
-- 支持 `regex` 参数：`false` 列举节点名，`true` 运行时正则筛选
 */
 
 // ======================== 运行参数 ========================
@@ -18,8 +17,7 @@ const options = Object.freeze({
   ipv6Enabled: parseBool(runtimeArgs.ipv6),
   fullConfig: parseBool(runtimeArgs.full),
   enableKeepAlive: parseBool(runtimeArgs.keepalive),
-  quicEnabled: parseBool(runtimeArgs.quic),
-  regexFilter: parseBool(runtimeArgs.regex)
+  quicEnabled: parseBool(runtimeArgs.quic)
 });
 
 // ==================== 基础数组（只读基线） ====================
@@ -263,9 +261,6 @@ const LOW_COST_PATTERN = '(?i)0\\.[0-5]|低倍率|省流|大流量|实验性';
 const ISP_OR_LANDING_RE = makeRegex(ISP_EXCLUDE_PATTERN);
 const LOW_COST_RE = makeRegex(LOW_COST_PATTERN);
 const COUNTRY_ENTRIES = compileCountryEntries(countryRegex);
-const COUNTRY_REGEX_MAP = new Map(
-  COUNTRY_ENTRIES.map(({ country, regex }) => [country, regex])
-);
 
 const SERVICE_GROUP_SPECS = Object.freeze([
   { name: '静态资源', icon: 'Cloudflare.png', source: 'default' },
@@ -344,37 +339,6 @@ function isIspName(name) {
   return ISP_OR_LANDING_RE.test(asString(name));
 }
 
-function parseLowCostNodes(proxies) {
-  return proxies
-    .filter((proxy) => isLowCostName(proxy.name))
-    .map((proxy) => proxy.name);
-}
-
-function parseLandingNodes(proxies) {
-  return proxies
-    .filter((proxy) => isIspName(proxy.name))
-    .map((proxy) => proxy.name);
-}
-
-function parseCountryBuckets(proxies, countryList) {
-  const buckets = Object.fromEntries(countryList.map((country) => [country, []]));
-
-  for (const proxy of proxies) {
-    const name = asString(proxy.name);
-    if (!name || isIspName(name)) continue;
-
-    for (const country of countryList) {
-      const regex = COUNTRY_REGEX_MAP.get(country);
-      if (regex && regex.test(name)) {
-        buckets[country].push(name);
-        break;
-      }
-    }
-  }
-
-  return buckets;
-}
-
 function insertAfter(arr, target, item) {
   if (!Array.isArray(arr) || arr.includes(item)) return;
   const index = arr.indexOf(target);
@@ -421,7 +385,7 @@ function parseCountries(proxies) {
 }
 
 // ========== 国家组（无智能兜底，固定排除 ISP/落地） ==========
-function buildCountryProxyGroups(countryList, countryBuckets) {
+function buildCountryProxyGroups(countryList) {
   const groups = [];
 
   for (const country of countryList) {
@@ -430,20 +394,11 @@ function buildCountryProxyGroups(countryList, countryBuckets) {
     const group = {
       name: `${country}节点`,
       icon: countryIconURLs[country],
-      type: options.loadBalance ? 'load-balance' : 'url-test'
+      type: options.loadBalance ? 'load-balance' : 'url-test',
+      'include-all': true,
+      filter: countryRegex[country],
+      'exclude-filter': ISP_EXCLUDE_PATTERN
     };
-
-    if (options.regexFilter) {
-      Object.assign(group, {
-        'include-all': true,
-        filter: countryRegex[country],
-        'exclude-filter': ISP_EXCLUDE_PATTERN
-      });
-    } else {
-      const nodes = countryBuckets[country] || [];
-      if (!nodes.length) continue;
-      group.proxies = nodes;
-    }
 
     if (!options.loadBalance) {
       Object.assign(group, { interval: 300, tolerance: 20, lazy: false });
@@ -456,13 +411,7 @@ function buildCountryProxyGroups(countryList, countryBuckets) {
 }
 
 // ========================= 代理组 =========================
-function buildProxyGroups(
-  countryList,
-  countryProxyGroups,
-  lowCostNodes,
-  landingNodes,
-  defaults
-) {
+function buildProxyGroups(countryList, countryProxyGroups, hasLowCostNodes, defaults) {
   const {
     defaultProxies,
     defaultSelector,
@@ -470,16 +419,14 @@ function buildProxyGroups(
     globalProxies
   } = defaults;
 
-  const hasLowCostGroup = options.regexFilter || lowCostNodes.length > 0;
   const countryProxies = [];
-
   for (const country of countryList) {
     const groupName = `${country}节点`;
     insertAfter(globalProxies, '全球直连', groupName);
     countryProxies.push(groupName);
   }
 
-  if (hasLowCostGroup) {
+  if (hasLowCostNodes) {
     insertAfter(globalProxies, '自动选择', '低倍率节点');
     countryProxies.push('低倍率节点');
   }
@@ -513,9 +460,8 @@ function buildProxyGroups(
           name: '落地节点',
           icon: ICON('Airport.png'),
           type: 'select',
-          ...(options.regexFilter
-            ? { 'include-all': true, filter: ISP_EXCLUDE_PATTERN }
-            : { proxies: landingNodes })
+          'include-all': true,
+          filter: ISP_EXCLUDE_PATTERN
         }
       : null,
 
@@ -524,24 +470,19 @@ function buildProxyGroups(
           name: '前置代理',
           icon: ICON('Area.png'),
           type: 'select',
-          ...(options.regexFilter
-            ? {
-                'include-all': true,
-                'exclude-filter': ISP_EXCLUDE_PATTERN,
-                proxies: defaultSelector
-              }
-            : { proxies: defaultSelector })
+          'include-all': true,
+          'exclude-filter': ISP_EXCLUDE_PATTERN,
+          proxies: defaultSelector
         }
       : null,
 
-    hasLowCostGroup
+    hasLowCostNodes
       ? {
           name: '低倍率节点',
           icon: ICON('Lab.png'),
           type: options.loadBalance ? 'load-balance' : 'url-test',
-          ...(options.regexFilter
-            ? { 'include-all': true, filter: LOW_COST_PATTERN }
-            : { proxies: lowCostNodes })
+          'include-all': true,
+          filter: LOW_COST_PATTERN
         }
       : null,
 
@@ -604,18 +545,13 @@ function main(config) {
     const dnsConfig = { ...dnsConfigBase, ipv6: options.ipv6Enabled };
 
     const countryList = parseCountries(proxies);
-    const lowCostNodes = parseLowCostNodes(proxies);
-    const landingNodes = options.landing ? parseLandingNodes(proxies) : [];
-    const countryBuckets = options.regexFilter
-      ? {}
-      : parseCountryBuckets(proxies, countryList);
-    const countryProxyGroups = buildCountryProxyGroups(countryList, countryBuckets);
+    const hasLowCostNodes = proxies.some((proxy) => isLowCostName(proxy.name));
+    const countryProxyGroups = buildCountryProxyGroups(countryList);
 
     const proxyGroups = buildProxyGroups(
       countryList,
       countryProxyGroups,
-      lowCostNodes,
-      landingNodes,
+      hasLowCostNodes,
       { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies }
     );
     const finalRules = buildRules(options.quicEnabled);
