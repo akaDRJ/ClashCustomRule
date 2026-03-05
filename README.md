@@ -22,13 +22,16 @@
 - `npm run check:rules`：检查规则 YAML 是否与单一源一致
 - `npm run build:drj3`：基于 `convert.js` 全量生成 `DRJCustomRule_3.0.ini`
 - `npm run check:drj3`：检查 `DRJCustomRule_3.0.ini` 是否为最新生成结果
-- `npm run refresh:drj3`：一键刷新（先生成规则 YAML，再生成 DRJ 3.0 INI）
+- `npm run build:configs`：基于 `convert.js` 全量生成 `config.yaml` 与 `config_substore.yaml`
+- `npm run check:configs`：检查 `config.yaml` 与 `config_substore.yaml` 是否为最新生成结果
+- `npm run refresh:drj3`：一键刷新规则 YAML + DRJ 3.0 INI
+- `npm run refresh:all`：一键刷新规则 YAML + DRJ 3.0 INI + config 文件
 - `npm run sync:drj3`：兼容别名（等同于 `build:drj3`）
 - `npm run lint:rules`：规则重复项检查
 
 ## 推荐流程
 
 1. 修改 `rules/src/rulesets.js` 和/或 `convert.js`
-2. 运行 `npm run refresh:drj3`
-3. 运行 `npm run check:rules && npm run check:drj3`
+2. 运行 `npm run refresh:all`
+3. 运行 `npm run check:rules && npm run check:drj3 && npm run check:configs`
 4. 提交并推送

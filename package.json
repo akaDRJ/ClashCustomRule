@@ -9,7 +9,10 @@
     "build:drj3": "node scripts/sync-drjcustomrule-3.js",
     "check:drj3": "node scripts/sync-drjcustomrule-3.js --check",
     "sync:drj3": "node scripts/sync-drjcustomrule-3.js",
+    "build:configs": "node scripts/build-configs.js",
+    "check:configs": "node scripts/build-configs.js --check",
     "refresh:drj3": "npm run build:rules && npm run build:drj3",
+    "refresh:all": "npm run refresh:drj3 && npm run build:configs",
     "lint:rules": "node scripts/lint-rules.js",
     "check:rename-dict": "node scripts/check-rename-dictionary.js"
   }
