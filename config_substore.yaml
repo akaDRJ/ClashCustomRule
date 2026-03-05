@@ -125,32 +125,6 @@ proxy-groups:
       - "手动切换"
       - "全球直连"
   -
-    name: "静态资源"
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cloudflare.png
-    type: select
-    proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
     name: "人工智能"
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bot.png
     type: select
@@ -752,7 +726,6 @@ proxy-groups:
       - "自动选择"
       - "低倍率节点"
       - "强制代理"
-      - "静态资源"
       - "人工智能"
       - "加密货币"
       - PayPal
@@ -791,45 +764,45 @@ rule-providers:
   outlook:
     type: http
     behavior: domain
-    format: yaml
+    format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.yaml
-    path: ./ruleset/outlook.yaml
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.mrs
+    path: ./ruleset/outlook.mrs
   pt:
     type: http
     behavior: domain
-    format: yaml
+    format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.yaml
-    path: ./ruleset/pt.yaml
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.mrs
+    path: ./ruleset/pt.mrs
   crypto:
     type: http
     behavior: domain
-    format: yaml
+    format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.yaml
-    path: ./ruleset/crypto.yaml
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.mrs
+    path: ./ruleset/crypto.mrs
   mining:
     type: http
     behavior: domain
-    format: yaml
+    format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/mining.yaml
-    path: ./ruleset/mining.yaml
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/mining.mrs
+    path: ./ruleset/mining.mrs
   forceproxy:
     type: http
     behavior: domain
-    format: yaml
+    format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forceproxy.yaml
-    path: ./ruleset/forceproxy.yaml
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forceproxy.mrs
+    path: ./ruleset/forceproxy.mrs
   forcedirect:
     type: http
     behavior: domain
-    format: yaml
+    format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forcedirect.yaml
-    path: ./ruleset/forcedirect.yaml
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forcedirect.mrs
+    path: ./ruleset/forcedirect.mrs
   fakeipfilter:
     type: http
     behavior: domain
@@ -844,19 +817,11 @@ rule-providers:
     interval: 86400
     url: https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs
     path: ./ruleset/cnsite.mrs
-  cdn:
-    type: http
-    behavior: classical
-    format: text
-    interval: 86400
-    url: https://ruleset.skk.moe/Clash/non_ip/cdn.txt
-    path: ./ruleset/cdn.txt
 rules:
   - "AND,((DST-PORT,443),(NETWORK,UDP)),REJECT"
   - "rule-set,forcedirect,全球直连"
   - "rule-set,forceproxy,强制代理"
   - "rule-set,outlook,全球直连"
-  - "rule-set,cdn,静态资源"
   - "rule-set,pt,全球直连"
   - "geosite,category-pt,全球直连"
   - "geosite,google-play@cn,全球直连"

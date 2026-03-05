@@ -43,6 +43,7 @@ const globalProxiesBase = Object.freeze([
   '手动切换',
   '自动选择',
   '强制代理',
+  '静态资源',
   '人工智能',
   '加密货币',
   'PayPal',
@@ -68,6 +69,7 @@ const rules = [
   'rule-set,forcedirect,全球直连',
   'rule-set,forceproxy,强制代理',
   'rule-set,outlook,全球直连',
+  'rule-set,cdn,静态资源',
   'rule-set,pt,全球直连',
   'geosite,category-pt,全球直连',
   'geosite,google-play@cn,全球直连',
@@ -122,6 +124,17 @@ const CDN = 'https://gcore.jsdelivr.net';
 const ICON = (path) => `${CDN}/gh/Koolson/Qure@master/IconSet/Color/${path}`;
 
 // ================= rule-providers（工厂） =================
+function yamlProvider(name, repoPath) {
+  return {
+    type: 'http',
+    behavior: 'domain',
+    format: 'yaml',
+    interval: 86400,
+    url: `https://raw.githubusercontent.com/${repoPath}`,
+    path: `./ruleset/${name}.yaml`
+  };
+}
+
 function mrsProvider(name, hostPath) {
   return {
     type: 'http',
@@ -133,27 +146,29 @@ function mrsProvider(name, hostPath) {
   };
 }
 
+function textProvider(name, hostPath) {
+  return {
+    type: 'http',
+    behavior: 'classical',
+    format: 'text',
+    interval: 86400,
+    url: `https://${hostPath}`,
+    path: `./ruleset/${name}.txt`
+  };
+}
+
 const ruleProviders = {
-  outlook: mrsProvider(
-    'outlook',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.mrs'
-  ),
-  pt: mrsProvider('pt', 'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.mrs'),
-  crypto: mrsProvider(
-    'crypto',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.mrs'
-  ),
-  mining: mrsProvider(
-    'mining',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/mining.mrs'
-  ),
-  forceproxy: mrsProvider(
+  outlook: yamlProvider('outlook', 'akaDRJ/ClashCustomRule/master/outlook.yaml'),
+  pt: yamlProvider('pt', 'akaDRJ/ClashCustomRule/master/pt.yaml'),
+  crypto: yamlProvider('crypto', 'akaDRJ/ClashCustomRule/master/crypto.yaml'),
+  mining: yamlProvider('mining', 'akaDRJ/ClashCustomRule/master/mining.yaml'),
+  forceproxy: yamlProvider(
     'forceproxy',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forceproxy.mrs'
+    'akaDRJ/ClashCustomRule/master/forceproxy.yaml'
   ),
-  forcedirect: mrsProvider(
+  forcedirect: yamlProvider(
     'forcedirect',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forcedirect.mrs'
+    'akaDRJ/ClashCustomRule/master/forcedirect.yaml'
   ),
   fakeipfilter: mrsProvider(
     'fakeipfilter',
@@ -162,7 +177,8 @@ const ruleProviders = {
   cnsite: mrsProvider(
     'cnsite',
     'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'
-  )
+  ),
+  cdn: textProvider('cdn', 'ruleset.skk.moe/Clash/non_ip/cdn.txt')
 };
 
 // ======================== 其余配置 ========================
@@ -252,6 +268,7 @@ const COUNTRY_REGEX_MAP = new Map(
 );
 
 const SERVICE_GROUP_SPECS = Object.freeze([
+  { name: '静态资源', icon: 'Cloudflare.png', source: 'default' },
   { name: '人工智能', icon: 'Bot.png', source: 'default' },
   { name: '加密货币', icon: 'Cryptocurrency_3.png', source: 'default' },
   { name: 'PayPal', icon: 'PayPal.png', source: 'default' },

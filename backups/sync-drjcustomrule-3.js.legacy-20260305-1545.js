@@ -21,6 +21,7 @@ function splitRule(ruleLine) {
 
 function providerType(provider) {
   if (!provider || provider.type !== 'http') return null;
+  if (provider.format === 'mrs') return null;
   if (provider.behavior === 'classical') return 'clash-classic';
   if (provider.behavior === 'ipcidr') return 'clash-ipcidr';
   if (provider.behavior === 'domain') return 'clash-domain';
