@@ -6,6 +6,10 @@
   "scripts": {
     "build:rules": "node scripts/build-rules.js",
     "check:rules": "node scripts/build-rules.js --check",
+    "build:drj3": "node scripts/sync-drjcustomrule-3.js",
+    "check:drj3": "node scripts/sync-drjcustomrule-3.js --check",
+    "sync:drj3": "node scripts/sync-drjcustomrule-3.js",
+    "refresh:drj3": "npm run build:rules && npm run build:drj3",
     "lint:rules": "node scripts/lint-rules.js",
     "check:rename-dict": "node scripts/check-rename-dictionary.js"
   }

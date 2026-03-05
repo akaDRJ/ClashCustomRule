@@ -660,5 +660,12 @@ function main(config) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { main };
+  module.exports = {
+    main,
+    metadata: {
+      rules,
+      ruleProviders,
+      countryRegex
+    }
+  };
 }
