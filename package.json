@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "description": "Baseline maintenance tooling for ClashCustomRule",
   "scripts": {
+    "build:rules": "node scripts/build-rules.js",
+    "check:rules": "node scripts/build-rules.js --check",
     "lint:rules": "node scripts/lint-rules.js",
     "check:rename-dict": "node scripts/check-rename-dictionary.js"
   }
