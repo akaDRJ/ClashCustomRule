@@ -527,7 +527,6 @@ function buildProxyGroups(
     insertAfter(globalProxies, '落地节点', '前置代理');
   }
 
-  const preProxySelector = defaultSelector.filter((name) => name !== '落地节点');
   const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
   const serviceGroups = buildServiceGroups(defaultProxies, directFallbackProxies);
 
@@ -559,9 +558,9 @@ function buildProxyGroups(
             ? {
                 'include-all': true,
                 'exclude-filter': ISP_EXCLUDE_PATTERN,
-                proxies: preProxySelector
+                proxies: defaultSelector
               }
-            : { proxies: preProxySelector })
+            : { proxies: defaultSelector })
         }
       : null,
 
