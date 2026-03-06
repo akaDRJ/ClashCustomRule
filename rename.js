@@ -1,43 +1,64 @@
 /**
- * 更新日期：2024-04-05 15:30:15
- * 用法：Sub-Store 脚本操作添加
- * rename.js 以下是此脚本支持的参数，必须以 # 为开头多个参数使用"&"连接，参考上述地址为例使用参数。 禁用缓存url#noCache
+ * rename.js - Sub-Store 节点重命名与过滤脚本
+ * 更新日期：2026-03-06
  *
- *** 主要参数
- * [in=] 自动判断机场节点名类型 优先级 zh(中文) -> flag(国旗) -> quan(英文全称) -> en(英文简写)
- * 如果不准的情况, 可以加参数指定:
+ * 功能概述：
+ * - 自动识别节点所属国家/地区（支持国旗、中文、英文简写/全称）
+ * - 统一节点命名格式（国旗 + 地区名 + 序号）
+ * - 按关键词过滤/保留节点
+ * - 添加机场前缀、保留倍率标识、ISP标签等
  *
- * [nm]    保留没有匹配到的节点
- * [in=zh] 或in=cn识别中文
- * [in=en] 或in=us 识别英文缩写
- * [in=flag] 或in=gq 识别国旗 如果加参数 in=flag 则识别国旗 脚本操作前面不要添加国旗操作 否则移除国旗后面脚本识别不到
- * [in=quan] 识别英文全称
-
+ * 使用方式：
+ * 在 Sub-Store 脚本操作中添加，URL 后接 # 参数，多个参数用 & 连接
+ * 示例：https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/rename.js#flag=true&name=NX&rmkey=Premium
+ * 禁用缓存：在 URL 末尾添加 #noCache
  *
- * [out=]   输出节点名可选参数: (cn或zh ，us或en ，gq或flag ，quan) 对应：(中文，英文缩写 ，国旗 ，英文全称) 默认中文 例如 [out=en] 或 out=us 输出英文缩写
- *** 分隔符参数
+ * ==================== 核心参数 ====================
  *
- * [fgf=]   节点名前缀或国旗分隔符，默认为空格；
- * [sn=]    设置国家与序号之间的分隔符，默认为空格；
- * 序号参数
- * [one]    清理只有一个节点的地区的01
- * [flag]   给节点前面加国旗
+ * 【输入识别】
+ * [in=]      强制指定输入识别类型（默认自动判断）
+ *            可选：zh/cn(中文), en/us(英文简写), flag/gq(国旗), quan(英文全称)
+ *            优先级（自动时）：zh > flag > quan > en
  *
- *** 前缀参数
- * [name=]  节点添加机场名称前缀；
- * [nf]     把 name= 的前缀放在最前面
- *** 保留参数
- * [blkey=iplc+gpt+NF+IPLC] 用+号添加多个关键词 保留节点名的自定义字段 需要区分大小写!
- * 如果需要修改 保留的关键词 替换成别的 可以用 > 分割 例如 [#blkey=GPT>新名字+其他关键词] 这将把【GPT】替换成【新名字】
- * 例如      https://raw.githubusercontent.com/Keywos/rule/main/rename.js#flag&blkey=GPT>新名字+NF
- * [blgd]   保留: 家宽 IPLC ˣ² 等
- * [bl]     正则匹配保留 [0.1x, x0.2, 6x ,3倍]等标识
- * [nx]     保留1倍率与不显示倍率的
- * [blnx]   只保留高倍率
- * [clear]  清理乱名
- * [rmkey=Premium+Test] 用+号添加多个关键词，命中即删除节点（不区分大小写）
- * [blpx]   如果用了上面的bl参数,对保留标识后的名称分组排序,如果没用上面的bl参数单独使用blpx则不起任何作用
- * [blockquic] blockquic=on 阻止; blockquic=off 不阻止
+ * [out=]     指定输出名称类型（默认中文）
+ *            可选：cn/zh(中文), us/en(英文简写), gq/flag(国旗), quan(英文全称)
+ *
+ * 【命名格式】
+ * [flag]     在节点名前添加国旗（如 🇭🇰 香港 01）
+ * [name=]    添加机场名称前缀（如 NX）
+ * [nf]       将 name 前缀放在最前面（默认在国旗后）
+ *            效果：NX 🇭🇰 香港 01（nf=true）vs 🇭🇰 NX 香港 01（nf=false）
+ *
+ * [fgf=]     设置分隔符（默认空格）
+ * [sn=]      设置国家与序号之间的分隔符（默认空格）
+ * [one]      清理只有一个节点的地区的序号 01
+ *
+ * 【过滤参数 - 删除节点】
+ * [rmkey=]   按关键词删除节点（+ 分隔，不区分大小写）
+ *            示例：rmkey=Premium+Test 删除含 Premium 或 Test 的节点
+ *
+ * [clear]    清理含营销/广告关键词的节点名（套餐/到期/流量/机场等）
+ * [nx]       只保留 1 倍率或不显示倍率的节点
+ * [blnx]     只保留高倍率节点（排除 1 倍率）
+ * [key]      只保留指定国家/地区的节点（HK/SG/JP/US/KR等 + 序号）
+ *
+ * 【保留参数 - 节点名中保留原字段】
+ * [blkey=]   保留指定关键词在原节点名中（+ 分隔，区分大小写）
+ *            支持替换：GPT>新名字 表示将 GPT 替换为新名字
+ *            示例：blkey=IPLC+GPT>AI+NF
+ *
+ * [blgd]     保留 ISP/线路标签（家宽/商宽/IPLC/IEPL/ˣ²等）
+ * [bl]       保留倍率标识（2x/3倍/0.5x等）并添加到节点名
+ *
+ * 【排序与分组】
+ * [blpx]     按保留的特殊标识排序（需配合 bl 使用，无 bl 时不生效）
+ *            顺序：IPLC/IEPL > Kern/Edge > Pro/Std > 其他
+ *
+ * [nm]       保留未匹配到国家/地区的节点（默认删除）
+ *
+ * 【其他】
+ * [blockquic=on/off]  设置 block-quic 属性
+ * [dictcheck]         启用字典回归测试（调试模式）
  */
 
 // const inArg = {'blkey':'iplc+GPT>GPTnewName+IPLC', 'flag':true };

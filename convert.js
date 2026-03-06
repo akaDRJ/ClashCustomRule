@@ -1,12 +1,59 @@
-/*
-powerfullz 的 Substore 订阅转换脚本（无智能兜底版）
-要点：
-- 去掉“智能低倍率兜底”功能，不做任何回填
-- 国家组恒定仅排除家宽/落地等 ISP 关键词
-- 规则关键字与集合标识统一小写；第三段保留策略组名大小写
-- 克隆基础数组避免多次运行污染；统一 ICON/Geo 源；正则工具化
-- 支持 `regex` 参数：`false` 列举节点名，`true` 运行时正则筛选
-*/
+/**
+ * convert.js - Sub-Store 配置转换脚本
+ * 功能：将订阅转换为完整 Clash/Mihomo 配置文件
+ *
+ * 核心特性：
+ * - 自动生成国家/地区分组（支持正则运行时匹配或枚举节点名）
+ * - 内置完整规则集（强制直连/代理、微软服务、流媒体、加密货币等）
+ * - 支持落地节点、低倍率节点、负载均衡等高级分组
+ * - 统一 MRS 格式规则源，支持 QUIC 控制
+ *
+ * ==================== 运行参数 ====================
+ *
+ * [loadbalance]    使用负载均衡模式（默认 url-test）
+ *                  开启后国家组使用 load-balance，否则使用 url-test
+ *
+ * [landing]        启用落地节点支持
+ *                  添加「落地节点」分组（匹配家宽/商宽/星链等 ISP 关键词）
+ *                  添加「前置代理」分组（自动选择排除 ISP 的节点）
+ *
+ * [ipv6]           启用 IPv6 支持（默认关闭）
+ *                  影响 DNS 配置和全局 ipv6 开关
+ *
+ * [full]           输出完整配置（包含端口、TUN、日志等基础配置）
+ *                  默认仅输出 proxy-groups、rules、rule-providers、dns、sniffer
+ *
+ * [keepalive]      启用 TCP Keep-Alive（默认关闭）
+ *                  设置 disable-keep-alive: false
+ *
+ * [quic]           启用 QUIC 支持（默认关闭，即阻止 QUIC）
+ *                  关闭时：自动添加规则 AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
+ *                  开启时：不添加 QUIC 阻止规则
+ *
+ * [regex]          使用正则运行时匹配模式（默认 false，使用枚举模式）
+ *                  false：国家组使用 proxies 列表枚举具体节点名
+ *                  true：国家组使用 include-all + filter + exclude-filter 正则匹配
+ *                       落地/低倍率组同样使用正则匹配
+ *
+ * ==================== 使用示例 ====================
+ *
+ * 基础转换（默认配置，阻止 QUIC，枚举节点）：
+ * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/convert.js
+ *
+ * 完整配置 + 落地节点 + 负载均衡 + 正则模式：
+ * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/convert.js#full=true&landing=true&loadbalance=true&regex=true
+ *
+ * 启用 QUIC + IPv6：
+ * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/convert.js#quic=true&ipv6=true
+ *
+ * ==================== 导出接口 ====================
+ *
+ * 本脚本导出以下接口供其他脚本调用：
+ * - main(config): 主入口，接收代理配置返回完整配置
+ * - metadata: { rules, ruleProviders, countryRegex } 元数据对象
+ *
+ * 被 sync-drjcustomrule-3.js 和 build-configs.js 依赖
+ */
 
 // ======================== 运行参数 ========================
 const runtimeArgs =
