@@ -35,7 +35,6 @@
  * [nx]     保留1倍率与不显示倍率的
  * [blnx]   只保留高倍率
  * [clear]  清理乱名
- * [rmkey=Premium+Test] 用+号添加多个关键词，命中即删除节点（不区分大小写）
  * [blpx]   如果用了上面的bl参数,对保留标识后的名称分组排序,如果没用上面的bl参数单独使用blpx则不起任何作用
  * [blockquic] blockquic=on 阻止; blockquic=off 不阻止
  */
@@ -84,7 +83,6 @@ const FGF = decodeArg(inArg.fgf, " "),
   XHFGF = decodeArg(inArg.sn, " "),
   FNAME = decodeArg(inArg.name, ""),
   BLKEY = decodeArg(inArg.blkey, ""),
-  RMKEY = decodeArg(inArg.rmkey, ""),
   blockquic = decodeArg(inArg.blockquic, "").toLowerCase(),
   nameMap = {
     cn: "cn",
@@ -214,13 +212,6 @@ const BLKEY_RULES = BLKEY
           replacement: raw.slice(pivot + 1),
         };
       })
-  : [];
-
-const RMKEY_RULES = RMKEY
-  ? RMKEY.split("+")
-      .map((raw) => normalizeProxyName(raw))
-      .filter(Boolean)
-      .map((item) => item.toUpperCase())
   : [];
 
 function resolveMatchPriority(key) {
@@ -378,13 +369,6 @@ function resolveRetainKey(originalName, normalizedName) {
   return kept.join(",");
 }
 
-function containsRemoveKey(normalizedName) {
-  if (RMKEY_RULES.length === 0) return false;
-
-  const upperName = normalizedName.toUpperCase();
-  return RMKEY_RULES.some((token) => upperName.includes(token));
-}
-
 function applyBlockQuic(proxy) {
   if (blockquic === "on" || blockquic === "off") {
     proxy["block-quic"] = blockquic;
@@ -435,14 +419,13 @@ function operator(pro) {
     }
   }
 
-  if (clear || nx || blnx || key || RMKEY_RULES.length > 0) {
+  if (clear || nx || blnx || key) {
     proxies = proxies.filter((item) => {
       const normalized = normalizeProxyName(item.name);
       return !(
         (clear && nameclear.test(normalized)) ||
         (nx && namenx.test(normalized)) ||
         (blnx && !nameblnx.test(normalized)) ||
-        (RMKEY_RULES.length > 0 && containsRemoveKey(normalized)) ||
         (key && !(keya.test(normalized) && KEY_DIGIT_FILTER_RE.test(normalized)))
       );
     });
