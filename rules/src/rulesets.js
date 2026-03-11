@@ -6,7 +6,6 @@ module.exports = {
     "+.baobaobooks.com",
     "+.pangolin-dsp-toutiao.com",
     "+.kuaishouzt.com",
-    "+.chuangzuoli.com",
     "+.ledupeiyou.com",
     "+.xiaoshufenji.com",
     "+.getui.com",
