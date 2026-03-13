@@ -114,6 +114,7 @@ const globalProxiesBase = Object.freeze([
 const rules = [
   'rule-set,forcedirect,全球直连',
   'rule-set,forceproxy,强制代理',
+  'rule-set,ai,人工智能',
   'rule-set,outlook,全球直连',
   'rule-set,pt,全球直连',
   'geosite,category-pt,全球直连',
@@ -197,6 +198,10 @@ const ruleProviders = {
   forceproxy: mrsProvider(
     'forceproxy',
     'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forceproxy.mrs'
+  ),
+  ai: mrsProvider(
+    'ai',
+    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/ai.mrs'
   ),
   forcedirect: mrsProvider(
     'forcedirect',

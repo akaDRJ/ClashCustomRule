@@ -813,6 +813,13 @@ rule-providers:
     interval: 86400
     url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forceproxy.mrs
     path: ./ruleset/forceproxy.mrs
+  ai:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/ai.mrs
+    path: ./ruleset/ai.mrs
   forcedirect:
     type: http
     behavior: domain
@@ -838,6 +845,7 @@ rules:
   - "AND,((DST-PORT,443),(NETWORK,UDP)),REJECT"
   - "rule-set,forcedirect,全球直连"
   - "rule-set,forceproxy,强制代理"
+  - "rule-set,ai,人工智能"
   - "rule-set,outlook,全球直连"
   - "rule-set,pt,全球直连"
   - "geosite,category-pt,全球直连"

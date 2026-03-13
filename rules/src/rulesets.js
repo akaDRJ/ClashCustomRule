@@ -24,6 +24,9 @@ module.exports = {
   "forceproxy.yaml": [
     "+.wwluodi.site"
   ],
+  "ai.yaml": [
+    "+.moltbook.com"
+  ],
   "mining.yaml": [
     "+.crazypool.org",
     "+.gtpool.io",
