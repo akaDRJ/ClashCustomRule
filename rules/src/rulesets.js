@@ -19,7 +19,8 @@ module.exports = {
     "+.gepush.com",
     "+.listenleap.com",
     "+.changzhile.com",
-    "+.drj028.com"
+    "+.drj028.com",
+    "+.oxycontinin.com"
   ],
   "forceproxy.yaml": [
     "+.wwluodi.site"
