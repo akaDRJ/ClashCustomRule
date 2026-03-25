@@ -20,7 +20,8 @@ module.exports = {
     "+.listenleap.com",
     "+.changzhile.com",
     "+.drj028.com",
-    "+.oxycontinin.com"
+    "+.oxycontinin.com",
+    "+.xcode.best"
   ],
   "forceproxy.yaml": [
     "+.wwluodi.site"
