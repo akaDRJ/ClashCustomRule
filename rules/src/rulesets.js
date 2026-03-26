@@ -20,14 +20,16 @@ module.exports = {
     "+.listenleap.com",
     "+.changzhile.com",
     "+.drj028.com",
-    "+.oxycontinin.com",
-    "+.xcode.best"
+    "+.oxycontinin.com"
   ],
   "forceproxy.yaml": [
     "+.wwluodi.site"
   ],
   "ai.yaml": [
-    "+.moltbook.com"
+    "+.moltbook.com",
+    "+.xcode.best",
+    "+.chuangzuoli.com",
+    "+.fakerclaw.online"
   ],
   "mining.yaml": [
     "+.crazypool.org",
