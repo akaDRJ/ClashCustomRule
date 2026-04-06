@@ -1,5 +1,6 @@
 module.exports = {
   "forcedirect.yaml": [
+    "+.zenithgrid.co",
     "+.redringvip.com",
     "+.ihezu.com",
     "+.javabikes.com",
