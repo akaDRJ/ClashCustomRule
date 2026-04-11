@@ -22,6 +22,7 @@ module.exports = {
     "+.listenleap.com",
     "+.changzhile.com",
     "+.drj028.com",
+    "+.gddns.org",
     "+.oxycontinin.com"
   ],
   "forceproxy.yaml": [
