@@ -117,14 +117,20 @@ function buildGroupLine(group) {
   const proxies = Array.isArray(group.proxies)
     ? group.proxies.filter((item) => typeof item === 'string' && item.trim())
     : [];
+  const hasDynamicFilter = Boolean(
+    String(group.filter || '').trim() || String(group['exclude-filter'] || '').trim()
+  );
+  const includePattern = group['include-all']
+    ? buildIncludePattern(group.filter, group['exclude-filter'])
+    : '';
 
-  if (proxies.length > 0) {
-    for (const proxyName of proxies) {
-      parts.push(`[]${proxyName}`);
-    }
-  } else if (group['include-all']) {
-    parts.push(buildIncludePattern(group.filter, group['exclude-filter']));
-  } else {
+  for (const proxyName of proxies) {
+    parts.push(`[]${proxyName}`);
+  }
+
+  if (includePattern && (hasDynamicFilter || !proxies.length)) {
+    parts.push(includePattern);
+  } else if (!proxies.length) {
     parts.push('.*');
   }
 

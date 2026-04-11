@@ -561,8 +561,9 @@ function oneP(items) {
   }
 
   for (const group of grouped.values()) {
-    if (group.length === 1 && group[0].name.endsWith("01")) {
-      group[0].name = group[0].name.replace(/[^.]01$/, "");
+    const suffix = `${XHFGF}01`;
+    if (group.length === 1 && group[0].name.endsWith(suffix)) {
+      group[0].name = group[0].name.slice(0, -suffix.length);
     }
   }
   return items;
@@ -601,4 +602,3 @@ if (typeof module !== "undefined" && module.exports) {
     },
   };
 }
-
