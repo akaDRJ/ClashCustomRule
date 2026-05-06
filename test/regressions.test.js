@@ -170,3 +170,97 @@ test('convert aggressive mode keeps the old high-risk performance defaults', () 
   assert.equal(result.sniffer.sniff.TLS['override-destination'], true);
   assert.equal(result.sniffer.sniff.QUIC['override-destination'], true);
 });
+
+test('convert main fails fast instead of returning a partial config', () => {
+  const modulePath = path.join(repoRoot, 'convert.js');
+  delete require.cache[modulePath];
+  global.$arguments = {};
+
+  const convert = require(modulePath);
+  const config = { proxies: [{ name: '香港 01', type: 'direct' }] };
+  Object.defineProperty(config, 'proxy-groups', {
+    configurable: true,
+    set() {
+      throw new Error('write blocked');
+    }
+  });
+
+  assert.throws(() => convert.main(config), /write blocked/);
+});
+
+test('convert metadata passes internal consistency checks', () => {
+  const modulePath = path.join(repoRoot, 'convert.js');
+  delete require.cache[modulePath];
+  global.$arguments = {};
+
+  const { metadata } = require(modulePath);
+  const providers = metadata.ruleProviders;
+
+  for (const rule of metadata.rules) {
+    const [kind, providerName] = rule.split(',');
+    if (kind === 'rule-set') {
+      assert.ok(providers[providerName], `missing provider for ${rule}`);
+    }
+  }
+
+  assert.ok(Object.keys(metadata.countryRegex).length > 10);
+});
+
+test('package exposes one-shot test and check scripts', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+
+  assert.equal(manifest.scripts.test, 'node --test');
+  assert.ok(manifest.scripts.check);
+  assert.match(manifest.scripts.check, /npm run test/);
+  assert.match(manifest.scripts.check, /npm run check:configs/);
+  assert.match(manifest.scripts.check, /npm run check:drj3/);
+  assert.match(manifest.scripts.check, /npm run lint:rules -- --strict/);
+  assert.match(manifest.scripts.check, /npm run check:rename-dict/);
+});
+
+test('rename country dictionary exposes complete row data without index drift', () => {
+  const rename = loadRename({});
+  const rows = rename._internal.COUNTRY_ROWS;
+
+  assert.ok(Array.isArray(rows));
+  assert.ok(rows.length > 150);
+
+  const codes = new Set();
+  for (const row of rows) {
+    assert.match(row.code, /^[A-Z]{2,3}$/);
+    assert.ok(row.zh);
+    assert.ok(row.flag);
+    assert.ok(row.quan);
+    assert.equal(codes.has(row.code), false, `duplicate country code: ${row.code}`);
+    codes.add(row.code);
+  }
+});
+
+test('build-configs uses the yaml package instead of a hand-rolled emitter', () => {
+  const source = fs.readFileSync(path.join(repoRoot, 'scripts', 'build-configs.js'), 'utf8');
+
+  assert.match(source, /require\(['"]yaml['"]\)/);
+  assert.match(source, /aliasDuplicateObjects:\s*false/);
+  assert.doesNotMatch(source, /function toYaml\(/);
+  assert.doesNotMatch(source, /function formatScalar\(/);
+});
+
+test('generated configs avoid yaml anchors and aliases for client compatibility', () => {
+  for (const file of ['config.yaml', 'config_substore.yaml']) {
+    const raw = fs.readFileSync(path.join(repoRoot, file), 'utf8');
+
+    assert.doesNotMatch(raw, /&a\d+/);
+    assert.doesNotMatch(raw, /\*a\d+/);
+  }
+});
+
+test('github actions runs the repository check command', () => {
+  const workflowPath = path.join(repoRoot, '.github', 'workflows', 'check.yml');
+  const workflow = fs.readFileSync(workflowPath, 'utf8');
+
+  assert.match(workflow, /actions\/checkout@v4/);
+  assert.match(workflow, /actions\/setup-node@v4/);
+  assert.match(workflow, /npm ci/);
+  assert.match(workflow, /npm run check/);
+  assert.match(workflow, /mihomo -v/);
+});

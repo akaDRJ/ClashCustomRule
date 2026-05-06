@@ -27,7 +27,7 @@ sniffer:
       ports:
         - 443
         - 8443
-      override-destination: true
+      override-destination: false
     HTTP:
       ports:
         - 80
@@ -38,18 +38,18 @@ sniffer:
       ports:
         - 443
         - 8443
-      override-destination: true
+      override-destination: false
   enable: true
   parse-pure-ip: true
   force-dns-mapping: true
   skip-domain:
-    - "Mijia Cloud"
+    - Mijia Cloud
     - dlg.io.mi.com
     - +.push.apple.com
 dns:
   enable: true
   ipv6: false
-  prefer-h3: true
+  prefer-h3: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.20.0.1/16
   fake-ip-filter:
@@ -71,663 +71,623 @@ geox-url:
   mmdb: https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb
   asn: https://gcore.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb
 proxy-groups:
-  -
-    name: "节点选择"
+  - name: 节点选择
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
     type: select
     proxies:
-      - "自动选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "手动切换"
+      - 自动选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 手动切换
       - DIRECT
-  -
-    name: "低倍率节点"
+  - name: 低倍率节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Lab.png
     type: url-test
     include-all: true
-    filter: "(?i)0\\.[0-5]|低倍率|省流|大流量|实验性"
-  -
-    name: "手动切换"
+    filter: (?i)0\.[0-5]|低倍率|省流|大流量|实验性
+  - name: 手动切换
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
     type: select
     include-all: true
-  -
-    name: "自动选择"
+  - name: 自动选择
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png
     type: url-test
     include-all: true
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "强制代理"
+  - name: 强制代理
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png
     type: select
     proxies:
-      - "节点选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: "人工智能"
+      - 节点选择
+      - 手动切换
+      - 全球直连
+  - name: 人工智能
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Bot.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: "加密货币"
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: 加密货币
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_3.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: PayPal
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: PayPal
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/PayPal.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: Telegram
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Telegram
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: Microsoft
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Microsoft
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Microsoft.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: Apple
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Apple
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple_2.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: Google
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Google
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: YouTube
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: YouTube
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: Disney
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Disney
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Disney+.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: Netflix
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Netflix
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: Spotify
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Spotify
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: "Twitter(X)"
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Twitter(X)
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Twitter.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: "学术资源"
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: 学术资源
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Scholar.png
     type: select
     proxies:
-      - "节点选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: "开发者资源"
+      - 节点选择
+      - 手动切换
+      - 全球直连
+  - name: 开发者资源
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/GitHub.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: "游戏下载"
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: 游戏下载
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: "游戏平台"
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: 游戏平台
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Game.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: Speedtest
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: Speedtest
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Speedtest.png
     type: select
     proxies:
-      - "节点选择"
-      - "香港节点"
-      - "澳门节点"
-      - "台湾节点"
-      - "新加坡节点"
-      - "日本节点"
-      - "韩国节点"
-      - "美国节点"
-      - "加拿大节点"
-      - "英国节点"
-      - "澳大利亚节点"
-      - "德国节点"
-      - "法国节点"
-      - "俄罗斯节点"
-      - "泰国节点"
-      - "印度节点"
-      - "马来西亚节点"
-      - "低倍率节点"
-      - "自动选择"
-      - "手动切换"
-      - "全球直连"
-  -
-    name: "全球直连"
+      - 节点选择
+      - 香港节点
+      - 澳门节点
+      - 台湾节点
+      - 新加坡节点
+      - 日本节点
+      - 韩国节点
+      - 美国节点
+      - 加拿大节点
+      - 英国节点
+      - 澳大利亚节点
+      - 德国节点
+      - 法国节点
+      - 俄罗斯节点
+      - 泰国节点
+      - 印度节点
+      - 马来西亚节点
+      - 低倍率节点
+      - 自动选择
+      - 手动切换
+      - 全球直连
+  - name: 全球直连
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Direct.png
     type: select
     proxies:
       - DIRECT
-      - "节点选择"
-  -
-    name: "香港节点"
+      - 节点选择
+  - name: 香港节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png
     type: url-test
     include-all: true
-    filter: "(?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "澳门节点"
+  - name: 澳门节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Macao.png
     type: url-test
     include-all: true
-    filter: "(?i)澳门|MO|Macau"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)澳门|MO|Macau
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "台湾节点"
+  - name: 台湾节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png
     type: url-test
     include-all: true
-    filter: "(?i)台|新北|彰化|TW|Taiwan"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)台|新北|彰化|TW|Taiwan
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "新加坡节点"
+  - name: 新加坡节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png
     type: url-test
     include-all: true
-    filter: "(?i)新加坡|坡|狮城|SG|Singapore"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)新加坡|坡|狮城|SG|Singapore
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "日本节点"
+  - name: 日本节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png
     type: url-test
     include-all: true
-    filter: "(?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "韩国节点"
+  - name: 韩国节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png
     type: url-test
     include-all: true
-    filter: "(?i)KR|Korea|KOR|首尔|韩|韓"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)KR|Korea|KOR|首尔|韩|韓
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "美国节点"
+  - name: 美国节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png
     type: url-test
     include-all: true
-    filter: "(?i)美国|美|US|United States"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)美国|美|US|United States
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "加拿大节点"
+  - name: 加拿大节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Canada.png
     type: url-test
     include-all: true
-    filter: "(?i)加拿大|Canada|CA"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)加拿大|Canada|CA
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "英国节点"
+  - name: 英国节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_Kingdom.png
     type: url-test
     include-all: true
-    filter: "(?i)英国|United Kingdom|UK|伦敦|London"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)英国|United Kingdom|UK|伦敦|London
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "澳大利亚节点"
+  - name: 澳大利亚节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Australia.png
     type: url-test
     include-all: true
-    filter: "(?i)澳洲|澳大利亚|AU|Australia"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)澳洲|澳大利亚|AU|Australia
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "德国节点"
+  - name: 德国节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Germany.png
     type: url-test
     include-all: true
-    filter: "(?i)德国|德|DE|Germany"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)德国|德|DE|Germany
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "法国节点"
+  - name: 法国节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/France.png
     type: url-test
     include-all: true
-    filter: "(?i)法国|法|FR|France"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)法国|法|FR|France
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "俄罗斯节点"
+  - name: 俄罗斯节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Russia.png
     type: url-test
     include-all: true
-    filter: "(?i)俄罗斯|俄|RU|Russia"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)俄罗斯|俄|RU|Russia
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "泰国节点"
+  - name: 泰国节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Thailand.png
     type: url-test
     include-all: true
-    filter: "(?i)泰国|泰|TH|Thailand"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)泰国|泰|TH|Thailand
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "印度节点"
+  - name: 印度节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/India.png
     type: url-test
     include-all: true
-    filter: "(?i)印度|IN|India"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)印度|IN|India
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: "马来西亚节点"
+  - name: 马来西亚节点
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Malaysia.png
     type: url-test
     include-all: true
-    filter: "(?i)马来西亚|马来|MY|Malaysia"
-    exclude-filter: "(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地"
+    filter: (?i)马来西亚|马来|MY|Malaysia
+    exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     interval: 300
     tolerance: 20
     lazy: false
-  -
-    name: GLOBAL
+  - name: GLOBAL
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png
     type: select
     include-all: true
     proxies:
-      - "节点选择"
-      - "手动切换"
-      - "自动选择"
-      - "低倍率节点"
-      - "强制代理"
-      - "人工智能"
-      - "加密货币"
+      - 节点选择
+      - 手动切换
+      - 自动选择
+      - 低倍率节点
+      - 强制代理
+      - 人工智能
+      - 加密货币
       - PayPal
       - Telegram
       - Microsoft
@@ -737,29 +697,29 @@ proxy-groups:
       - Disney
       - Netflix
       - Spotify
-      - "Twitter(X)"
-      - "学术资源"
-      - "开发者资源"
-      - "游戏下载"
-      - "游戏平台"
+      - Twitter(X)
+      - 学术资源
+      - 开发者资源
+      - 游戏下载
+      - 游戏平台
       - Speedtest
-      - "全球直连"
-      - "马来西亚节点"
-      - "印度节点"
-      - "泰国节点"
-      - "俄罗斯节点"
-      - "法国节点"
-      - "德国节点"
-      - "澳大利亚节点"
-      - "英国节点"
-      - "加拿大节点"
-      - "美国节点"
-      - "韩国节点"
-      - "日本节点"
-      - "新加坡节点"
-      - "台湾节点"
-      - "澳门节点"
-      - "香港节点"
+      - 全球直连
+      - 马来西亚节点
+      - 印度节点
+      - 泰国节点
+      - 俄罗斯节点
+      - 法国节点
+      - 德国节点
+      - 澳大利亚节点
+      - 英国节点
+      - 加拿大节点
+      - 美国节点
+      - 韩国节点
+      - 日本节点
+      - 新加坡节点
+      - 台湾节点
+      - 澳门节点
+      - 香港节点
 rule-providers:
   outlook:
     type: http
@@ -825,46 +785,46 @@ rule-providers:
     url: https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs
     path: ./ruleset/cnsite.mrs
 rules:
-  - "AND,((DST-PORT,443),(NETWORK,UDP)),REJECT"
-  - "rule-set,forcedirect,全球直连"
-  - "rule-set,forceproxy,强制代理"
-  - "rule-set,ai,人工智能"
-  - "rule-set,outlook,全球直连"
-  - "rule-set,pt,全球直连"
-  - "geosite,category-pt,全球直连"
-  - "geosite,google-play@cn,全球直连"
-  - "geosite,youtube@cn,全球直连"
-  - "geosite,youtube,YouTube"
-  - "geosite,paypal@cn,全球直连"
-  - "geosite,paypal,PayPal"
-  - "geosite,telegram,Telegram"
-  - "geosite,disney,Disney"
-  - "geosite,netflix,Netflix"
-  - "geosite,spotify,Spotify"
-  - "geosite,twitter,Twitter(X)"
-  - "geosite,ookla-speedtest,Speedtest"
-  - "geosite,category-dev,开发者资源"
-  - "geosite,category-ai-chat-!cn,人工智能"
-  - "geosite,steam@cn,全球直连"
-  - "geosite,category-games@cn,全球直连"
-  - "geosite,category-game-platforms-download,游戏下载"
-  - "geosite,category-games,游戏平台"
-  - "geosite,category-scholar-cn,全球直连"
-  - "geosite,category-scholar-!cn,学术资源"
-  - "rule-set,crypto,加密货币"
-  - "rule-set,mining,加密货币"
-  - "geosite,category-cryptocurrency,加密货币"
-  - "geosite,apple@cn,全球直连"
-  - "geosite,apple,Apple"
-  - "geosite,microsoft@cn,全球直连"
-  - "geosite,microsoft,Microsoft"
-  - "geosite,google,Google"
-  - "geosite,cn,全球直连"
-  - "rule-set,cnsite,全球直连"
-  - "geosite,private,全球直连"
-  - "geoip,netflix,Netflix,no-resolve"
-  - "geoip,google,Google,no-resolve"
-  - "geoip,telegram,Telegram,no-resolve"
-  - "geoip,cn,全球直连,no-resolve"
-  - "geoip,private,全球直连,no-resolve"
-  - "match,节点选择"
+  - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
+  - rule-set,forcedirect,全球直连
+  - rule-set,forceproxy,强制代理
+  - rule-set,ai,人工智能
+  - rule-set,outlook,全球直连
+  - rule-set,pt,全球直连
+  - geosite,category-pt,全球直连
+  - geosite,google-play@cn,全球直连
+  - geosite,youtube@cn,全球直连
+  - geosite,youtube,YouTube
+  - geosite,paypal@cn,全球直连
+  - geosite,paypal,PayPal
+  - geosite,telegram,Telegram
+  - geosite,disney,Disney
+  - geosite,netflix,Netflix
+  - geosite,spotify,Spotify
+  - geosite,twitter,Twitter(X)
+  - geosite,ookla-speedtest,Speedtest
+  - geosite,category-dev,开发者资源
+  - geosite,category-ai-chat-!cn,人工智能
+  - geosite,steam@cn,全球直连
+  - geosite,category-games@cn,全球直连
+  - geosite,category-game-platforms-download,游戏下载
+  - geosite,category-games,游戏平台
+  - geosite,category-scholar-cn,全球直连
+  - geosite,category-scholar-!cn,学术资源
+  - rule-set,crypto,加密货币
+  - rule-set,mining,加密货币
+  - geosite,category-cryptocurrency,加密货币
+  - geosite,apple@cn,全球直连
+  - geosite,apple,Apple
+  - geosite,microsoft@cn,全球直连
+  - geosite,microsoft,Microsoft
+  - geosite,google,Google
+  - geosite,cn,全球直连
+  - rule-set,cnsite,全球直连
+  - geosite,private,全球直连
+  - geoip,netflix,Netflix,no-resolve
+  - geoip,google,Google,no-resolve
+  - geoip,telegram,Telegram,no-resolve
+  - geoip,cn,全球直连,no-resolve
+  - geoip,private,全球直连,no-resolve
+  - match,节点选择

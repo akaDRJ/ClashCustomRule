@@ -677,69 +677,62 @@ function buildProxyGroups(
 function main(config) {
   const safeConfig = asPlainObject(config);
 
-  try {
-    const proxies = normalizeProxyList(safeConfig);
-    const defaultProxies = [...defaultProxiesBase];
-    const defaultSelector = [...defaultSelectorBase];
-    const defaultProxiesDirect = [...defaultProxiesDirectBase];
-    const globalProxies = [...globalProxiesBase];
-    const dnsConfig = cloneDnsConfig(options.useAggressiveDefaults);
-    const snifferConfig = cloneSnifferConfig(options.useAggressiveDefaults);
+  const proxies = normalizeProxyList(safeConfig);
+  const defaultProxies = [...defaultProxiesBase];
+  const defaultSelector = [...defaultSelectorBase];
+  const defaultProxiesDirect = [...defaultProxiesDirectBase];
+  const globalProxies = [...globalProxiesBase];
+  const dnsConfig = cloneDnsConfig(options.useAggressiveDefaults);
+  const snifferConfig = cloneSnifferConfig(options.useAggressiveDefaults);
 
-    const countryList = parseCountries(proxies);
-    const lowCostNodes = parseLowCostNodes(proxies);
-    const landingNodes = options.landing ? parseLandingNodes(proxies) : [];
-    const countryBuckets = options.regexFilter
-      ? {}
-      : parseCountryBuckets(proxies, countryList);
-    const countryProxyGroups = buildCountryProxyGroups(countryList, countryBuckets);
+  const countryList = parseCountries(proxies);
+  const lowCostNodes = parseLowCostNodes(proxies);
+  const landingNodes = options.landing ? parseLandingNodes(proxies) : [];
+  const countryBuckets = options.regexFilter
+    ? {}
+    : parseCountryBuckets(proxies, countryList);
+  const countryProxyGroups = buildCountryProxyGroups(countryList, countryBuckets);
 
-    const proxyGroups = buildProxyGroups(
-      countryList,
-      countryProxyGroups,
-      lowCostNodes,
-      landingNodes,
-      { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies }
-    );
-    const finalRules = buildRules(options.quicEnabled);
+  const proxyGroups = buildProxyGroups(
+    countryList,
+    countryProxyGroups,
+    lowCostNodes,
+    landingNodes,
+    { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies }
+  );
+  const finalRules = buildRules(options.quicEnabled);
 
-    if (options.fullConfig) {
-      Object.assign(safeConfig, {
-        'mixed-port': 7890,
-        'redir-port': 7892,
-        'tproxy-port': 7893,
-        'routing-mark': 7894,
-        'allow-lan': true,
-        ipv6: options.ipv6Enabled,
-        mode: 'rule',
-        'unified-delay': true,
-        'tcp-concurrent': resolveTcpConcurrent(options.useAggressiveDefaults),
-        'find-process-mode': 'off',
-        'log-level': 'info',
-        'geodata-loader': 'standard',
-        'external-controller': ':9999',
-        'disable-keep-alive': false,
-        profile: { 'store-selected': true }
-      });
-    }
-
+  if (options.fullConfig) {
     Object.assign(safeConfig, {
-      'proxy-groups': proxyGroups,
-      'rule-providers': ruleProviders,
-      rules: finalRules,
-      sniffer: snifferConfig,
-      dns: dnsConfig,
-      'geodata-mode': true,
-      'geox-url': geoxURL
+      'mixed-port': 7890,
+      'redir-port': 7892,
+      'tproxy-port': 7893,
+      'routing-mark': 7894,
+      'allow-lan': true,
+      ipv6: options.ipv6Enabled,
+      mode: 'rule',
+      'unified-delay': true,
+      'tcp-concurrent': resolveTcpConcurrent(options.useAggressiveDefaults),
+      'find-process-mode': 'off',
+      'log-level': 'info',
+      'geodata-loader': 'standard',
+      'external-controller': ':9999',
+      'disable-keep-alive': false,
+      profile: { 'store-selected': true }
     });
-
-    return safeConfig;
-  } catch (error) {
-    if (typeof console !== 'undefined' && typeof console.error === 'function') {
-      console.error('[convert.js] Failed to generate config:', error);
-    }
-    return safeConfig;
   }
+
+  Object.assign(safeConfig, {
+    'proxy-groups': proxyGroups,
+    'rule-providers': ruleProviders,
+    rules: finalRules,
+    sniffer: snifferConfig,
+    dns: dnsConfig,
+    'geodata-mode': true,
+    'geox-url': geoxURL
+  });
+
+  return safeConfig;
 }
 
 if (typeof module !== 'undefined' && module.exports) {

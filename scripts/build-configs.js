@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const YAML = require('yaml');
 
 const rootDir = path.resolve(__dirname, '..');
 const isCheckMode = process.argv.includes('--check');
@@ -19,71 +20,13 @@ function seedCountryProxies() {
   }));
 }
 
-function formatScalar(value) {
-  if (value === null) return 'null';
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-
-  const text = String(value);
-  const isPlainSafe = /^[A-Za-z0-9_./:@+-]+$/.test(text);
-  const isReserved = /^(null|true|false|yes|no|on|off|~)$/i.test(text);
-  const isNumericLike = /^[-+]?\d+(\.\d+)?$/.test(text);
-
-  if (isPlainSafe && !isReserved && !isNumericLike && !text.startsWith('-')) {
-    return text;
-  }
-
-  return JSON.stringify(text);
-}
-
-function formatKey(key) {
-  const text = String(key);
-  if (/^[A-Za-z0-9_-]+$/.test(text)) {
-    return text;
-  }
-  return JSON.stringify(text);
-}
-
-function toYaml(value, indent = 0) {
-  const pad = ' '.repeat(indent);
-
-  if (Array.isArray(value)) {
-    if (!value.length) return `${pad}[]`;
-
-    return value
-      .map((item) => {
-        if (item === null || ['string', 'number', 'boolean'].includes(typeof item)) {
-          return `${pad}- ${formatScalar(item)}`;
-        }
-
-        return `${pad}-\n${toYaml(item, indent + 2)}`;
-      })
-      .join('\n');
-  }
-
-  if (value && typeof value === 'object') {
-    const entries = Object.entries(value);
-    if (!entries.length) return `${pad}{}`;
-
-    return entries
-      .map(([key, child]) => {
-        if (child === null || ['string', 'number', 'boolean'].includes(typeof child)) {
-          return `${pad}${formatKey(key)}: ${formatScalar(child)}`;
-        }
-
-        if (Array.isArray(child) && child.length === 0) {
-          return `${pad}${formatKey(key)}: []`;
-        }
-
-        if (child && typeof child === 'object' && !Array.isArray(child) && !Object.keys(child).length) {
-          return `${pad}${formatKey(key)}: {}`;
-        }
-
-        return `${pad}${formatKey(key)}:\n${toYaml(child, indent + 2)}`;
-      })
-      .join('\n');
-  }
-
-  return `${pad}${formatScalar(value)}`;
+function renderYaml(value) {
+  return YAML.stringify(value, {
+    aliasDuplicateObjects: false,
+    lineWidth: 0,
+    minContentWidth: 0,
+    singleQuote: false
+  });
 }
 
 function orderTopLevel(config) {
@@ -257,7 +200,7 @@ let hasDrift = false;
 for (const target of targets) {
   const outputPath = path.join(rootDir, target.file);
   const generated = buildTargetConfig(target);
-  const rendered = `${toYaml(generated)}\n`;
+  const rendered = renderYaml(generated);
   const current = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, 'utf8') : '';
 
   if (isCheckMode) {
