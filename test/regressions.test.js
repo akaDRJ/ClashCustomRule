@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const YAML = require('yaml');
 
 const repoRoot = path.resolve(__dirname, '..');
 const rootPublicFiles = [
@@ -303,6 +304,32 @@ test('generated configs avoid yaml anchors and aliases for client compatibility'
 
     assert.doesNotMatch(raw, /&a\d+/);
     assert.doesNotMatch(raw, /\*a\d+/);
+  }
+});
+
+test('generated geox urls stay compact on one yaml line', () => {
+  const keys = ['geoip', 'geosite', 'mmdb', 'asn'];
+
+  for (const file of ['config.yaml', 'config_substore.yaml']) {
+    const raw = fs.readFileSync(path.join(repoRoot, 'dist', 'configs', file), 'utf8');
+    const parsed = YAML.parse(raw);
+    const geoxBlock = raw.match(/^geox-url:\n(?<body>(?:  .+\n)+)/m);
+
+    assert.ok(geoxBlock, `${file} missing geox-url block`);
+    for (const key of keys) {
+      assert.match(
+        geoxBlock.groups.body,
+        new RegExp(`^  ${key}: ['"]?https://[^'"\\n]+['"]?$`, 'm'),
+        `${file} ${key} should be a single line`
+      );
+      assert.equal(parsed['geox-url'][key].length <= 80, true, `${file} ${key} is too long`);
+    }
+    assert.equal(
+      parsed['geox-url'].geosite.length <= 76,
+      true,
+      `${file} geosite exceeds Sub-Store scalar fold threshold`
+    );
+    assert.doesNotMatch(geoxBlock.groups.body, />-/);
   }
 });
 

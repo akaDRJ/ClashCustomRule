@@ -175,6 +175,7 @@ function buildRules(quicEnabled) {
 // ======================= 统一资源与图标 =======================
 const CDN = 'https://gcore.jsdelivr.net';
 const ICON = (path) => `${CDN}/gh/Koolson/Qure@master/IconSet/Color/${path}`;
+const GEOX_CDN = 'https://cdn.jsdelivr.net';
 
 // ================= rule-providers（工厂） =================
 function mrsProvider(name, hostPath) {
@@ -257,10 +258,10 @@ const dnsConfigBase = {
 };
 
 const geoxURL = {
-  geoip: `${CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat`,
-  geosite: `${CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat`,
-  mmdb: `${CDN}/gh/Loyalsoldier/geoip@release/Country.mmdb`,
-  asn: `${CDN}/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb`
+  geoip: `${GEOX_CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat`,
+  geosite: `${GEOX_CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat`,
+  mmdb: `${GEOX_CDN}/gh/Loyalsoldier/geoip@release/Country.mmdb`,
+  asn: `${GEOX_CDN}/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb`
 };
 
 // ===================== 国家识别与图标 =====================
