@@ -257,6 +257,54 @@ test('convert metadata passes internal consistency checks', () => {
   assert.ok(Object.keys(metadata.countryRegex).length > 10);
 });
 
+test('convert output avoids shared array aliases with direct yaml emitters', () => {
+  const convert = loadConvert({ landing: true });
+  const result = convert.main({
+    proxies: [
+      { name: '香港 01', type: 'direct' },
+      { name: '日本 01', type: 'direct' },
+      { name: '美国 01', type: 'direct' }
+    ]
+  });
+  const rendered = YAML.stringify(result);
+
+  assert.doesNotMatch(rendered, /&a\d+/);
+  assert.doesNotMatch(rendered, /\*a\d+/);
+});
+
+test('convert keeps global country groups in detected country order', () => {
+  const convert = loadConvert({});
+  const result = convert.main({
+    proxies: [
+      { name: '香港 01', type: 'direct' },
+      { name: '日本 01', type: 'direct' },
+      { name: '美国 01', type: 'direct' }
+    ]
+  });
+  const global = result['proxy-groups'].find((group) => group.name === 'GLOBAL');
+
+  assert.deepEqual(
+    global.proxies.filter((name) => name.endsWith('节点')),
+    ['香港节点', '日本节点', '美国节点']
+  );
+});
+
+test('convert omits empty landing group in enumerated mode', () => {
+  const convert = loadConvert({ landing: true });
+  const result = convert.main({
+    proxies: [
+      { name: '香港 01', type: 'direct' }
+    ]
+  });
+
+  assert.equal(
+    result['proxy-groups'].some(
+      (group) => group.name === '落地节点' && Array.isArray(group.proxies) && group.proxies.length === 0
+    ),
+    false
+  );
+});
+
 test('package exposes one-shot test and check scripts', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
 

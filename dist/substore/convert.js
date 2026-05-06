@@ -477,12 +477,21 @@ function insertUniqueAt(arr, index, values) {
   arr.splice(index, 0, ...filtered);
 }
 
+function appendUnique(arr, values) {
+  if (!Array.isArray(arr) || !Array.isArray(values)) return;
+  for (const value of values) {
+    if (!arr.includes(value)) {
+      arr.push(value);
+    }
+  }
+}
+
 function buildServiceGroups(defaultProxies, directProxies) {
   return SERVICE_GROUP_SPECS.map(({ name, icon, source }) => ({
     name,
     icon: ICON(icon),
     type: 'select',
-    proxies: source === 'direct' ? directProxies : defaultProxies
+    proxies: source === 'direct' ? [...directProxies] : [...defaultProxies]
   }));
 }
 
@@ -556,11 +565,11 @@ function buildProxyGroups(
   } = defaults;
 
   const hasLowCostGroup = options.regexFilter || lowCostNodes.length > 0;
+  const hasLandingGroup = options.landing && (options.regexFilter || landingNodes.length > 0);
   const countryProxies = [];
 
   for (const country of countryList) {
     const groupName = `${country}节点`;
-    insertAfter(globalProxies, '全球直连', groupName);
     countryProxies.push(groupName);
   }
 
@@ -573,7 +582,7 @@ function buildProxyGroups(
   insertUniqueAt(defaultSelector, 1, countryProxies);
   insertUniqueAt(defaultProxiesDirect, 2, countryProxies);
 
-  if (options.landing) {
+  if (hasLandingGroup) {
     insertAfter(defaultProxies, '自动选择', '落地节点');
     if (!defaultSelector.includes('落地节点')) {
       defaultSelector.unshift('落地节点');
@@ -581,6 +590,7 @@ function buildProxyGroups(
     insertAfter(globalProxies, '自动选择', '落地节点');
     insertAfter(globalProxies, '落地节点', '前置代理');
   }
+  appendUnique(globalProxies, countryProxies);
 
   const preProxySelector = defaultSelector.filter((name) => name !== '落地节点');
   const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
@@ -591,21 +601,21 @@ function buildProxyGroups(
       name: '节点选择',
       icon: ICON('Proxy.png'),
       type: 'select',
-      proxies: defaultSelector
+      proxies: [...defaultSelector]
     },
 
-    options.landing
+    hasLandingGroup
       ? {
           name: '落地节点',
           icon: ICON('Airport.png'),
           type: 'select',
           ...(options.regexFilter
             ? { 'include-all': true, filter: ISP_EXCLUDE_PATTERN }
-            : { proxies: landingNodes })
+            : { proxies: [...landingNodes] })
         }
       : null,
 
-    options.landing
+    hasLandingGroup
       ? {
           name: '前置代理',
           icon: ICON('Area.png'),
@@ -614,9 +624,9 @@ function buildProxyGroups(
             ? {
                 'include-all': true,
                 'exclude-filter': ISP_EXCLUDE_PATTERN,
-                proxies: preProxySelector
+                proxies: [...preProxySelector]
               }
-            : { proxies: preProxySelector })
+            : { proxies: [...preProxySelector] })
         }
       : null,
 
@@ -627,7 +637,7 @@ function buildProxyGroups(
           type: options.loadBalance ? 'load-balance' : 'url-test',
           ...(options.regexFilter
             ? { 'include-all': true, filter: LOW_COST_PATTERN }
-            : { proxies: lowCostNodes })
+            : { proxies: [...lowCostNodes] })
         }
       : null,
 
@@ -672,7 +682,7 @@ function buildProxyGroups(
       icon: ICON('Global.png'),
       type: 'select',
       'include-all': true,
-      proxies: globalProxies
+      proxies: [...globalProxies]
     }
   ].filter(Boolean);
 }
