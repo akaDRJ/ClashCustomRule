@@ -22,19 +22,14 @@
  *
  * [full]           输出完整配置（包含端口、TUN、日志等基础配置）
  *                  默认仅输出 proxy-groups、rules、rule-providers、dns、sniffer
- *                  完整配置默认使用保守兼容参数，适合 OpenWRT 透明代理、
- *                  AKCDN/SS2022 和部分容易断流的中转链路
+ *                  完整配置默认使用保守参数：tcp-concurrent=false、
+ *                  disable-keep-alive=false、DNS prefer-h3=false、
+ *                  sniffer 不覆写 TLS/QUIC 目的地址
  *
- * [keepalive]      保留兼容参数；完整配置默认已启用 TCP Keep-Alive
- *                  即 disable-keep-alive: false
+ * [tcpconcurrent]  显式覆盖 tcp-concurrent（默认 false）
  *
- * [tcpconcurrent]  显式启用/关闭 tcp-concurrent（默认关闭）
- *
- * [aggressive]     启用旧的激进参数：tcp-concurrent=true、DNS prefer-h3=true、
- *                  sniffer 覆写 TLS/QUIC 目的地址
- *
- * [compat|stable|openwrt]
- *                  保留兼容参数；默认已经等同保守兼容模式
+ * [aggressive]     启用旧激进模式：tcp-concurrent=true、DNS prefer-h3=true、
+ *                  sniffer 覆写 TLS/QUIC 目的地址；仅建议临时 A/B 测试
  *
  * [quic]           启用 QUIC 支持（默认关闭，即阻止 QUIC）
  *                  关闭时：自动添加规则 AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
@@ -69,15 +64,14 @@
 const runtimeArgs =
   typeof $arguments === 'object' && $arguments !== null ? $arguments : {};
 
-const compatibilityMode = !parseBool(runtimeArgs.aggressive);
+const useAggressiveDefaults = parseBool(runtimeArgs.aggressive);
 
 const options = Object.freeze({
   loadBalance: parseBool(runtimeArgs.loadbalance),
   landing: parseBool(runtimeArgs.landing),
   ipv6Enabled: parseBool(runtimeArgs.ipv6),
   fullConfig: parseBool(runtimeArgs.full),
-  compatibilityMode,
-  enableKeepAlive: true,
+  useAggressiveDefaults,
   quicEnabled: parseBool(runtimeArgs.quic),
   regexFilter: parseBool(runtimeArgs.regex)
 });
@@ -352,7 +346,7 @@ function parseBoolWithDefault(value, defaultValue) {
   return parseBool(value);
 }
 
-function cloneSnifferConfig(compatibilityMode) {
+function cloneSnifferConfig(useAggressiveDefaults) {
   const config = {
     ...snifferConfigBase,
     sniff: {
@@ -363,7 +357,7 @@ function cloneSnifferConfig(compatibilityMode) {
     'skip-domain': [...snifferConfigBase['skip-domain']]
   };
 
-  if (compatibilityMode) {
+  if (!useAggressiveDefaults) {
     config.sniff.TLS['override-destination'] = false;
     config.sniff.QUIC['override-destination'] = false;
   }
@@ -371,19 +365,19 @@ function cloneSnifferConfig(compatibilityMode) {
   return config;
 }
 
-function cloneDnsConfig(compatibilityMode) {
+function cloneDnsConfig(useAggressiveDefaults) {
   return {
     ...dnsConfigBase,
     ipv6: options.ipv6Enabled,
-    'prefer-h3': compatibilityMode ? false : dnsConfigBase['prefer-h3'],
+    'prefer-h3': useAggressiveDefaults ? dnsConfigBase['prefer-h3'] : false,
     'fake-ip-filter': [...dnsConfigBase['fake-ip-filter']],
     'default-nameserver': [...dnsConfigBase['default-nameserver']],
     nameserver: [...dnsConfigBase.nameserver]
   };
 }
 
-function resolveTcpConcurrent(compatibilityMode) {
-  return parseBoolWithDefault(runtimeArgs.tcpconcurrent, !compatibilityMode);
+function resolveTcpConcurrent(useAggressiveDefaults) {
+  return parseBoolWithDefault(runtimeArgs.tcpconcurrent, useAggressiveDefaults);
 }
 
 function compileCountryEntries(source) {
@@ -689,8 +683,8 @@ function main(config) {
     const defaultSelector = [...defaultSelectorBase];
     const defaultProxiesDirect = [...defaultProxiesDirectBase];
     const globalProxies = [...globalProxiesBase];
-    const dnsConfig = cloneDnsConfig(options.compatibilityMode);
-    const snifferConfig = cloneSnifferConfig(options.compatibilityMode);
+    const dnsConfig = cloneDnsConfig(options.useAggressiveDefaults);
+    const snifferConfig = cloneSnifferConfig(options.useAggressiveDefaults);
 
     const countryList = parseCountries(proxies);
     const lowCostNodes = parseLowCostNodes(proxies);
@@ -719,12 +713,12 @@ function main(config) {
         ipv6: options.ipv6Enabled,
         mode: 'rule',
         'unified-delay': true,
-        'tcp-concurrent': resolveTcpConcurrent(options.compatibilityMode),
+        'tcp-concurrent': resolveTcpConcurrent(options.useAggressiveDefaults),
         'find-process-mode': 'off',
         'log-level': 'info',
         'geodata-loader': 'standard',
         'external-controller': ':9999',
-        'disable-keep-alive': !options.enableKeepAlive,
+        'disable-keep-alive': false,
         profile: { 'store-selected': true }
       });
     }
