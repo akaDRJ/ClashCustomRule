@@ -129,3 +129,44 @@ test('sync-drjcustomrule-3 preserves regex filters when a group also defines fix
     assert.match(groupLine, /\(\?i\)\^\(\?!\.\*\(\?:家宽\|落地\)\)\.\*\$/);
   });
 });
+
+test('convert full config uses conservative OpenWRT transparent proxy defaults', () => {
+  const modulePath = path.join(repoRoot, 'convert.js');
+  delete require.cache[modulePath];
+  global.$arguments = { full: true };
+
+  const convert = require(modulePath);
+  const result = convert.main({
+    proxies: [
+      {
+        name: 'AKCDN-IX-SS2022-twlite',
+        type: 'ss',
+        server: '39.108.228.6',
+        port: 44031,
+        cipher: '2022-blake3-aes-128-gcm',
+        password: 'redacted'
+      }
+    ]
+  });
+
+  assert.equal(result['tcp-concurrent'], false);
+  assert.equal(result['disable-keep-alive'], false);
+  assert.equal(result.dns['prefer-h3'], false);
+  assert.equal(result.sniffer.sniff.TLS['override-destination'], false);
+  assert.equal(result.sniffer.sniff.QUIC['override-destination'], false);
+});
+
+test('convert aggressive mode keeps the old high-risk performance defaults', () => {
+  const modulePath = path.join(repoRoot, 'convert.js');
+  delete require.cache[modulePath];
+  global.$arguments = { full: true, aggressive: true };
+
+  const convert = require(modulePath);
+  const result = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
+
+  assert.equal(result['tcp-concurrent'], true);
+  assert.equal(result['disable-keep-alive'], false);
+  assert.equal(result.dns['prefer-h3'], true);
+  assert.equal(result.sniffer.sniff.TLS['override-destination'], true);
+  assert.equal(result.sniffer.sniff.QUIC['override-destination'], true);
+});

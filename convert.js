@@ -22,9 +22,19 @@
  *
  * [full]           输出完整配置（包含端口、TUN、日志等基础配置）
  *                  默认仅输出 proxy-groups、rules、rule-providers、dns、sniffer
+ *                  完整配置默认使用保守兼容参数，适合 OpenWRT 透明代理、
+ *                  AKCDN/SS2022 和部分容易断流的中转链路
  *
- * [keepalive]      启用 TCP Keep-Alive（默认关闭）
- *                  设置 disable-keep-alive: false
+ * [keepalive]      保留兼容参数；完整配置默认已启用 TCP Keep-Alive
+ *                  即 disable-keep-alive: false
+ *
+ * [tcpconcurrent]  显式启用/关闭 tcp-concurrent（默认关闭）
+ *
+ * [aggressive]     启用旧的激进参数：tcp-concurrent=true、DNS prefer-h3=true、
+ *                  sniffer 覆写 TLS/QUIC 目的地址
+ *
+ * [compat|stable|openwrt]
+ *                  保留兼容参数；默认已经等同保守兼容模式
  *
  * [quic]           启用 QUIC 支持（默认关闭，即阻止 QUIC）
  *                  关闭时：自动添加规则 AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
@@ -59,12 +69,15 @@
 const runtimeArgs =
   typeof $arguments === 'object' && $arguments !== null ? $arguments : {};
 
+const compatibilityMode = !parseBool(runtimeArgs.aggressive);
+
 const options = Object.freeze({
   loadBalance: parseBool(runtimeArgs.loadbalance),
   landing: parseBool(runtimeArgs.landing),
   ipv6Enabled: parseBool(runtimeArgs.ipv6),
   fullConfig: parseBool(runtimeArgs.full),
-  enableKeepAlive: parseBool(runtimeArgs.keepalive),
+  compatibilityMode,
+  enableKeepAlive: true,
   quicEnabled: parseBool(runtimeArgs.quic),
   regexFilter: parseBool(runtimeArgs.regex)
 });
@@ -218,7 +231,7 @@ const ruleProviders = {
 };
 
 // ======================== 其余配置 ========================
-const snifferConfig = {
+const snifferConfigBase = {
   sniff: {
     TLS: { ports: [443, 8443], 'override-destination': true },
     HTTP: { ports: [80, 8080, 8880], 'override-destination': false },
@@ -332,6 +345,45 @@ function parseBool(value) {
     return normalized === 'true' || normalized === '1';
   }
   return false;
+}
+
+function parseBoolWithDefault(value, defaultValue) {
+  if (value === undefined || value === null || value === '') return defaultValue;
+  return parseBool(value);
+}
+
+function cloneSnifferConfig(compatibilityMode) {
+  const config = {
+    ...snifferConfigBase,
+    sniff: {
+      TLS: { ...snifferConfigBase.sniff.TLS },
+      HTTP: { ...snifferConfigBase.sniff.HTTP },
+      QUIC: { ...snifferConfigBase.sniff.QUIC }
+    },
+    'skip-domain': [...snifferConfigBase['skip-domain']]
+  };
+
+  if (compatibilityMode) {
+    config.sniff.TLS['override-destination'] = false;
+    config.sniff.QUIC['override-destination'] = false;
+  }
+
+  return config;
+}
+
+function cloneDnsConfig(compatibilityMode) {
+  return {
+    ...dnsConfigBase,
+    ipv6: options.ipv6Enabled,
+    'prefer-h3': compatibilityMode ? false : dnsConfigBase['prefer-h3'],
+    'fake-ip-filter': [...dnsConfigBase['fake-ip-filter']],
+    'default-nameserver': [...dnsConfigBase['default-nameserver']],
+    nameserver: [...dnsConfigBase.nameserver]
+  };
+}
+
+function resolveTcpConcurrent(compatibilityMode) {
+  return parseBoolWithDefault(runtimeArgs.tcpconcurrent, !compatibilityMode);
 }
 
 function compileCountryEntries(source) {
@@ -637,7 +689,8 @@ function main(config) {
     const defaultSelector = [...defaultSelectorBase];
     const defaultProxiesDirect = [...defaultProxiesDirectBase];
     const globalProxies = [...globalProxiesBase];
-    const dnsConfig = { ...dnsConfigBase, ipv6: options.ipv6Enabled };
+    const dnsConfig = cloneDnsConfig(options.compatibilityMode);
+    const snifferConfig = cloneSnifferConfig(options.compatibilityMode);
 
     const countryList = parseCountries(proxies);
     const lowCostNodes = parseLowCostNodes(proxies);
@@ -666,7 +719,7 @@ function main(config) {
         ipv6: options.ipv6Enabled,
         mode: 'rule',
         'unified-delay': true,
-        'tcp-concurrent': true,
+        'tcp-concurrent': resolveTcpConcurrent(options.compatibilityMode),
         'find-process-mode': 'off',
         'log-level': 'info',
         'geodata-loader': 'standard',
