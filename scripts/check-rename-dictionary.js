@@ -1,7 +1,7 @@
 "use strict";
 
 const path = require("path");
-const rename = require(path.resolve(__dirname, "../rename.js"));
+const rename = require(path.resolve(__dirname, "../src/substore/rename.js"));
 
 if (!rename || !rename._internal) {
   console.error("[check-rename-dictionary] rename.js internal helpers are unavailable");

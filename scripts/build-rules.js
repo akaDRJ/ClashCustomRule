@@ -4,7 +4,9 @@ const fs = require('fs');
 const path = require('path');
 
 const rootDir = path.resolve(__dirname, '..');
-const ruleSets = require(path.join(rootDir, 'rules', 'src', 'rulesets.js'));
+const sourcePath = path.join(rootDir, 'src', 'data', 'rulesets.js');
+const outputDir = path.join(rootDir, 'dist', 'rulesets', 'yaml');
+const ruleSets = require(sourcePath);
 const isCheckMode = process.argv.includes('--check');
 
 let hasOutdated = false;
@@ -18,22 +20,23 @@ for (const [fileName, payload] of Object.entries(ruleSets)) {
     throw new Error(`Invalid payload in ${fileName}: expected non-empty string array.`);
   }
 
-  const filePath = path.join(rootDir, fileName);
+  const filePath = path.join(outputDir, fileName);
   const rendered = renderPayload(payload);
   const current = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
 
   if (isCheckMode) {
     if (current !== rendered) {
       hasOutdated = true;
-      console.log(`OUTDATED ${fileName}`);
+      console.log(`OUTDATED dist/rulesets/yaml/${fileName}`);
     } else {
-      console.log(`OK ${fileName}`);
+      console.log(`OK dist/rulesets/yaml/${fileName}`);
     }
     continue;
   }
 
+  fs.mkdirSync(outputDir, { recursive: true });
   fs.writeFileSync(filePath, rendered);
-  console.log(`WROTE ${fileName} (${payload.length} entries)`);
+  console.log(`WROTE dist/rulesets/yaml/${fileName} (${payload.length} entries)`);
 }
 
 if (isCheckMode) {

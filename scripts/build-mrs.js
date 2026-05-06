@@ -6,7 +6,10 @@ const { spawnSync } = require('child_process');
 
 const rootDir = path.resolve(__dirname, '..');
 const isCheckMode = process.argv.includes('--check');
-const ruleSets = require(path.join(rootDir, 'rules', 'src', 'rulesets.js'));
+const sourcePath = path.join(rootDir, 'src', 'data', 'rulesets.js');
+const yamlDir = path.join(rootDir, 'dist', 'rulesets', 'yaml');
+const mrsDir = path.join(rootDir, 'dist', 'rulesets', 'mrs');
+const ruleSets = require(sourcePath);
 
 const binary = resolveMihomoBinary();
 if (!binary) {
@@ -24,15 +27,15 @@ try {
       throw new Error(`Invalid payload in ${yamlFile}: expected non-empty string array.`);
     }
 
-    const yamlPath = path.join(rootDir, yamlFile);
+    const yamlPath = path.join(yamlDir, yamlFile);
     const mrsFile = toMrsFileName(yamlFile);
-    const mrsPath = path.join(rootDir, mrsFile);
+    const mrsPath = path.join(mrsDir, mrsFile);
     const tempMrsPath = path.join(tempDir, mrsFile);
 
     const result = convertToMrs(binary, yamlPath, tempMrsPath);
     if (!result.ok) {
       hasError = true;
-      console.error(`FAILED ${mrsFile}`);
+      console.error(`FAILED dist/rulesets/mrs/${mrsFile}`);
       if (result.message) {
         console.error(result.message);
       }
@@ -45,21 +48,22 @@ try {
 
     if (isCheckMode) {
       if (isSame) {
-        console.log(`OK ${mrsFile}`);
+        console.log(`OK dist/rulesets/mrs/${mrsFile}`);
       } else {
         hasOutdated = true;
-        console.log(`OUTDATED ${mrsFile}`);
+        console.log(`OUTDATED dist/rulesets/mrs/${mrsFile}`);
       }
       continue;
     }
 
     if (isSame) {
-      console.log(`SKIP ${mrsFile}`);
+      console.log(`SKIP dist/rulesets/mrs/${mrsFile}`);
       continue;
     }
 
+    fs.mkdirSync(mrsDir, { recursive: true });
     fs.writeFileSync(mrsPath, nextBuffer);
-    console.log(`WROTE ${mrsFile}`);
+    console.log(`WROTE dist/rulesets/mrs/${mrsFile}`);
   }
 } finally {
   fs.rmSync(tempDir, { recursive: true, force: true });

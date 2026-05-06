@@ -6,6 +6,30 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..');
+const rootPublicFiles = [
+  'convert.js',
+  'rename.js',
+  'convert-overseas-to-cn.js',
+  'config.yaml',
+  'config_substore.yaml',
+  'DRJCustomRule_3.0.ini',
+  'ai.yaml',
+  'crypto.yaml',
+  'forcedirect.yaml',
+  'forceproxy.yaml',
+  'mining.yaml',
+  'outlook.yaml',
+  'pt.yaml',
+  'steamcontent.yaml',
+  'ai.mrs',
+  'crypto.mrs',
+  'forcedirect.mrs',
+  'forceproxy.mrs',
+  'mining.mrs',
+  'outlook.mrs',
+  'pt.mrs',
+  'steamcontent.mrs'
+];
 
 function withTempDir(run) {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clashcustomrule-test-'));
@@ -17,11 +41,48 @@ function withTempDir(run) {
 }
 
 function loadRename(argumentsMap) {
-  const modulePath = path.join(repoRoot, 'rename.js');
+  const modulePath = path.join(repoRoot, 'src', 'substore', 'rename.js');
   delete require.cache[modulePath];
   global.$arguments = argumentsMap;
   return require(modulePath);
 }
+
+function loadConvert(argumentsMap) {
+  const modulePath = path.join(repoRoot, 'src', 'substore', 'convert.js');
+  delete require.cache[modulePath];
+  global.$arguments = argumentsMap;
+  return require(modulePath);
+}
+
+test('repository separates source, generated output, and legacy code', () => {
+  for (const file of rootPublicFiles) {
+    assert.equal(fs.existsSync(path.join(repoRoot, file)), false, `${file} should not live at repo root`);
+  }
+
+  assert.equal(fs.existsSync(path.join(repoRoot, 'src', 'substore', 'convert.js')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'src', 'substore', 'rename.js')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'src', 'data', 'rulesets.js')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'legacy', 'convert-overseas-to-cn.js')), true);
+
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'convert.js')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'rename.js')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'configs', 'config.yaml')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'configs', 'config_substore.yaml')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'configs', 'DRJCustomRule_3.0.ini')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'rulesets', 'yaml', 'ai.yaml')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'rulesets', 'mrs', 'ai.mrs')), true);
+});
+
+test('readme documents the current public dist layout', () => {
+  const readme = fs.readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
+
+  assert.match(readme, /src\/\s+substore\//);
+  assert.match(readme, /dist\/\s+substore\//);
+  assert.match(readme, /dist\/configs\/config\.yaml/);
+  assert.match(readme, /dist\/rulesets\/mrs\/<name>\.mrs/);
+  assert.doesNotMatch(readme, /master\/convert\.js/);
+  assert.doesNotMatch(readme, /master\/rename\.js/);
+});
 
 test('rename one removes the full custom separator when only one node remains', () => {
   const rename = loadRename({ flag: true, one: true, sn: ' - ' });
@@ -68,14 +129,16 @@ test('lint-rules ignores duplicate proxy entries in config files but still repor
 test('sync-drjcustomrule-3 preserves regex filters when a group also defines fixed proxies', () => {
   withTempDir((tempDir) => {
     const scriptsDir = path.join(tempDir, 'scripts');
+    const substoreDir = path.join(tempDir, 'src', 'substore');
     fs.mkdirSync(scriptsDir, { recursive: true });
+    fs.mkdirSync(substoreDir, { recursive: true });
     fs.copyFileSync(
       path.join(repoRoot, 'scripts', 'sync-drjcustomrule-3.js'),
       path.join(scriptsDir, 'sync-drjcustomrule-3.js')
     );
 
     fs.writeFileSync(
-      path.join(tempDir, 'convert.js'),
+      path.join(substoreDir, 'convert.js'),
       [
         'module.exports = {',
         '  main() {',
@@ -118,7 +181,10 @@ test('sync-drjcustomrule-3 preserves regex filters when a group also defines fix
 
     assert.equal(result.status, 0, result.stderr || result.stdout);
 
-    const rendered = fs.readFileSync(path.join(tempDir, 'DRJCustomRule_3.0.ini'), 'utf8');
+    const rendered = fs.readFileSync(
+      path.join(tempDir, 'dist', 'configs', 'DRJCustomRule_3.0.ini'),
+      'utf8'
+    );
     const groupLine = rendered
       .split(/\r?\n/)
       .find((line) => line.startsWith('custom_proxy_group=前置代理`select`'));
@@ -131,11 +197,7 @@ test('sync-drjcustomrule-3 preserves regex filters when a group also defines fix
 });
 
 test('convert full config uses conservative OpenWRT transparent proxy defaults', () => {
-  const modulePath = path.join(repoRoot, 'convert.js');
-  delete require.cache[modulePath];
-  global.$arguments = { full: true };
-
-  const convert = require(modulePath);
+  const convert = loadConvert({ full: true });
   const result = convert.main({
     proxies: [
       {
@@ -157,11 +219,7 @@ test('convert full config uses conservative OpenWRT transparent proxy defaults',
 });
 
 test('convert aggressive mode keeps the old high-risk performance defaults', () => {
-  const modulePath = path.join(repoRoot, 'convert.js');
-  delete require.cache[modulePath];
-  global.$arguments = { full: true, aggressive: true };
-
-  const convert = require(modulePath);
+  const convert = loadConvert({ full: true, aggressive: true });
   const result = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
 
   assert.equal(result['tcp-concurrent'], true);
@@ -172,11 +230,7 @@ test('convert aggressive mode keeps the old high-risk performance defaults', () 
 });
 
 test('convert main fails fast instead of returning a partial config', () => {
-  const modulePath = path.join(repoRoot, 'convert.js');
-  delete require.cache[modulePath];
-  global.$arguments = {};
-
-  const convert = require(modulePath);
+  const convert = loadConvert({});
   const config = { proxies: [{ name: '香港 01', type: 'direct' }] };
   Object.defineProperty(config, 'proxy-groups', {
     configurable: true,
@@ -189,11 +243,7 @@ test('convert main fails fast instead of returning a partial config', () => {
 });
 
 test('convert metadata passes internal consistency checks', () => {
-  const modulePath = path.join(repoRoot, 'convert.js');
-  delete require.cache[modulePath];
-  global.$arguments = {};
-
-  const { metadata } = require(modulePath);
+  const { metadata } = loadConvert({});
   const providers = metadata.ruleProviders;
 
   for (const rule of metadata.rules) {
@@ -212,10 +262,12 @@ test('package exposes one-shot test and check scripts', () => {
   assert.equal(manifest.scripts.test, 'node --test');
   assert.ok(manifest.scripts.check);
   assert.match(manifest.scripts.check, /npm run test/);
+  assert.match(manifest.scripts.check, /npm run check:substore/);
   assert.match(manifest.scripts.check, /npm run check:configs/);
   assert.match(manifest.scripts.check, /npm run check:drj3/);
   assert.match(manifest.scripts.check, /npm run lint:rules -- --strict/);
   assert.match(manifest.scripts.check, /npm run check:rename-dict/);
+  assert.equal(manifest.scripts['build:substore'], 'node scripts/build-substore.js');
 });
 
 test('rename country dictionary exposes complete row data without index drift', () => {
@@ -247,7 +299,7 @@ test('build-configs uses the yaml package instead of a hand-rolled emitter', () 
 
 test('generated configs avoid yaml anchors and aliases for client compatibility', () => {
   for (const file of ['config.yaml', 'config_substore.yaml']) {
-    const raw = fs.readFileSync(path.join(repoRoot, file), 'utf8');
+    const raw = fs.readFileSync(path.join(repoRoot, 'dist', 'configs', file), 'utf8');
 
     assert.doesNotMatch(raw, /&a\d+/);
     assert.doesNotMatch(raw, /\*a\d+/);

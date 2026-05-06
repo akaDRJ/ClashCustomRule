@@ -1,5 +1,6 @@
 /*
 powerfullz 的 Substore 订阅转换脚本（无智能兜底版）
+状态：legacy/ 归档脚本，不参与 dist 生成与 npm run check。
 要点：
 - 去掉“智能低倍率兜底”功能，不做任何回填
 - 国家组恒定仅排除家宽/落地等 ISP 关键词

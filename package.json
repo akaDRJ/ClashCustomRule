@@ -5,7 +5,9 @@
   "description": "Baseline maintenance tooling for ClashCustomRule",
   "scripts": {
     "test": "node --test",
-    "check": "npm run test && npm run check:rules && npm run check:drj3 && npm run check:configs && npm run lint:rules -- --strict && npm run check:rename-dict",
+    "check": "npm run test && npm run check:substore && npm run check:rules && npm run check:drj3 && npm run check:configs && npm run lint:rules -- --strict && npm run check:rename-dict",
+    "build:substore": "node scripts/build-substore.js",
+    "check:substore": "node scripts/build-substore.js --check",
     "build:rules": "node scripts/build-rules.js && node scripts/build-mrs.js",
     "check:rules": "node scripts/build-rules.js --check && node scripts/build-mrs.js --check",
     "build:mrs": "node scripts/build-mrs.js",
@@ -16,7 +18,7 @@
     "build:configs": "node scripts/build-configs.js",
     "check:configs": "node scripts/build-configs.js --check",
     "refresh:drj3": "npm run build:rules && npm run build:drj3",
-    "refresh:all": "npm run refresh:drj3 && npm run build:configs",
+    "refresh:all": "npm run build:substore && npm run refresh:drj3 && npm run build:configs",
     "lint:rules": "node scripts/lint-rules.js",
     "check:rename-dict": "node scripts/check-rename-dictionary.js"
   },

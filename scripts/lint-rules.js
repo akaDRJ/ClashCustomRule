@@ -4,12 +4,45 @@ const fs = require('fs');
 const path = require('path');
 
 const root = process.cwd();
-const targetFiles = fs.readdirSync(root)
-  .filter((f) => /\.(ya?ml|ini)$/i.test(f))
-  .sort();
+const distRoots = [
+  path.join(root, 'dist', 'configs'),
+  path.join(root, 'dist', 'rulesets', 'yaml')
+];
+const targetFiles = resolveTargetFiles();
 
 const strict = process.argv.includes('--strict');
 let hasIssue = false;
+
+function isRuleLikeFile(filePath) {
+  return /\.(ya?ml|ini)$/i.test(filePath);
+}
+
+function listFilesRecursive(dir) {
+  const files = [];
+  if (!fs.existsSync(dir)) return files;
+
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === '.git' || entry.name === 'node_modules') continue;
+
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...listFilesRecursive(fullPath));
+    } else if (entry.isFile() && isRuleLikeFile(fullPath)) {
+      files.push(fullPath);
+    }
+  }
+
+  return files;
+}
+
+function resolveTargetFiles() {
+  const distFiles = distRoots.flatMap(listFilesRecursive);
+  if (distFiles.length > 0) {
+    return distFiles.sort();
+  }
+
+  return listFilesRecursive(root).sort();
+}
 
 function normalizeRule(line) {
   return line
@@ -47,8 +80,8 @@ function isTrackedRuleLine(file, rawLine, currentYamlSection) {
 }
 
 for (const file of targetFiles) {
-  const abs = path.join(root, file);
-  const raw = fs.readFileSync(abs, 'utf8');
+  const rel = path.relative(root, file) || file;
+  const raw = fs.readFileSync(file, 'utf8');
   const lines = raw.split(/\r?\n/);
 
   const seen = new Map();
@@ -68,13 +101,13 @@ for (const file of targetFiles) {
     effective++;
     if (seen.has(key)) {
       hasIssue = true;
-      console.log(`DUPLICATE ${file}:${i + 1} == ${seen.get(key)}`);
+      console.log(`DUPLICATE ${rel}:${i + 1} == ${seen.get(key)}`);
     } else {
       seen.set(key, i + 1);
     }
   }
 
-  console.log(`OK ${file} (effective-rules: ${effective})`);
+  console.log(`OK ${rel} (effective-rules: ${effective})`);
 }
 
 if (!targetFiles.length) {

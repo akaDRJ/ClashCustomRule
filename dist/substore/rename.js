@@ -10,7 +10,7 @@
  *
  * 使用方式：
  * 在 Sub-Store 脚本操作中添加，URL 后接 # 参数，多个参数用 & 连接
- * 示例：https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/rename.js#flag=true&name=NX&rmkey=Premium
+ * 示例：https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/rename.js#flag=true&name=NX&rmkey=Premium
  * 禁用缓存：在 URL 末尾添加 #noCache
  *
  * ==================== 核心参数 ====================

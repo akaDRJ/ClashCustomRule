@@ -4,11 +4,11 @@ const fs = require('fs');
 const path = require('path');
 
 const rootDir = path.resolve(__dirname, '..');
-const iniPath = path.join(rootDir, 'DRJCustomRule_3.0.ini');
+const iniPath = path.join(rootDir, 'dist', 'configs', 'DRJCustomRule_3.0.ini');
 const isCheckMode = process.argv.includes('--check');
 
 global.$arguments = { regex: 'true' };
-const { main, metadata } = require(path.join(rootDir, 'convert.js'));
+const { main, metadata } = require(path.join(rootDir, 'src', 'substore', 'convert.js'));
 
 const testUrl = 'http://cp.cloudflare.com/generate_204';
 
@@ -199,19 +199,20 @@ const current = fs.existsSync(iniPath) ? fs.readFileSync(iniPath, 'utf8') : '';
 
 if (isCheckMode) {
   if (current !== rendered) {
-    console.error('DRJCustomRule_3.0.ini is out of date. Run: npm run sync:drj3');
+    console.error('dist/configs/DRJCustomRule_3.0.ini is out of date. Run: npm run sync:drj3');
     process.exit(1);
   }
-  console.log('DRJCustomRule_3.0.ini is up-to-date.');
+  console.log('dist/configs/DRJCustomRule_3.0.ini is up-to-date.');
   process.exit(0);
 }
 
 if (current === rendered) {
-  console.log('No changes needed. DRJCustomRule_3.0.ini is already synced.');
+  console.log('No changes needed. dist/configs/DRJCustomRule_3.0.ini is already synced.');
   process.exit(0);
 }
 
+fs.mkdirSync(path.dirname(iniPath), { recursive: true });
 fs.writeFileSync(iniPath, rendered);
 console.log(
-  `WROTE DRJCustomRule_3.0.ini (${rulesetLines.length} rulesets, ${proxyGroupLines.length} groups).`
+  `WROTE dist/configs/DRJCustomRule_3.0.ini (${rulesetLines.length} rulesets, ${proxyGroupLines.length} groups).`
 );

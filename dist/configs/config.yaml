@@ -741,49 +741,49 @@ rule-providers:
     behavior: domain
     format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.mrs
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/outlook.mrs
     path: ./ruleset/outlook.mrs
   pt:
     type: http
     behavior: domain
     format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.mrs
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/pt.mrs
     path: ./ruleset/pt.mrs
   crypto:
     type: http
     behavior: domain
     format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.mrs
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/crypto.mrs
     path: ./ruleset/crypto.mrs
   mining:
     type: http
     behavior: domain
     format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/mining.mrs
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/mining.mrs
     path: ./ruleset/mining.mrs
   forceproxy:
     type: http
     behavior: domain
     format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forceproxy.mrs
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/forceproxy.mrs
     path: ./ruleset/forceproxy.mrs
   ai:
     type: http
     behavior: domain
     format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/ai.mrs
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/ai.mrs
     path: ./ruleset/ai.mrs
   forcedirect:
     type: http
     behavior: domain
     format: mrs
     interval: 86400
-    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forcedirect.mrs
+    url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/forcedirect.mrs
     path: ./ruleset/forcedirect.mrs
   fakeipfilter:
     type: http

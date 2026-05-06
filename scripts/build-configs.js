@@ -5,10 +5,11 @@ const path = require('path');
 const YAML = require('yaml');
 
 const rootDir = path.resolve(__dirname, '..');
+const outputDir = path.join(rootDir, 'dist', 'configs');
 const isCheckMode = process.argv.includes('--check');
 
 global.$arguments = { regex: 'true' };
-const { main, metadata } = require(path.join(rootDir, 'convert.js'));
+const { main, metadata } = require(path.join(rootDir, 'src', 'substore', 'convert.js'));
 
 function deepClone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -198,7 +199,7 @@ const targets = [
 let hasDrift = false;
 
 for (const target of targets) {
-  const outputPath = path.join(rootDir, target.file);
+  const outputPath = path.join(outputDir, target.file);
   const generated = buildTargetConfig(target);
   const rendered = renderYaml(generated);
   const current = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, 'utf8') : '';
@@ -206,15 +207,16 @@ for (const target of targets) {
   if (isCheckMode) {
     if (current !== rendered) {
       hasDrift = true;
-      console.log(`OUTDATED ${target.file}`);
+      console.log(`OUTDATED dist/configs/${target.file}`);
     } else {
-      console.log(`OK ${target.file}`);
+      console.log(`OK dist/configs/${target.file}`);
     }
     continue;
   }
 
+  fs.mkdirSync(outputDir, { recursive: true });
   fs.writeFileSync(outputPath, rendered);
-  console.log(`WROTE ${target.file}`);
+  console.log(`WROTE dist/configs/${target.file}`);
 }
 
 if (isCheckMode) {

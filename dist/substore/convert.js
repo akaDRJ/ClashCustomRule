@@ -43,13 +43,13 @@
  * ==================== 使用示例 ====================
  *
  * 基础转换（默认配置，阻止 QUIC，枚举节点）：
- * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/convert.js
+ * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js
  *
  * 完整配置 + 落地节点 + 负载均衡 + 正则模式：
- * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/convert.js#full=true&landing=true&loadbalance=true&regex=true
+ * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#full=true&landing=true&loadbalance=true&regex=true
  *
  * 启用 QUIC + IPv6：
- * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/convert.js#quic=true&ipv6=true
+ * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#quic=true&ipv6=true
  *
  * ==================== 导出接口 ====================
  *
@@ -191,28 +191,31 @@ function mrsProvider(name, hostPath) {
 const ruleProviders = {
   outlook: mrsProvider(
     'outlook',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/outlook.mrs'
+    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/outlook.mrs'
   ),
-  pt: mrsProvider('pt', 'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/pt.mrs'),
+  pt: mrsProvider(
+    'pt',
+    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/pt.mrs'
+  ),
   crypto: mrsProvider(
     'crypto',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/crypto.mrs'
+    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/crypto.mrs'
   ),
   mining: mrsProvider(
     'mining',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/mining.mrs'
+    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/mining.mrs'
   ),
   forceproxy: mrsProvider(
     'forceproxy',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forceproxy.mrs'
+    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/forceproxy.mrs'
   ),
   ai: mrsProvider(
     'ai',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/ai.mrs'
+    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/ai.mrs'
   ),
   forcedirect: mrsProvider(
     'forcedirect',
-    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/forcedirect.mrs'
+    'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/forcedirect.mrs'
   ),
   fakeipfilter: mrsProvider(
     'fakeipfilter',
