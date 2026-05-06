@@ -305,6 +305,42 @@ test('convert omits empty landing group in enumerated mode', () => {
   );
 });
 
+test('convert smart mode switches automatic url-test groups to smart', () => {
+  const convert = loadConvert({ smart: true });
+  const result = convert.main({
+    proxies: [
+      { name: '香港 01', type: 'direct' },
+      { name: '日本 01', type: 'direct' },
+      { name: '香港 0.5x', type: 'direct' }
+    ]
+  });
+  const groups = Object.fromEntries(
+    result['proxy-groups'].map((group) => [group.name, group])
+  );
+
+  assert.equal(groups['自动选择'].type, 'smart');
+  assert.equal(groups['香港节点'].type, 'smart');
+  assert.equal(groups['日本节点'].type, 'smart');
+  assert.equal(groups['低倍率节点'].type, 'smart');
+});
+
+test('convert loadbalance keeps priority over smart for country and low cost groups', () => {
+  const convert = loadConvert({ smart: true, loadbalance: true });
+  const result = convert.main({
+    proxies: [
+      { name: '香港 01', type: 'direct' },
+      { name: '香港 0.5x', type: 'direct' }
+    ]
+  });
+  const groups = Object.fromEntries(
+    result['proxy-groups'].map((group) => [group.name, group])
+  );
+
+  assert.equal(groups['自动选择'].type, 'smart');
+  assert.equal(groups['香港节点'].type, 'load-balance');
+  assert.equal(groups['低倍率节点'].type, 'load-balance');
+});
+
 test('package exposes one-shot test and check scripts', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
 

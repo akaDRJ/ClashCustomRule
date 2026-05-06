@@ -13,6 +13,10 @@
  * [loadbalance]    使用负载均衡模式（默认 url-test）
  *                  开启后国家组使用 load-balance，否则使用 url-test
  *
+ * [smart]          使用 Smart 策略替代 url-test
+ *                  开启后自动选择、国家组、低倍率组使用 smart
+ *                  loadbalance=true 时国家组和低倍率组仍使用 load-balance
+ *
  * [landing]        启用落地节点支持
  *                  添加「落地节点」分组（匹配家宽/商宽/星链等 ISP 关键词）
  *                  添加「前置代理」分组（自动选择排除 ISP 的节点）
@@ -48,6 +52,9 @@
  * 完整配置 + 落地节点 + 负载均衡 + 正则模式：
  * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#full=true&landing=true&loadbalance=true&regex=true
  *
+ * Smart 策略 + 正则模式：
+ * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#smart=true&regex=true
+ *
  * 启用 QUIC + IPv6：
  * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#quic=true&ipv6=true
  *
@@ -68,6 +75,7 @@ const useAggressiveDefaults = parseBool(runtimeArgs.aggressive);
 
 const options = Object.freeze({
   loadBalance: parseBool(runtimeArgs.loadbalance),
+  smartStrategy: parseBool(runtimeArgs.smart),
   landing: parseBool(runtimeArgs.landing),
   ipv6Enabled: parseBool(runtimeArgs.ipv6),
   fullConfig: parseBool(runtimeArgs.full),
@@ -517,6 +525,7 @@ function parseCountries(proxies) {
 // ========== 国家组（无智能兜底，固定排除 ISP/落地） ==========
 function buildCountryProxyGroups(countryList, countryBuckets) {
   const groups = [];
+  const groupType = regionalAutoGroupType();
 
   for (const country of countryList) {
     if (!countryRegex[country]) continue;
@@ -524,7 +533,7 @@ function buildCountryProxyGroups(countryList, countryBuckets) {
     const group = {
       name: `${country}节点`,
       icon: countryIconURLs[country],
-      type: options.loadBalance ? 'load-balance' : 'url-test'
+      type: groupType
     };
 
     if (options.regexFilter) {
@@ -547,6 +556,14 @@ function buildCountryProxyGroups(countryList, countryBuckets) {
   }
 
   return groups;
+}
+
+function autoGroupType() {
+  return options.smartStrategy ? 'smart' : 'url-test';
+}
+
+function regionalAutoGroupType() {
+  return options.loadBalance ? 'load-balance' : autoGroupType();
 }
 
 // ========================= 代理组 =========================
@@ -634,7 +651,7 @@ function buildProxyGroups(
       ? {
           name: '低倍率节点',
           icon: ICON('Lab.png'),
-          type: options.loadBalance ? 'load-balance' : 'url-test',
+          type: regionalAutoGroupType(),
           ...(options.regexFilter
             ? { 'include-all': true, filter: LOW_COST_PATTERN }
             : { proxies: [...lowCostNodes] })
@@ -651,7 +668,7 @@ function buildProxyGroups(
     {
       name: '自动选择',
       icon: ICON('Auto.png'),
-      type: 'url-test',
+      type: autoGroupType(),
       'include-all': true,
       'exclude-filter': ISP_EXCLUDE_PATTERN,
       interval: 300,
