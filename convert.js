@@ -54,7 +54,7 @@
  * ==================== 导出接口 ====================
  *
  * 本脚本导出以下接口供其他脚本调用：
- * - main(config): 主入口，接收代理配置返回完整配置
+ * - main(config): 主入口，接收代理配置返回完整配置；生成失败时直接抛错
  * - metadata: { rules, ruleProviders, countryRegex } 元数据对象
  *
  * 被 sync-drjcustomrule-3.js 和 build-configs.js 依赖
