@@ -26,7 +26,8 @@ module.exports = {
     "+.oxycontinin.com"
   ],
   "forceproxy.yaml": [
-    "+.wwluodi.site"
+    "+.wwluodi.site",
+    "+.tabbitbrowser.com"
   ],
   "ai.yaml": [
     "+.moltbook.com",
