@@ -33,7 +33,8 @@ module.exports = {
     "+.moltbook.com",
     "+.xcode.best",
     "+.chuangzuoli.com",
-    "+.fakerclaw.online"
+    "+.fakerclaw.online",
+    "+.86gamestore.com"
   ],
   "mining.yaml": [
     "+.crazypool.org",
