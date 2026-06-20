@@ -214,6 +214,7 @@ test('convert full config uses conservative OpenWRT transparent proxy defaults',
 
   assert.equal(result['tcp-concurrent'], false);
   assert.equal(result['disable-keep-alive'], false);
+  assert.equal(result['find-process-mode'], undefined);
   assert.equal(result.dns['prefer-h3'], false);
   assert.equal(result.sniffer.sniff.TLS['override-destination'], false);
   assert.equal(result.sniffer.sniff.QUIC['override-destination'], false);

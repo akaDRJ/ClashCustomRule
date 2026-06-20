@@ -753,7 +753,6 @@ function main(config) {
       mode: 'rule',
       'unified-delay': true,
       'tcp-concurrent': resolveTcpConcurrent(options.useAggressiveDefaults),
-      'find-process-mode': 'off',
       'log-level': 'info',
       'geodata-loader': 'standard',
       'external-controller': ':9999',
