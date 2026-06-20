@@ -257,6 +257,36 @@ test('convert metadata passes internal consistency checks', () => {
   assert.ok(Object.keys(metadata.countryRegex).length > 10);
 });
 
+test('convert DNS follows the akaDRJ strict fake-ip baseline', () => {
+  const convert = loadConvert({});
+  const result = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
+
+  assert.deepEqual(result.dns, {
+    enable: true,
+    ipv6: false,
+    'prefer-h3': false,
+    'respect-rules': false,
+    'enhanced-mode': 'fake-ip',
+    'fake-ip-range': '198.18.0.1/16',
+    'fake-ip-range6': '',
+    'fake-ip-filter-mode': 'rule',
+    'fake-ip-ttl': 1,
+    'fake-ip-filter': ['MATCH,fake-ip'],
+    'default-nameserver': ['223.5.5.5'],
+    'proxy-server-nameserver': ['223.5.5.5'],
+    'direct-nameserver': ['223.5.5.5'],
+    'direct-nameserver-follow-policy': false,
+    nameserver: [
+      'https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true'
+    ],
+    fallback: ['https://1.1.1.1/dns-query#proxy'],
+    'fallback-filter': {
+      geoip: true,
+      'geoip-code': 'CN'
+    }
+  });
+});
+
 test('convert output avoids shared array aliases with direct yaml emitters', () => {
   const convert = loadConvert({ landing: true });
   const result = convert.main({
