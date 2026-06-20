@@ -258,7 +258,7 @@ test('convert metadata passes internal consistency checks', () => {
   assert.ok(Object.keys(metadata.countryRegex).length > 10);
 });
 
-test('convert DNS follows the akaDRJ strict fake-ip baseline', () => {
+test('convert DNS uses fake-ip globally while keeping domestic/direct domains on real domestic DNS', () => {
   const convert = loadConvert({});
   const result = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
 
@@ -272,11 +272,21 @@ test('convert DNS follows the akaDRJ strict fake-ip baseline', () => {
     'fake-ip-range6': '',
     'fake-ip-filter-mode': 'rule',
     'fake-ip-ttl': 1,
-    'fake-ip-filter': ['MATCH,fake-ip'],
-    'default-nameserver': ['223.5.5.5'],
-    'proxy-server-nameserver': ['223.5.5.5'],
-    'direct-nameserver': ['223.5.5.5'],
-    'direct-nameserver-follow-policy': false,
+    'fake-ip-filter': [
+      'RULE-SET,forcedirect,real-ip',
+      'RULE-SET,cnsite,real-ip',
+      'GEOSITE,private,real-ip',
+      'GEOSITE,cn,real-ip',
+      'MATCH,fake-ip'
+    ],
+    'default-nameserver': ['223.5.5.5', '119.29.29.29'],
+    'proxy-server-nameserver': ['223.5.5.5', '119.29.29.29'],
+    'direct-nameserver': ['223.5.5.5', '119.29.29.29'],
+    'direct-nameserver-follow-policy': true,
+    'nameserver-policy': {
+      'geosite:private,cn,google-play@cn,youtube@cn,paypal@cn,steam@cn,category-games@cn,category-scholar-cn,apple@cn,microsoft@cn': ['223.5.5.5', '119.29.29.29'],
+      'rule-set:forcedirect,cnsite': ['223.5.5.5', '119.29.29.29']
+    },
     nameserver: [
       'https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true'
     ],

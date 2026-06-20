@@ -125,6 +125,9 @@ const globalProxiesBase = Object.freeze([
   '全球直连'
 ]);
 
+const domesticDnsServers = Object.freeze(['223.5.5.5', '119.29.29.29']);
+const directGeositePolicy = 'geosite:private,cn,google-play@cn,youtube@cn,paypal@cn,steam@cn,category-games@cn,category-scholar-cn,apple@cn,microsoft@cn';
+
 // ============== 规则（第一二段小写，第三段保留） ==============
 const rules = [
   'rule-set,forcedirect,全球直连',
@@ -255,11 +258,21 @@ const dnsConfigBase = {
   'fake-ip-range6': '',
   'fake-ip-filter-mode': 'rule',
   'fake-ip-ttl': 1,
-  'fake-ip-filter': ['MATCH,fake-ip'],
-  'default-nameserver': ['223.5.5.5'],
-  'proxy-server-nameserver': ['223.5.5.5'],
-  'direct-nameserver': ['223.5.5.5'],
-  'direct-nameserver-follow-policy': false,
+  'fake-ip-filter': [
+    'RULE-SET,forcedirect,real-ip',
+    'RULE-SET,cnsite,real-ip',
+    'GEOSITE,private,real-ip',
+    'GEOSITE,cn,real-ip',
+    'MATCH,fake-ip'
+  ],
+  'default-nameserver': [...domesticDnsServers],
+  'proxy-server-nameserver': [...domesticDnsServers],
+  'direct-nameserver': [...domesticDnsServers],
+  'direct-nameserver-follow-policy': true,
+  'nameserver-policy': {
+    [directGeositePolicy]: [...domesticDnsServers],
+    'rule-set:forcedirect,cnsite': [...domesticDnsServers]
+  },
   nameserver: [
     'https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true'
   ],
@@ -391,6 +404,12 @@ function cloneDnsConfig(useAggressiveDefaults) {
     'default-nameserver': [...dnsConfigBase['default-nameserver']],
     'proxy-server-nameserver': [...dnsConfigBase['proxy-server-nameserver']],
     'direct-nameserver': [...dnsConfigBase['direct-nameserver']],
+    'nameserver-policy': Object.fromEntries(
+      Object.entries(dnsConfigBase['nameserver-policy']).map(([match, servers]) => [
+        match,
+        [...servers]
+      ])
+    ),
     nameserver: [...dnsConfigBase.nameserver],
     fallback: [...dnsConfigBase.fallback],
     'fallback-filter': { ...dnsConfigBase['fallback-filter'] }

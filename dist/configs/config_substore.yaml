@@ -57,14 +57,28 @@ dns:
   fake-ip-filter-mode: rule
   fake-ip-ttl: 1
   fake-ip-filter:
+    - RULE-SET,forcedirect,real-ip
+    - RULE-SET,cnsite,real-ip
+    - GEOSITE,private,real-ip
+    - GEOSITE,cn,real-ip
     - MATCH,fake-ip
   default-nameserver:
     - 223.5.5.5
+    - 119.29.29.29
   proxy-server-nameserver:
     - 223.5.5.5
+    - 119.29.29.29
   direct-nameserver:
     - 223.5.5.5
-  direct-nameserver-follow-policy: false
+    - 119.29.29.29
+  direct-nameserver-follow-policy: true
+  nameserver-policy:
+    geosite:private,cn,google-play@cn,youtube@cn,paypal@cn,steam@cn,category-games@cn,category-scholar-cn,apple@cn,microsoft@cn:
+      - 223.5.5.5
+      - 119.29.29.29
+    rule-set:forcedirect,cnsite:
+      - 223.5.5.5
+      - 119.29.29.29
   nameserver:
     - https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true
   fallback:
