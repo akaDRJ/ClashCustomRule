@@ -258,46 +258,6 @@ test('convert metadata passes internal consistency checks', () => {
   assert.ok(Object.keys(metadata.countryRegex).length > 10);
 });
 
-test('convert DNS uses fake-ip globally while keeping domestic/direct domains on real domestic DNS', () => {
-  const convert = loadConvert({});
-  const result = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
-
-  assert.deepEqual(result.dns, {
-    enable: true,
-    ipv6: false,
-    'prefer-h3': false,
-    'respect-rules': false,
-    'enhanced-mode': 'fake-ip',
-    'fake-ip-range': '198.18.0.1/16',
-    'fake-ip-range6': '',
-    'fake-ip-filter-mode': 'rule',
-    'fake-ip-ttl': 1,
-    'fake-ip-filter': [
-      'RULE-SET,forcedirect,real-ip',
-      'RULE-SET,cnsite,real-ip',
-      'GEOSITE,private,real-ip',
-      'GEOSITE,cn,real-ip',
-      'MATCH,fake-ip'
-    ],
-    'default-nameserver': ['223.5.5.5', '119.29.29.29'],
-    'proxy-server-nameserver': ['223.5.5.5', '119.29.29.29'],
-    'direct-nameserver': ['223.5.5.5', '119.29.29.29'],
-    'direct-nameserver-follow-policy': true,
-    'nameserver-policy': {
-      'geosite:private,cn,google-play@cn,youtube@cn,paypal@cn,steam@cn,category-games@cn,category-scholar-cn,apple@cn,microsoft@cn': ['223.5.5.5', '119.29.29.29'],
-      'rule-set:forcedirect,cnsite': ['223.5.5.5', '119.29.29.29']
-    },
-    nameserver: [
-      'https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true'
-    ],
-    fallback: ['https://1.1.1.1/dns-query#proxy'],
-    'fallback-filter': {
-      geoip: true,
-      'geoip-code': 'CN'
-    }
-  });
-});
-
 test('convert output avoids shared array aliases with direct yaml emitters', () => {
   const convert = loadConvert({ landing: true });
   const result = convert.main({

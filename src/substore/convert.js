@@ -125,9 +125,6 @@ const globalProxiesBase = Object.freeze([
   '全球直连'
 ]);
 
-const domesticDnsServers = Object.freeze(['223.5.5.5', '119.29.29.29']);
-const directGeositePolicy = 'geosite:private,cn,google-play@cn,youtube@cn,paypal@cn,steam@cn,category-games@cn,category-scholar-cn,apple@cn,microsoft@cn';
-
 // ============== 规则（第一二段小写，第三段保留） ==============
 const rules = [
   'rule-set,forcedirect,全球直连',
@@ -229,6 +226,10 @@ const ruleProviders = {
     'forcedirect',
     'raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/forcedirect.mrs'
   ),
+  fakeipfilter: mrsProvider(
+    'fakeipfilter',
+    'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs'
+  ),
   cnsite: mrsProvider(
     'cnsite',
     'github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs'
@@ -251,36 +252,17 @@ const snifferConfigBase = {
 const dnsConfigBase = {
   enable: true,
   ipv6: options.ipv6Enabled,
-  'prefer-h3': false,
-  'respect-rules': false,
+  'prefer-h3': true,
   'enhanced-mode': 'fake-ip',
-  'fake-ip-range': '198.18.0.1/16',
-  'fake-ip-range6': '',
-  'fake-ip-filter-mode': 'rule',
-  'fake-ip-ttl': 1,
+  'fake-ip-range': '198.20.0.1/16',
   'fake-ip-filter': [
-    'RULE-SET,forcedirect,real-ip',
-    'RULE-SET,cnsite,real-ip',
-    'GEOSITE,private,real-ip',
-    'GEOSITE,cn,real-ip',
-    'MATCH,fake-ip'
+    '+.drj028.com',
+    'geosite:cn',
+    'rule-set:cnsite',
+    'rule-set:fakeipfilter'
   ],
-  'default-nameserver': [...domesticDnsServers],
-  'proxy-server-nameserver': [...domesticDnsServers],
-  'direct-nameserver': [...domesticDnsServers],
-  'direct-nameserver-follow-policy': true,
-  'nameserver-policy': {
-    [directGeositePolicy]: [...domesticDnsServers],
-    'rule-set:forcedirect,cnsite': [...domesticDnsServers]
-  },
-  nameserver: [
-    'https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true'
-  ],
-  fallback: ['https://1.1.1.1/dns-query#proxy'],
-  'fallback-filter': {
-    geoip: true,
-    'geoip-code': 'CN'
-  }
+  'default-nameserver': ['tls://223.5.5.5', 'tls://223.6.6.6'],
+  nameserver: ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']
 };
 
 const geoxURL = {
@@ -399,20 +381,10 @@ function cloneDnsConfig(useAggressiveDefaults) {
   return {
     ...dnsConfigBase,
     ipv6: options.ipv6Enabled,
-    'prefer-h3': useAggressiveDefaults,
+    'prefer-h3': useAggressiveDefaults ? dnsConfigBase['prefer-h3'] : false,
     'fake-ip-filter': [...dnsConfigBase['fake-ip-filter']],
     'default-nameserver': [...dnsConfigBase['default-nameserver']],
-    'proxy-server-nameserver': [...dnsConfigBase['proxy-server-nameserver']],
-    'direct-nameserver': [...dnsConfigBase['direct-nameserver']],
-    'nameserver-policy': Object.fromEntries(
-      Object.entries(dnsConfigBase['nameserver-policy']).map(([match, servers]) => [
-        match,
-        [...servers]
-      ])
-    ),
-    nameserver: [...dnsConfigBase.nameserver],
-    fallback: [...dnsConfigBase.fallback],
-    'fallback-filter': { ...dnsConfigBase['fallback-filter'] }
+    nameserver: [...dnsConfigBase.nameserver]
   };
 }
 

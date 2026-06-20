@@ -65,42 +65,19 @@ dns:
   enable: true
   ipv6: false
   prefer-h3: false
-  respect-rules: false
   enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  fake-ip-range6: ""
-  fake-ip-filter-mode: rule
-  fake-ip-ttl: 1
+  fake-ip-range: 198.20.0.1/16
   fake-ip-filter:
-    - RULE-SET,forcedirect,real-ip
-    - RULE-SET,cnsite,real-ip
-    - GEOSITE,private,real-ip
-    - GEOSITE,cn,real-ip
-    - MATCH,fake-ip
+    - +.drj028.com
+    - geosite:cn
+    - rule-set:cnsite
+    - rule-set:fakeipfilter
   default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-  proxy-server-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-  direct-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-  direct-nameserver-follow-policy: true
-  nameserver-policy:
-    geosite:private,cn,google-play@cn,youtube@cn,paypal@cn,steam@cn,category-games@cn,category-scholar-cn,apple@cn,microsoft@cn:
-      - 223.5.5.5
-      - 119.29.29.29
-    rule-set:forcedirect,cnsite:
-      - 223.5.5.5
-      - 119.29.29.29
+    - tls://223.5.5.5
+    - tls://223.6.6.6
   nameserver:
-    - https://8.8.8.8/dns-query#proxy&disable-ipv6=true&ecs=114.114.114.114/24&ecs-override=true
-  fallback:
-    - https://1.1.1.1/dns-query#proxy
-  fallback-filter:
-    geoip: true
-    geoip-code: CN
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
   listen: 0.0.0.0:7874
 geodata-mode: true
 geox-url:
@@ -808,6 +785,13 @@ rule-providers:
     interval: 86400
     url: https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/forcedirect.mrs
     path: ./ruleset/forcedirect.mrs
+  fakeipfilter:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/fakeip-filter.mrs
+    path: ./ruleset/fakeipfilter.mrs
   cnsite:
     type: http
     behavior: domain
