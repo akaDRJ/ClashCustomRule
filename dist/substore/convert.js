@@ -159,6 +159,7 @@ const rules = [
   'geosite,apple,Apple',
   'geosite,microsoft@cn,全球直连',
   'geosite,microsoft,Microsoft',
+  'geosite,googlefcm,全球直连',
   'geosite,google,Google',
   'geosite,cn,全球直连',
   'rule-set,cnsite,全球直连',

@@ -244,6 +244,17 @@ test('convert main fails fast instead of returning a partial config', () => {
   assert.throws(() => convert.main(config), /write blocked/);
 });
 
+test('convert routes Google FCM directly before generic Google rules', () => {
+  const { metadata } = loadConvert({});
+  const googleFcmRule = 'geosite,googlefcm,全球直连';
+
+  assert.equal(metadata.rules.includes(googleFcmRule), true);
+  assert.equal(
+    metadata.rules.indexOf(googleFcmRule) < metadata.rules.indexOf('geosite,google,Google'),
+    true
+  );
+});
+
 test('convert metadata passes internal consistency checks', () => {
   const { metadata } = loadConvert({});
   const providers = metadata.ruleProviders;
