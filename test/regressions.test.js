@@ -324,7 +324,50 @@ test('convert omits empty landing group in enumerated mode', () => {
   );
 });
 
-test('akcdn fallback convert prefers IX and falls back to dialer landing on same landing server', () => {
+test('akcdn fallback convert prefers IX and falls back to dialer landing through transit nodes only', () => {
+  const convert = loadAkcdnFallbackConvert({});
+  const result = convert.main({
+    proxies: [
+      {
+        name: '🇭🇰 NX 香港 01',
+        type: 'ss',
+        server: 'nexitally.example',
+        port: 46030
+      },
+      {
+        name: '🇭🇰 YT 香港 01',
+        type: 'anytls',
+        server: 'ytoo.example',
+        port: 14521
+      },
+      {
+        name: '🇨🇳 台湾 01',
+        type: 'anytls',
+        server: '162.14.111.30',
+        port: 443
+      },
+      {
+        name: '🇹🇼 落地 台湾 01',
+        type: 'vmess',
+        server: '83.147.12.131',
+        port: 443,
+        'dialer-proxy': '前置代理'
+      }
+    ]
+  });
+  const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+
+  assert.equal(groups['AKCDN 兜底'].type, 'fallback');
+  assert.deepEqual(groups['AKCDN 兜底'].proxies, ['🇨🇳 台湾 01', '🇹🇼 落地 台湾 01']);
+  assert.equal(groups['AKCDN 兜底'].lazy, false);
+  assert.equal(groups['节点选择'].proxies[0], 'AKCDN 兜底');
+  assert.equal(groups['GLOBAL'].proxies.includes('AKCDN 兜底'), true);
+  assert.equal(Object.prototype.hasOwnProperty.call(groups['自动选择'], 'proxies'), false);
+  assert.equal(groups['前置代理'].type, 'url-test');
+  assert.deepEqual(groups['前置代理'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
+});
+
+test('akcdn fallback convert omits fallback when no independent transit node exists', () => {
   const convert = loadAkcdnFallbackConvert({});
   const result = convert.main({
     proxies: [
@@ -340,21 +383,14 @@ test('akcdn fallback convert prefers IX and falls back to dialer landing on same
         server: '83.147.12.131',
         port: 443,
         'dialer-proxy': '前置代理'
-      },
-      {
-        name: '香港 01',
-        type: 'direct'
       }
     ]
   });
-  const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
 
-  assert.equal(groups['AKCDN 兜底'].type, 'fallback');
-  assert.deepEqual(groups['AKCDN 兜底'].proxies, ['🇨🇳 台湾 01', '🇹🇼 落地 台湾 01']);
-  assert.equal(groups['AKCDN 兜底'].lazy, false);
-  assert.equal(groups['节点选择'].proxies[0], 'AKCDN 兜底');
-  assert.equal(groups['GLOBAL'].proxies.includes('AKCDN 兜底'), true);
-  assert.equal(Object.prototype.hasOwnProperty.call(groups['自动选择'], 'proxies'), false);
+  assert.equal(
+    result['proxy-groups'].some((group) => group.name === 'AKCDN 兜底'),
+    false
+  );
 });
 
 test('akcdn fallback convert keeps base behavior when no AKCDN and dialer pair exists', () => {

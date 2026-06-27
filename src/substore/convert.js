@@ -46,7 +46,8 @@
  *
  * [akcdnfallback]  启用 AKCDN IX → Dialer 落地自动兜底（默认关闭）
  *                  自动创建「AKCDN 兜底」fallback 组：优先使用 AKCDN IX，
- *                  健康检查失败时切到同落地 IP 的 dialer-proxy 落地节点
+ *                  健康检查失败时切到 dialer-proxy 落地节点
+ *                  「前置代理」会收敛为独立机场中转节点，避免再走 AKCDN/落地自环
  *                  开启后会自动启用落地/前置代理分组，避免 dialer 节点悬空
  *
  * ==================== 使用示例 ====================
@@ -325,7 +326,10 @@ const countryIconURLs = {
 
 const ISP_EXCLUDE_PATTERN =
   '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地';
-const AKCDN_PATTERN = '(?i)AKCDN|IX|162\\.14\\.111\\.30|39\\.108\\.228\\.6';
+const AKCDN_PATTERN = '(?i)\\bAKCDN\\b|\\bIX\\b|162\\.14\\.111\\.30|39\\.108\\.228\\.6';
+const TRANSIT_EXCLUDE_PATTERN = [ISP_EXCLUDE_PATTERN, AKCDN_PATTERN]
+  .map((pattern) => pattern.replace(/^\\(\\?i\\)/, ''))
+  .join('|');
 const LOW_COST_PATTERN = '(?i)0\\.[0-5]|低倍率|省流|大流量|实验性';
 
 const ISP_OR_LANDING_RE = makeRegex(ISP_EXCLUDE_PATTERN);
@@ -460,7 +464,31 @@ function isDialerLandingNode(proxy) {
   return Boolean(proxy && proxy['dialer-proxy'] && isIspName(proxy.name));
 }
 
-function parseAkcdnFallbackNodes(proxies) {
+function proxyServerKey(proxy) {
+  return proxy && proxy.server !== undefined ? String(proxy.server).toLowerCase() : '';
+}
+
+function isTransitNode(proxy, landingServerKeys) {
+  if (!proxy || !proxy.name) return false;
+  if (proxy['dialer-proxy']) return false;
+  if (proxy.type === 'direct') return false;
+  if (isIspName(proxy.name) || isAkcdnNode(proxy)) return false;
+  const serverKey = proxyServerKey(proxy);
+  return !serverKey || !landingServerKeys.has(serverKey);
+}
+
+function parseTransitNodes(proxies) {
+  const landingServerKeys = new Set(
+    proxies.filter(isDialerLandingNode).map(proxyServerKey).filter(Boolean)
+  );
+  return proxies
+    .filter((proxy) => isTransitNode(proxy, landingServerKeys))
+    .map((proxy) => proxy.name)
+    .filter(Boolean);
+}
+
+function parseAkcdnFallbackNodes(proxies, transitNodes) {
+  if (!transitNodes.length) return [];
   const akcdnNodes = proxies.filter(isAkcdnNode).map((proxy) => proxy.name).filter(Boolean);
   const dialerLandingNodes = proxies
     .filter(isDialerLandingNode)
@@ -607,6 +635,7 @@ function buildProxyGroups(
   lowCostNodes,
   landingNodes,
   akcdnFallbackNodes,
+  transitNodes,
   defaults
 ) {
   const {
@@ -659,9 +688,10 @@ function buildProxyGroups(
   }
   appendUnique(globalProxies, countryProxies);
 
-  const preProxySelector = defaultSelector.filter(
-    (name) => name !== '落地节点' && name !== 'AKCDN 兜底'
-  );
+  const preProxySelector = hasAkcdnFallbackGroup
+    ? [...transitNodes]
+    : defaultSelector.filter((name) => name !== '落地节点' && name !== 'AKCDN 兜底');
+  const preProxyType = hasAkcdnFallbackGroup && !options.regexFilter ? autoGroupType() : 'select';
   const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
   const serviceGroups = buildServiceGroups(defaultProxies, directFallbackProxies);
 
@@ -702,14 +732,17 @@ function buildProxyGroups(
       ? {
           name: '前置代理',
           icon: ICON('Area.png'),
-          type: 'select',
+          type: preProxyType,
           ...(options.regexFilter
             ? {
                 'include-all': true,
-                'exclude-filter': ISP_EXCLUDE_PATTERN,
+                'exclude-filter': TRANSIT_EXCLUDE_PATTERN,
                 proxies: [...preProxySelector]
               }
-            : { proxies: [...preProxySelector] })
+            : { proxies: [...preProxySelector] }),
+          ...(preProxyType === 'url-test'
+            ? { interval: 300, tolerance: 20, lazy: false }
+            : {})
         }
       : null,
 
@@ -786,8 +819,9 @@ function main(config) {
   const lowCostNodes = parseLowCostNodes(proxies);
   const landingNodes =
     options.landing || options.akcdnFallback ? parseLandingNodes(proxies) : [];
+  const transitNodes = options.akcdnFallback ? parseTransitNodes(proxies) : [];
   const akcdnFallbackNodes = options.akcdnFallback
-    ? parseAkcdnFallbackNodes(proxies)
+    ? parseAkcdnFallbackNodes(proxies, transitNodes)
     : [];
   const countryBuckets = options.regexFilter
     ? {}
@@ -800,6 +834,7 @@ function main(config) {
     lowCostNodes,
     landingNodes,
     akcdnFallbackNodes,
+    transitNodes,
     { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies }
   );
   const finalRules = buildRules(options.quicEnabled);
