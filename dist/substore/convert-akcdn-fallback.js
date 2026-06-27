@@ -47,7 +47,7 @@
  * [akcdnfallback]  启用 AKCDN IX → Dialer 落地自动兜底（默认关闭）
  *                  自动创建「AKCDN 兜底」fallback 组：优先使用 AKCDN IX，
  *                  健康检查失败时切到 dialer-proxy 落地节点
- *                  「前置代理」会收敛为独立机场中转节点，避免再走 AKCDN/落地自环
+ *                  「前置代理」会收敛为独立机场中转分组，避免再走 AKCDN/落地自环
  *                  开启后会自动启用落地/前置代理分组，避免 dialer 节点悬空
  *
  * ==================== 使用示例 ====================
@@ -559,6 +559,20 @@ function appendUnique(arr, values) {
   }
 }
 
+function uniqueStrings(values) {
+  const result = [];
+  for (const value of values) {
+    if (typeof value === 'string' && value && !result.includes(value)) {
+      result.push(value);
+    }
+  }
+  return result;
+}
+
+function timedAutoGroupFields() {
+  return { interval: 300, tolerance: 20, lazy: false };
+}
+
 function buildServiceGroups(defaultProxies, directProxies) {
   return SERVICE_GROUP_SPECS.map(({ name, icon, source }) => ({
     name,
@@ -566,6 +580,73 @@ function buildServiceGroups(defaultProxies, directProxies) {
     type: 'select',
     proxies: source === 'direct' ? [...directProxies] : [...defaultProxies]
   }));
+}
+
+function buildTransitCountryProxyGroups(countryList, transitNodes) {
+  const groups = [];
+  const groupType = regionalAutoGroupType();
+
+  for (const country of countryList) {
+    const regex = COUNTRY_REGEX_MAP.get(country);
+    if (!regex) continue;
+
+    const nodes = uniqueStrings(transitNodes.filter((name) => regex.test(name)));
+    if (!nodes.length) continue;
+
+    const group = {
+      name: `中转${country}节点`,
+      icon: countryIconURLs[country],
+      type: groupType,
+      proxies: nodes
+    };
+
+    if (!options.loadBalance) {
+      Object.assign(group, timedAutoGroupFields());
+    }
+
+    groups.push(group);
+  }
+
+  return groups;
+}
+
+function buildTransitProxyGroups(countryList, transitNodes) {
+  const uniqueTransitNodes = uniqueStrings(transitNodes);
+  const transitCountryGroups = buildTransitCountryProxyGroups(countryList, uniqueTransitNodes);
+  const lowCostTransitNodes = uniqueStrings(uniqueTransitNodes.filter(isLowCostName));
+
+  const groups = [
+    {
+      name: '中转自动选择',
+      icon: ICON('Auto.png'),
+      type: autoGroupType(),
+      proxies: [...uniqueTransitNodes],
+      ...timedAutoGroupFields()
+    },
+    ...transitCountryGroups
+  ];
+
+  if (lowCostTransitNodes.length) {
+    const lowCostGroup = {
+      name: '中转低倍率节点',
+      icon: ICON('Lab.png'),
+      type: regionalAutoGroupType(),
+      proxies: lowCostTransitNodes
+    };
+    if (!options.loadBalance) {
+      Object.assign(lowCostGroup, timedAutoGroupFields());
+    }
+    groups.push(lowCostGroup);
+  }
+
+  groups.push({
+    name: '中转手动切换',
+    icon: ICON('Proxy.png'),
+    type: 'select',
+    proxies: [...uniqueTransitNodes]
+  });
+
+  return groups;
 }
 
 // ======================== 国家解析 ========================
@@ -691,10 +772,12 @@ function buildProxyGroups(
   }
   appendUnique(globalProxies, countryProxies);
 
+  const transitProxyGroups = hasAkcdnFallbackGroup
+    ? buildTransitProxyGroups(countryList, transitNodes)
+    : [];
   const preProxySelector = hasAkcdnFallbackGroup
-    ? [...transitNodes]
+    ? transitProxyGroups.map((group) => group.name)
     : defaultSelector.filter((name) => name !== '落地节点' && name !== 'AKCDN 兜底');
-  const preProxyType = hasAkcdnFallbackGroup && !options.regexFilter ? autoGroupType() : 'select';
   const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
   const serviceGroups = buildServiceGroups(defaultProxies, directFallbackProxies);
 
@@ -735,19 +818,20 @@ function buildProxyGroups(
       ? {
           name: '前置代理',
           icon: ICON('Area.png'),
-          type: preProxyType,
-          ...(options.regexFilter
+          type: 'select',
+          ...(hasAkcdnFallbackGroup
+            ? { proxies: [...preProxySelector] }
+            : options.regexFilter
             ? {
                 'include-all': true,
                 'exclude-filter': TRANSIT_EXCLUDE_PATTERN,
                 proxies: [...preProxySelector]
               }
-            : { proxies: [...preProxySelector] }),
-          ...(preProxyType === 'url-test'
-            ? { interval: 300, tolerance: 20, lazy: false }
-            : {})
+            : { proxies: [...preProxySelector] })
         }
       : null,
+
+    ...transitProxyGroups,
 
     hasLowCostGroup
       ? {

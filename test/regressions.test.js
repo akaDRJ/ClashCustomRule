@@ -324,7 +324,7 @@ test('convert omits empty landing group in enumerated mode', () => {
   );
 });
 
-test('akcdn fallback convert prefers IX and falls back to dialer landing through transit nodes only', () => {
+test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups instead of raw nodes', () => {
   const convert = loadAkcdnFallbackConvert({});
   const result = convert.main({
     proxies: [
@@ -363,8 +363,18 @@ test('akcdn fallback convert prefers IX and falls back to dialer landing through
   assert.equal(groups['节点选择'].proxies[0], 'AKCDN 兜底');
   assert.equal(groups['GLOBAL'].proxies.includes('AKCDN 兜底'), true);
   assert.equal(Object.prototype.hasOwnProperty.call(groups['自动选择'], 'proxies'), false);
-  assert.equal(groups['前置代理'].type, 'url-test');
-  assert.deepEqual(groups['前置代理'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
+  assert.equal(groups['前置代理'].type, 'select');
+  assert.deepEqual(groups['前置代理'].proxies, [
+    '中转自动选择',
+    '中转香港节点',
+    '中转手动切换'
+  ]);
+  assert.equal(groups['中转自动选择'].type, 'url-test');
+  assert.deepEqual(groups['中转自动选择'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
+  assert.equal(groups['中转香港节点'].type, 'url-test');
+  assert.deepEqual(groups['中转香港节点'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
+  assert.equal(groups['中转手动切换'].type, 'select');
+  assert.deepEqual(groups['中转手动切换'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
 });
 
 test('akcdn fallback convert omits fallback when no independent transit node exists', () => {
