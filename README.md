@@ -28,6 +28,7 @@ Sub-Store scripts:
 
 ```text
 https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js
+https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert-akcdn-fallback.js
 https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/rename.js
 ```
 

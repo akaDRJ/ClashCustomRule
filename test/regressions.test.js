@@ -9,6 +9,7 @@ const YAML = require('yaml');
 const repoRoot = path.resolve(__dirname, '..');
 const rootPublicFiles = [
   'convert.js',
+  'convert-akcdn-fallback.js',
   'rename.js',
   'convert-overseas-to-cn.js',
   'config.yaml',
@@ -55,6 +56,10 @@ function loadConvert(argumentsMap) {
   return require(modulePath);
 }
 
+function loadAkcdnFallbackConvert(argumentsMap) {
+  return loadConvert({ ...argumentsMap, akcdnfallback: true, landing: true });
+}
+
 test('repository separates source, generated output, and legacy code', () => {
   for (const file of rootPublicFiles) {
     assert.equal(fs.existsSync(path.join(repoRoot, file)), false, `${file} should not live at repo root`);
@@ -66,6 +71,7 @@ test('repository separates source, generated output, and legacy code', () => {
   assert.equal(fs.existsSync(path.join(repoRoot, 'legacy', 'convert-overseas-to-cn.js')), true);
 
   assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'convert.js')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'convert-akcdn-fallback.js')), true);
   assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'rename.js')), true);
   assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'configs', 'config.yaml')), true);
   assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'configs', 'config_substore.yaml')), true);
@@ -80,6 +86,7 @@ test('readme documents the current public dist layout', () => {
   assert.match(readme, /src\/\s+substore\//);
   assert.match(readme, /dist\/\s+substore\//);
   assert.match(readme, /dist\/configs\/config\.yaml/);
+  assert.match(readme, /convert-akcdn-fallback\.js/);
   assert.match(readme, /dist\/rulesets\/mrs\/<name>\.mrs/);
   assert.doesNotMatch(readme, /master\/convert\.js/);
   assert.doesNotMatch(readme, /master\/rename\.js/);
@@ -313,6 +320,54 @@ test('convert omits empty landing group in enumerated mode', () => {
     result['proxy-groups'].some(
       (group) => group.name === '落地节点' && Array.isArray(group.proxies) && group.proxies.length === 0
     ),
+    false
+  );
+});
+
+test('akcdn fallback convert prefers IX and falls back to dialer landing on same landing server', () => {
+  const convert = loadAkcdnFallbackConvert({});
+  const result = convert.main({
+    proxies: [
+      {
+        name: '🇨🇳 台湾 01',
+        type: 'anytls',
+        server: '162.14.111.30',
+        port: 443
+      },
+      {
+        name: '🇹🇼 落地 台湾 01',
+        type: 'vmess',
+        server: '83.147.12.131',
+        port: 443,
+        'dialer-proxy': '前置代理'
+      },
+      {
+        name: '香港 01',
+        type: 'direct'
+      }
+    ]
+  });
+  const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+
+  assert.equal(groups['AKCDN 兜底'].type, 'fallback');
+  assert.deepEqual(groups['AKCDN 兜底'].proxies, ['🇨🇳 台湾 01', '🇹🇼 落地 台湾 01']);
+  assert.equal(groups['AKCDN 兜底'].lazy, false);
+  assert.equal(groups['节点选择'].proxies[0], 'AKCDN 兜底');
+  assert.equal(groups['GLOBAL'].proxies.includes('AKCDN 兜底'), true);
+  assert.equal(Object.prototype.hasOwnProperty.call(groups['自动选择'], 'proxies'), false);
+});
+
+test('akcdn fallback convert keeps base behavior when no AKCDN and dialer pair exists', () => {
+  const convert = loadAkcdnFallbackConvert({ landing: true });
+  const result = convert.main({
+    proxies: [
+      { name: '香港 01', type: 'direct' },
+      { name: '🇹🇼 落地 台湾 01', type: 'vmess', 'dialer-proxy': '前置代理' }
+    ]
+  });
+
+  assert.equal(
+    result['proxy-groups'].some((group) => group.name === 'AKCDN 兜底'),
     false
   );
 });

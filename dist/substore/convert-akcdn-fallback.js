@@ -78,8 +78,11 @@
  */
 
 // ======================== 运行参数 ========================
-const runtimeArgs =
-  typeof $arguments === 'object' && $arguments !== null ? $arguments : {};
+const runtimeArgs = {
+  ...(typeof $arguments === 'object' && $arguments !== null ? $arguments : {}),
+  akcdnfallback: true,
+  landing: true
+};
 
 const useAggressiveDefaults = parseBool(runtimeArgs.aggressive);
 
