@@ -29,6 +29,7 @@ Sub-Store scripts:
 ```text
 https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js
 https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert-akcdn-fallback.js
+https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert-sing-box.js
 https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/rename.js
 ```
 
@@ -45,7 +46,10 @@ Generated rulesets:
 ```text
 https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/yaml/<name>.yaml
 https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/mrs/<name>.mrs
+https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/sing-box/<name>.json
 ```
+
+For sing-box via Sub-Store, create a Sub-Store "file" output and attach `dist/substore/convert-sing-box.js`; Sub-Store does not need a dedicated sing-box output type for this flow.
 
 ## Maintenance
 
@@ -54,4 +58,4 @@ npm run refresh:all
 npm run check
 ```
 
-`npm run refresh:all` rebuilds the published Sub-Store scripts, YAML/MRS rulesets, DRJ custom rule INI, and generated configs. `npm run check` runs tests, drift checks, rule linting, and rename dictionary validation.
+`npm run refresh:all` rebuilds the published Sub-Store scripts, YAML/MRS/sing-box rulesets, DRJ custom rule INI, and generated configs. `npm run check` runs tests, drift checks, rule linting, and rename dictionary validation.

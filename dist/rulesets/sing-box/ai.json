@@ -1,0 +1,21 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "moltbook.com",
+        "xcode.best",
+        "chuangzuoli.com",
+        "fakerclaw.online",
+        "86gamestore.com"
+      ],
+      "domain_suffix": [
+        ".moltbook.com",
+        ".xcode.best",
+        ".chuangzuoli.com",
+        ".fakerclaw.online",
+        ".86gamestore.com"
+      ]
+    }
+  ]
+}

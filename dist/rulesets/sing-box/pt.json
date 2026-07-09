@@ -1,0 +1,21 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "ptchdbits.co",
+        "chdbits.co",
+        "chdbits.xyz",
+        "rainbowisland.co",
+        "drj028.com"
+      ],
+      "domain_suffix": [
+        ".ptchdbits.co",
+        ".chdbits.co",
+        ".chdbits.xyz",
+        ".rainbowisland.co",
+        ".drj028.com"
+      ]
+    }
+  ]
+}

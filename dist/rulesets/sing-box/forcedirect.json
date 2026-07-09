@@ -1,0 +1,61 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "nxonearth.com",
+        "zenithgrid.co",
+        "redringvip.com",
+        "ihezu.com",
+        "javabikes.com",
+        "baobaobooks.com",
+        "pangolin-dsp-toutiao.com",
+        "kuaishouzt.com",
+        "ledupeiyou.com",
+        "xiaoshufenji.com",
+        "getui.com",
+        "getui.net",
+        "smarteducloud.com",
+        "igexin.com",
+        "miaozhen.com",
+        "beizi.biz",
+        "tanx.com",
+        "snssdk.com",
+        "gepush.com",
+        "listenleap.com",
+        "changzhile.com",
+        "drj028.com",
+        "gddns.org",
+        "oxycontinin.com",
+        "fcxx0898.com"
+      ],
+      "domain_suffix": [
+        ".nxonearth.com",
+        ".zenithgrid.co",
+        ".redringvip.com",
+        ".ihezu.com",
+        ".javabikes.com",
+        ".baobaobooks.com",
+        ".pangolin-dsp-toutiao.com",
+        ".kuaishouzt.com",
+        ".ledupeiyou.com",
+        ".xiaoshufenji.com",
+        ".getui.com",
+        ".getui.net",
+        ".smarteducloud.com",
+        ".igexin.com",
+        ".miaozhen.com",
+        ".beizi.biz",
+        ".tanx.com",
+        ".snssdk.com",
+        ".gepush.com",
+        ".listenleap.com",
+        ".changzhile.com",
+        ".drj028.com",
+        ".gddns.org",
+        ".oxycontinin.com",
+        ".fcxx0898.com"
+      ]
+    }
+  ]
+}

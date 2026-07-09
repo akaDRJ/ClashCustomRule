@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "steamcontent.com"
+      ],
+      "domain_suffix": [
+        ".steamcontent.com"
+      ]
+    }
+  ]
+}

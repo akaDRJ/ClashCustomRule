@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "wwluodi.site",
+        "tabbitbrowser.com"
+      ],
+      "domain_suffix": [
+        ".wwluodi.site",
+        ".tabbitbrowser.com"
+      ]
+    }
+  ]
+}

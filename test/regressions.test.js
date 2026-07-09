@@ -56,6 +56,13 @@ function loadConvert(argumentsMap) {
   return require(modulePath);
 }
 
+function loadSingBoxConvert(argumentsMap) {
+  const modulePath = path.join(repoRoot, 'src', 'substore', 'convert-sing-box.js');
+  delete require.cache[require.resolve(modulePath)];
+  global.$arguments = argumentsMap;
+  return require(modulePath);
+}
+
 function loadAkcdnFallbackConvert(argumentsMap) {
   return loadConvert({ ...argumentsMap, akcdnfallback: true, landing: true });
 }
@@ -337,6 +344,85 @@ test('convert omits empty landing group in enumerated mode', () => {
     ),
     false
   );
+});
+
+test('sing-box convert builds modular Sub-Store config with selectors, rule sets, and DNS', () => {
+  const convert = loadSingBoxConvert({});
+  const result = convert.main({
+    proxies: [
+      {
+        name: '香港 01',
+        type: 'ss',
+        server: 'hk.example.com',
+        port: 443,
+        cipher: '2022-blake3-aes-128-gcm',
+        password: 'redacted'
+      },
+      {
+        name: '日本 01',
+        type: 'trojan',
+        server: 'jp.example.com',
+        port: 443,
+        password: 'redacted'
+      }
+    ]
+  });
+  const outbounds = Object.fromEntries(result.outbounds.map((outbound) => [outbound.tag, outbound]));
+  const ruleSets = Object.fromEntries(result.route.rule_set.map((ruleSet) => [ruleSet.tag, ruleSet]));
+
+  assert.equal(result.log.level, 'info');
+  assert.equal(result.dns.strategy, 'ipv4_only');
+  assert.equal(result.inbounds[0].type, 'mixed');
+  assert.equal(outbounds['节点选择'].type, 'selector');
+  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', 'direct']);
+  assert.equal(outbounds['自动选择'].type, 'urltest');
+  assert.deepEqual(outbounds['自动选择'].outbounds, ['香港 01', '日本 01']);
+  assert.equal(outbounds['手动切换'].type, 'selector');
+  assert.deepEqual(outbounds['手动切换'].outbounds, ['香港 01', '日本 01']);
+  assert.equal(outbounds['香港 01'].type, 'shadowsocks');
+  assert.equal(outbounds['日本 01'].type, 'trojan');
+  assert.equal(ruleSets.ai.type, 'remote');
+  assert.match(ruleSets.ai.url, /dist\/rulesets\/sing-box\/ai\.json$/);
+  assert.deepEqual(result.route.rules.slice(0, 4), [
+    { network: 'udp', port: 443, action: 'reject' },
+    { rule_set: 'forcedirect', outbound: 'direct' },
+    { rule_set: 'forceproxy', outbound: '节点选择' },
+    { rule_set: 'ai', outbound: '人工智能' }
+  ]);
+  assert.equal(result.route.final, '节点选择');
+  assert.equal(JSON.parse(convert.operator(result.outbounds.slice(-2))).route.final, '节点选择');
+  assert.equal(JSON.parse(convert.operator({ proxies: result.outbounds.slice(-2) })).route.final, '节点选择');
+});
+
+test('sing-box remote rule-set tags all have generated source files', () => {
+  const { RULE_SET_TAGS } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
+  const generatedTags = new Set(
+    fs.readdirSync(path.join(repoRoot, 'dist', 'rulesets', 'sing-box'))
+      .map((file) => file.replace(/\.json$/, ''))
+  );
+
+  assert.deepEqual(
+    RULE_SET_TAGS.filter((tag) => !generatedTags.has(tag)),
+    []
+  );
+});
+
+test('build-substore publishes a self-contained sing-box Sub-Store converter', () => {
+  const source = fs.readFileSync(path.join(repoRoot, 'scripts', 'build-substore.js'), 'utf8');
+
+  assert.match(source, /convert-sing-box\.js/);
+
+  const output = fs.readFileSync(path.join(repoRoot, 'dist', 'substore', 'convert-sing-box.js'), 'utf8');
+  assert.doesNotMatch(output, /require\(['"]\.\.\/sing-box\//);
+  assert.match(output, /function buildSingBoxConfig/);
+});
+
+test('package check includes sing-box build drift checks', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+
+  assert.equal(manifest.scripts['build:sing-box'], 'node scripts/build-sing-box.js');
+  assert.equal(manifest.scripts['check:sing-box'], 'node scripts/build-sing-box.js --check');
+  assert.match(manifest.scripts.check, /npm run check:sing-box/);
 });
 
 test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups instead of raw nodes', () => {

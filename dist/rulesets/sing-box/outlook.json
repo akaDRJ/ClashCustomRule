@@ -1,0 +1,18 @@
+{
+  "version": 3,
+  "rules": [
+    {
+      "domain": [
+        "imap-mail.outlook.com",
+        "pop-mail.outlook.com",
+        "outlook.office365.com",
+        "smtp-mail.outlook.com",
+        "smtp.office365.com",
+        "m.hotmail.com"
+      ],
+      "domain_suffix": [
+        ".m.hotmail.com"
+      ]
+    }
+  ]
+}
