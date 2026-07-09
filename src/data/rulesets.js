@@ -23,7 +23,8 @@ module.exports = {
     "+.changzhile.com",
     "+.drj028.com",
     "+.gddns.org",
-    "+.oxycontinin.com"
+    "+.oxycontinin.com",
+    "+.fcxx0898.com"
   ],
   "forceproxy.yaml": [
     "+.wwluodi.site",
