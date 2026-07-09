@@ -62,27 +62,6 @@ const generatedFiles = [
         'src/sing-box/rule-sets.js'
       ]);
     }
-  },
-  {
-    file: 'convert-akcdn-fallback.js',
-    sourceFile: 'convert.js',
-    build(source) {
-      const original = [
-        'const runtimeArgs =',
-        "  typeof $arguments === 'object' && $arguments !== null ? $arguments : {};"
-      ].join('\n');
-      const replacement = [
-        'const runtimeArgs = {',
-        "  ...(typeof $arguments === 'object' && $arguments !== null ? $arguments : {}),",
-        '  akcdnfallback: true,',
-        '  landing: true',
-        '};'
-      ].join('\n');
-      if (!source.includes(original)) {
-        throw new Error('convert.js runtimeArgs block changed; update convert-akcdn-fallback.js generator.');
-      }
-      return source.replace(original, replacement);
-    }
   }
 ];
 

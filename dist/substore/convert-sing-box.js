@@ -277,7 +277,6 @@ const CORE_OUTBOUND_TAGS = Object.freeze({
   ai: '人工智能',
   forceProxy: '强制代理',
   directPolicy: '全球直连',
-  preProxy: '前置代理',
   direct: 'direct',
   block: 'block'
 });
@@ -301,7 +300,6 @@ const COUNTRY_MATCHERS = Object.freeze([
   ['马来西亚', /马来西亚|马来|\bMY\b|Malaysia/i]
 ]);
 
-const LANDING_RE = /家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地/i;
 const LOW_COST_RE = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
 
 const TYPE_MAP = Object.freeze({
@@ -323,16 +321,6 @@ function asArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
-function uniqueStrings(values) {
-  const result = [];
-  for (const value of values) {
-    if (typeof value === 'string' && value && !result.includes(value)) {
-      result.push(value);
-    }
-  }
-  return result;
-}
-
 function normalizeProxy(proxy) {
   const tag = proxy && (proxy.name || proxy.tag);
   if (!proxy || typeof proxy !== 'object' || !tag || !proxy.type) return null;
@@ -345,7 +333,7 @@ function normalizeProxy(proxy) {
   }
 
   if (proxy.tag && !proxy.name && proxy.server_port) {
-    const outbound = { ...proxy, type, tag };
+    const outbound = withoutDetourFields({ ...proxy, type, tag });
     return outbound.server && outbound.server_port ? outbound : null;
   }
 
@@ -376,19 +364,23 @@ function normalizeProxy(proxy) {
   return outbound.server && outbound.server_port ? outbound : null;
 }
 
+function withoutDetourFields(outbound) {
+  const cleaned = { ...outbound };
+  delete cleaned.detour;
+  delete cleaned['dialer-proxy'];
+  return cleaned;
+}
+
 function buildOutbounds(proxies) {
   const proxyOutbounds = asArray(proxies).map(normalizeProxy).filter(Boolean);
   const proxyTags = proxyOutbounds.map((outbound) => outbound.tag);
   const selectableTags = proxyTags.length ? proxyTags : [CORE_OUTBOUND_TAGS.direct];
   const staticGroups = buildStaticGroups(proxyTags);
   const staticGroupTags = staticGroups.map((group) => group.tag);
-  const preProxySelector = buildPreProxySelector(proxyOutbounds, staticGroupTags);
-  const preProxyTags = preProxySelector ? [preProxySelector.tag] : [];
   const nodeSelectionChoices = [
     CORE_OUTBOUND_TAGS.auto,
     CORE_OUTBOUND_TAGS.manual,
     ...staticGroupTags,
-    ...preProxyTags,
     CORE_OUTBOUND_TAGS.direct
   ];
   const policyChoices = buildPolicyChoices(staticGroupTags);
@@ -403,7 +395,6 @@ function buildOutbounds(proxies) {
       outbounds: [CORE_OUTBOUND_TAGS.direct]
     },
     ...staticGroups,
-    ...(preProxySelector ? [preProxySelector] : []),
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.proxy,
@@ -434,29 +425,6 @@ function buildOutbounds(proxies) {
   ];
 }
 
-function buildPreProxySelector(proxyOutbounds, staticGroupTags) {
-  const hasPreProxyDependency = proxyOutbounds.some(
-    (outbound) => outbound.detour === CORE_OUTBOUND_TAGS.preProxy
-  );
-  const alreadyDefined = proxyOutbounds.some((outbound) => outbound.tag === CORE_OUTBOUND_TAGS.preProxy);
-  if (!hasPreProxyDependency || alreadyDefined) return null;
-
-  const transitTags = proxyOutbounds
-    .map((outbound) => outbound.tag)
-    .filter((tag) => tag && !LANDING_RE.test(tag));
-  const outbounds = uniqueStrings([
-    ...staticGroupTags,
-    ...transitTags,
-    CORE_OUTBOUND_TAGS.direct
-  ]);
-
-  return {
-    type: 'selector',
-    tag: CORE_OUTBOUND_TAGS.preProxy,
-    outbounds: outbounds.length ? outbounds : [CORE_OUTBOUND_TAGS.direct]
-  };
-}
-
 function buildPolicyChoices(staticGroupTags) {
   return [
     CORE_OUTBOUND_TAGS.proxy,
@@ -470,11 +438,11 @@ function buildPolicyChoices(staticGroupTags) {
 function buildStaticGroups(proxyTags) {
   const groups = [];
   for (const [country, regex] of COUNTRY_MATCHERS) {
-    const outbounds = proxyTags.filter((tag) => !LANDING_RE.test(tag) && regex.test(tag));
+    const outbounds = proxyTags.filter((tag) => regex.test(tag));
     if (outbounds.length) groups.push(buildUrlTestGroup(`${country}节点`, outbounds));
   }
 
-  const lowCost = proxyTags.filter((tag) => !LANDING_RE.test(tag) && LOW_COST_RE.test(tag));
+  const lowCost = proxyTags.filter((tag) => LOW_COST_RE.test(tag));
   if (lowCost.length) groups.push(buildUrlTestGroup('低倍率节点', lowCost));
 
   return groups;
@@ -503,7 +471,6 @@ module.exports = {
   CORE_OUTBOUND_TAGS,
   buildOutbounds,
   buildPolicyChoices,
-  buildPreProxySelector,
   buildStaticGroups,
   normalizeProxy
 };

@@ -78,7 +78,7 @@ test('repository separates source, generated output, and legacy code', () => {
   assert.equal(fs.existsSync(path.join(repoRoot, 'legacy', 'convert-overseas-to-cn.js')), true);
 
   assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'convert.js')), true);
-  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'convert-akcdn-fallback.js')), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'convert-akcdn-fallback.js')), false);
   assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'substore', 'rename.js')), true);
   assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'configs', 'config.yaml')), true);
   assert.equal(fs.existsSync(path.join(repoRoot, 'dist', 'configs', 'config_substore.yaml')), true);
@@ -93,7 +93,7 @@ test('readme documents the current public dist layout', () => {
   assert.match(readme, /src\/\s+substore\//);
   assert.match(readme, /dist\/\s+substore\//);
   assert.match(readme, /dist\/configs\/config\.yaml/);
-  assert.match(readme, /convert-akcdn-fallback\.js/);
+  assert.doesNotMatch(readme, /convert-akcdn-fallback\.js/);
   assert.match(readme, /dist\/rulesets\/mrs\/<name>\.mrs/);
   assert.doesNotMatch(readme, /master\/convert\.js/);
   assert.doesNotMatch(readme, /master\/rename\.js/);
@@ -488,6 +488,7 @@ test('sing-box generated config uses static groups instead of Clash-only filters
   assert.deepEqual(outbounds['香港节点'].outbounds, ['香港 01']);
   assert.deepEqual(outbounds['美国节点'].outbounds, ['美国 0.5x']);
   assert.deepEqual(outbounds['低倍率节点'].outbounds, ['美国 0.5x']);
+  assert.deepEqual(outbounds['台湾节点'].outbounds, ['落地 台湾 01']);
   assert.equal(outbounds['落地节点'], undefined);
 });
 
@@ -504,7 +505,7 @@ test('sing-box builder keeps already produced sing-box outbound tags', () => {
   assert.deepEqual(outbounds['香港节点'].outbounds, ['🇭🇰 NX 香港 01']);
 });
 
-test('sing-box builder defines pre-proxy selector for detoured landing nodes', () => {
+test('sing-box builder strips legacy detours instead of generating pre-proxy fallback', () => {
   const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
   const result = buildSingBoxConfig({
     proxies: [
@@ -515,12 +516,13 @@ test('sing-box builder defines pre-proxy selector for detoured landing nodes', (
   const outbounds = Object.fromEntries(result.outbounds.map((outbound) => [outbound.tag, outbound]));
   const tags = new Set(result.outbounds.map((outbound) => outbound.tag));
 
-  assert.equal(outbounds['🇹🇼 落地 台湾 01'].detour, '前置代理');
-  assert.deepEqual(outbounds['前置代理'].outbounds, ['香港节点', '🇭🇰 NX 香港 01', 'direct']);
-  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '前置代理', 'direct']);
+  assert.equal(outbounds['🇹🇼 落地 台湾 01'].detour, undefined);
+  assert.equal(outbounds['前置代理'], undefined);
+  assert.deepEqual(outbounds['台湾节点'].outbounds, ['🇹🇼 落地 台湾 01']);
+  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '台湾节点', 'direct']);
   for (const outbound of result.outbounds) {
     for (const child of outbound.outbounds || []) assert.equal(tags.has(child), true, `missing child outbound ${child}`);
-    if (outbound.detour) assert.equal(tags.has(outbound.detour), true, `missing detour outbound ${outbound.detour}`);
+    assert.equal(outbound.detour, undefined);
   }
 });
 
