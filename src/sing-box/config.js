@@ -2,21 +2,21 @@ const { buildOutbounds, CORE_OUTBOUND_TAGS } = require('./outbounds');
 const { buildRemoteRuleSets } = require('./rule-sets');
 
 const ROUTE_RULES = Object.freeze([
-  ['forcedirect', CORE_OUTBOUND_TAGS.direct],
-  ['forceproxy', CORE_OUTBOUND_TAGS.proxy],
+  ['forcedirect', CORE_OUTBOUND_TAGS.directPolicy],
+  ['forceproxy', CORE_OUTBOUND_TAGS.forceProxy],
   ['ai', CORE_OUTBOUND_TAGS.ai],
-  ['outlook', CORE_OUTBOUND_TAGS.direct],
-  ['pt', CORE_OUTBOUND_TAGS.direct],
+  ['outlook', CORE_OUTBOUND_TAGS.directPolicy],
+  ['pt', CORE_OUTBOUND_TAGS.directPolicy],
   ['crypto', '加密货币'],
   ['mining', '加密货币']
 ]);
 
 const GEOSITE_RULES = Object.freeze([
-  ['category-pt', CORE_OUTBOUND_TAGS.direct],
-  ['google-play@cn', CORE_OUTBOUND_TAGS.direct],
-  ['youtube@cn', CORE_OUTBOUND_TAGS.direct],
+  ['category-pt', CORE_OUTBOUND_TAGS.directPolicy],
+  ['google-play@cn', CORE_OUTBOUND_TAGS.directPolicy],
+  ['youtube@cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['youtube', 'YouTube'],
-  ['paypal@cn', CORE_OUTBOUND_TAGS.direct],
+  ['paypal@cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['paypal', 'PayPal'],
   ['telegram', 'Telegram'],
   ['disney', 'Disney'],
@@ -26,25 +26,25 @@ const GEOSITE_RULES = Object.freeze([
   ['ookla-speedtest', 'Speedtest'],
   ['category-dev', '开发者资源'],
   ['category-ai-chat-!cn', CORE_OUTBOUND_TAGS.ai],
-  ['steam@cn', CORE_OUTBOUND_TAGS.direct],
-  ['category-games@cn', CORE_OUTBOUND_TAGS.direct],
+  ['steam@cn', CORE_OUTBOUND_TAGS.directPolicy],
+  ['category-games@cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['category-game-platforms-download', '游戏下载'],
   ['category-games', '游戏平台'],
-  ['category-scholar-cn', CORE_OUTBOUND_TAGS.direct],
+  ['category-scholar-cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['category-scholar-!cn', '学术资源'],
   ['category-cryptocurrency', '加密货币'],
-  ['apple@cn', CORE_OUTBOUND_TAGS.direct],
+  ['apple@cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['apple', 'Apple'],
-  ['microsoft@cn', CORE_OUTBOUND_TAGS.direct],
+  ['microsoft@cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['microsoft', 'Microsoft'],
-  ['googlefcm', CORE_OUTBOUND_TAGS.direct],
+  ['googlefcm', CORE_OUTBOUND_TAGS.directPolicy],
   ['google', 'Google'],
-  ['cn', CORE_OUTBOUND_TAGS.direct],
-  ['private', CORE_OUTBOUND_TAGS.direct]
+  ['cn', CORE_OUTBOUND_TAGS.directPolicy],
+  ['private', CORE_OUTBOUND_TAGS.directPolicy]
 ]);
 
 const GEOIP_RULES = Object.freeze([
-  ['cn', CORE_OUTBOUND_TAGS.direct]
+  ['cn', CORE_OUTBOUND_TAGS.directPolicy]
 ]);
 
 const RULE_SET_TAGS = Object.freeze([
@@ -69,7 +69,17 @@ function buildSingBoxConfig(input = {}, options = {}) {
     inbounds: buildInbounds(),
     outbounds: addMissingPolicyOutbounds(outbounds),
     route: buildRouteConfig(options),
-    experimental: { cache_file: { enabled: true } }
+    experimental: buildExperimentalConfig()
+  };
+}
+
+function buildExperimentalConfig() {
+  return {
+    cache_file: { enabled: true },
+    clash_api: {
+      external_controller: '127.0.0.1:9090',
+      default_mode: 'Rule'
+    }
   };
 }
 
@@ -87,6 +97,13 @@ function buildDnsConfig() {
 
 function buildInbounds() {
   return [
+    {
+      type: 'tun',
+      tag: 'tun-in',
+      address: ['172.19.0.1/30'],
+      auto_route: true,
+      stack: 'mixed'
+    },
     {
       type: 'mixed',
       tag: 'mixed-in',
@@ -115,7 +132,7 @@ function buildRouteConfig(options = {}) {
     rules.push({ rule_set: `geoip-${geoip}`, outbound });
   }
 
-  rules.push({ ip_is_private: true, outbound: CORE_OUTBOUND_TAGS.direct });
+  rules.push({ ip_is_private: true, outbound: CORE_OUTBOUND_TAGS.directPolicy });
 
   return {
     rules,
@@ -152,7 +169,7 @@ function addMissingPolicyOutbounds(outbounds) {
     .map((tag) => ({
       type: 'selector',
       tag,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
+      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.directPolicy]
     }));
 
   return [...outbounds, ...additions];
@@ -164,6 +181,7 @@ module.exports = {
   ROUTE_RULES,
   RULE_SET_TAGS,
   buildDnsConfig,
+  buildExperimentalConfig,
   buildInbounds,
   buildRouteConfig,
   buildSingBoxConfig

@@ -383,13 +383,20 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.equal(result.dns.strategy, 'ipv4_only');
   assert.ok(result.dns.servers.some((server) => server.tag === 'bootstrap' && server.type === 'udp'));
   assert.equal(result.dns.servers.filter((server) => server.type === 'https').every((server) => server.domain_resolver === 'bootstrap'), true);
-  assert.equal(result.inbounds[0].type, 'mixed');
+  assert.ok(result.inbounds.some((inbound) => inbound.type === 'mixed'));
+  assert.ok(result.inbounds.some((inbound) => inbound.type === 'tun' && inbound.auto_route === true));
+  assert.equal(result.experimental.clash_api.external_controller, '127.0.0.1:9090');
   assert.equal(outbounds['节点选择'].type, 'selector');
-  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', 'direct']);
+  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '台湾节点', '日本节点', '全球直连']);
   assert.equal(outbounds['自动选择'].type, 'urltest');
   assert.deepEqual(outbounds['自动选择'].outbounds, ['香港 01', '日本 01', '台湾 01']);
   assert.equal(outbounds['手动切换'].type, 'selector');
   assert.deepEqual(outbounds['手动切换'].outbounds, ['香港 01', '日本 01', '台湾 01']);
+  assert.deepEqual(outbounds['香港节点'].outbounds, ['香港 01']);
+  assert.deepEqual(outbounds['台湾节点'].outbounds, ['台湾 01']);
+  assert.deepEqual(outbounds['日本节点'].outbounds, ['日本 01']);
+  assert.deepEqual(outbounds['全球直连'].outbounds, ['direct', '节点选择']);
+  assert.deepEqual(outbounds['强制代理'].outbounds, ['节点选择', '手动切换', '全球直连']);
   assert.equal(outbounds['香港 01'].type, 'shadowsocks');
   assert.equal(outbounds['日本 01'].type, 'trojan');
   assert.deepEqual(outbounds['台湾 01'], {
@@ -410,8 +417,8 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.equal(JSON.stringify(result.route.rules).includes('"geoip"'), false);
   assert.deepEqual(result.route.rules.slice(0, 4), [
     { network: 'udp', port: 443, action: 'reject' },
-    { rule_set: 'forcedirect', outbound: 'direct' },
-    { rule_set: 'forceproxy', outbound: '节点选择' },
+    { rule_set: 'forcedirect', outbound: '全球直连' },
+    { rule_set: 'forceproxy', outbound: '强制代理' },
     { rule_set: 'ai', outbound: '人工智能' }
   ]);
   assert.equal(result.route.default_domain_resolver, 'bootstrap');
@@ -429,10 +436,33 @@ test('sing-box generated config avoids removed geosite and geoip route fields', 
   assert.equal(rulesJson.includes('"geosite"'), false);
   assert.equal(rulesJson.includes('"geoip"'), false);
   assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geosite-youtube' && rule.outbound === 'YouTube'));
-  assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geoip-cn' && rule.outbound === 'direct'));
+  assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geoip-cn' && rule.outbound === '全球直连'));
   assert.equal(result.route.rule_set.some((ruleSet) => ['geoip-netflix', 'geoip-google', 'geoip-telegram'].includes(ruleSet.tag)), false);
   assert.equal(result.route.rule_set.some((ruleSet) => ruleSet.url.includes('raw.githubusercontent.com')), false);
-  assert.ok(result.route.rules.some((rule) => rule.ip_is_private === true && rule.outbound === 'direct'));
+  assert.ok(result.route.rules.some((rule) => rule.ip_is_private === true && rule.outbound === '全球直连'));
+});
+
+test('sing-box generated config uses static groups instead of Clash-only filters', () => {
+  const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
+  const result = buildSingBoxConfig({
+    proxies: [
+      { name: '香港 01', type: 'anytls', server: 'hk.example.com', port: 443, password: 'redacted' },
+      { name: '美国 0.5x', type: 'anytls', server: 'us.example.com', port: 443, password: 'redacted' },
+      { name: '落地 台湾 01', type: 'anytls', server: 'tw.example.com', port: 443, password: 'redacted' }
+    ]
+  });
+  const outbounds = Object.fromEntries(result.outbounds.map((outbound) => [outbound.tag, outbound]));
+  const outboundJson = JSON.stringify(result.outbounds);
+
+  assert.equal(outboundJson.includes('include-all'), false);
+  assert.equal(outboundJson.includes('filter'), false);
+  assert.equal(outboundJson.includes('fallback'), false);
+  assert.equal(outboundJson.includes('load-balance'), false);
+  assert.equal(outboundJson.includes('smart'), false);
+  assert.deepEqual(outbounds['香港节点'].outbounds, ['香港 01']);
+  assert.deepEqual(outbounds['美国节点'].outbounds, ['美国 0.5x']);
+  assert.deepEqual(outbounds['低倍率节点'].outbounds, ['美国 0.5x']);
+  assert.equal(outbounds['落地节点'], undefined);
 });
 
 test('sing-box remote rule-set tags all have generated source files', () => {
