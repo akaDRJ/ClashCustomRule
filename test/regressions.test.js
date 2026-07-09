@@ -386,6 +386,8 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.ok(result.inbounds.some((inbound) => inbound.type === 'mixed'));
   assert.ok(result.inbounds.some((inbound) => inbound.type === 'tun' && inbound.auto_route === true));
   assert.equal(result.experimental.clash_api.external_controller, '127.0.0.1:9090');
+  assert.equal(result.experimental.clash_api.access_control_allow_private_network, true);
+  assert.ok(result.experimental.clash_api.access_control_allow_origin.includes('http://yacd.haishan.me'));
   assert.equal(outbounds['节点选择'].type, 'selector');
   assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '台湾节点', '日本节点', 'direct']);
   assert.deepEqual(outbounds['YouTube'].outbounds, ['节点选择', '香港节点', '台湾节点', '日本节点', '自动选择', '手动切换', 'direct']);

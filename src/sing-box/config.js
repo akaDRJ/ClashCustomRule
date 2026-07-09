@@ -85,7 +85,14 @@ function buildExperimentalConfig() {
     cache_file: { enabled: true },
     clash_api: {
       external_controller: '127.0.0.1:9090',
-      default_mode: 'Rule'
+      default_mode: 'Rule',
+      access_control_allow_origin: [
+        'http://127.0.0.1',
+        'http://localhost',
+        'http://yacd.haishan.me',
+        'https://yacd.metacubex.one'
+      ],
+      access_control_allow_private_network: true
     }
   };
 }
