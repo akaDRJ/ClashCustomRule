@@ -28,18 +28,23 @@ function normalizeInput(input) {
   return Array.isArray(input) ? { proxies: input } : input || {};
 }
 
-function main(config) {
+function build(config) {
   return buildSingBoxConfig(normalizeInput(config), {
     quicEnabled: parseBool(runtimeArgs.quic)
   });
 }
 
+function main(config) {
+  return `${JSON.stringify(build(config), null, 2)}\n`;
+}
+
 function operator(input) {
-  return `${JSON.stringify(main(input), null, 2)}\n`;
+  return main(input);
 }
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    build,
     main,
     operator
   };
@@ -388,6 +393,9 @@ function __require(id) {
   return __cache[id].exports;
 }
 const __entry = __require("src/substore/convert-sing-box.js");
+function build(config) {
+  return __entry.build(config);
+}
 function main(config) {
   return __entry.main(config);
 }

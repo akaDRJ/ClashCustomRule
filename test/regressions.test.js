@@ -348,7 +348,7 @@ test('convert omits empty landing group in enumerated mode', () => {
 
 test('sing-box convert builds modular Sub-Store config with selectors, rule sets, and DNS', () => {
   const convert = loadSingBoxConvert({});
-  const result = convert.main({
+  const result = convert.build({
     proxies: [
       {
         name: '香港 01',
@@ -392,6 +392,7 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.equal(result.route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator(result.outbounds.slice(-2))).route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator({ proxies: result.outbounds.slice(-2) })).route.final, '节点选择');
+  assert.equal(JSON.parse(convert.main({ proxies: result.outbounds.slice(-2) })).route.final, '节点选择');
 });
 
 test('sing-box remote rule-set tags all have generated source files', () => {
