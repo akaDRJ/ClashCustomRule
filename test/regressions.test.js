@@ -425,7 +425,7 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
     { rule_set: 'ai', outbound: '人工智能' }
   ]);
   assert.equal(result.route.default_domain_resolver, 'bootstrap');
-  assert.deepEqual(result.http_clients, [{ tag: 'rule-set-download', detour: 'direct' }]);
+  assert.deepEqual(result.http_clients, [{ tag: 'rule-set-download' }]);
   assert.equal(result.route.default_http_client, 'rule-set-download');
   assert.equal(result.route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator(result.outbounds.slice(-2))).route.final, '节点选择');

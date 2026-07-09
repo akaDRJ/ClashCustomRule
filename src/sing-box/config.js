@@ -76,7 +76,7 @@ function buildSingBoxConfig(input = {}, options = {}) {
 
 function buildHttpClients() {
   return [
-    { tag: 'rule-set-download', detour: CORE_OUTBOUND_TAGS.direct }
+    { tag: 'rule-set-download' }
   ];
 }
 
