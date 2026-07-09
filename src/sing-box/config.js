@@ -169,7 +169,7 @@ function addMissingPolicyOutbounds(outbounds) {
     .map((tag) => ({
       type: 'selector',
       tag,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.directPolicy]
+      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
     }));
 
   return [...outbounds, ...additions];

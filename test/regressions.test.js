@@ -387,7 +387,7 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.ok(result.inbounds.some((inbound) => inbound.type === 'tun' && inbound.auto_route === true));
   assert.equal(result.experimental.clash_api.external_controller, '127.0.0.1:9090');
   assert.equal(outbounds['节点选择'].type, 'selector');
-  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '台湾节点', '日本节点', '全球直连']);
+  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '台湾节点', '日本节点', 'direct']);
   assert.equal(outbounds['自动选择'].type, 'urltest');
   assert.deepEqual(outbounds['自动选择'].outbounds, ['香港 01', '日本 01', '台湾 01']);
   assert.equal(outbounds['手动切换'].type, 'selector');
@@ -395,8 +395,8 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.deepEqual(outbounds['香港节点'].outbounds, ['香港 01']);
   assert.deepEqual(outbounds['台湾节点'].outbounds, ['台湾 01']);
   assert.deepEqual(outbounds['日本节点'].outbounds, ['日本 01']);
-  assert.deepEqual(outbounds['全球直连'].outbounds, ['direct', '节点选择']);
-  assert.deepEqual(outbounds['强制代理'].outbounds, ['节点选择', '手动切换', '全球直连']);
+  assert.deepEqual(outbounds['全球直连'].outbounds, ['direct']);
+  assert.deepEqual(outbounds['强制代理'].outbounds, ['节点选择', '手动切换', 'direct']);
   assert.equal(outbounds['香港 01'].type, 'shadowsocks');
   assert.equal(outbounds['日本 01'].type, 'trojan');
   assert.deepEqual(outbounds['台湾 01'], {
@@ -426,6 +426,25 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.equal(JSON.parse(convert.operator(result.outbounds.slice(-2))).route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator({ proxies: result.outbounds.slice(-2) })).route.final, '节点选择');
   assert.equal(JSON.parse(convert.main({ proxies: result.outbounds.slice(-2) })).route.final, '节点选择');
+});
+
+test('sing-box generated selector policies have no circular outbound dependencies', () => {
+  const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
+  const result = buildSingBoxConfig({
+    proxies: [
+      { name: '香港 01', type: 'anytls', server: 'hk.example.com', port: 443, password: 'redacted' },
+      { name: '美国 01', type: 'anytls', server: 'us.example.com', port: 443, password: 'redacted' }
+    ]
+  });
+  const outboundMap = Object.fromEntries(result.outbounds.map((outbound) => [outbound.tag, outbound]));
+  const visit = (tag, stack = []) => {
+    assert.equal(stack.includes(tag), false, `circular outbound dependency: ${[...stack, tag].join('->')}`);
+    const outbound = outboundMap[tag];
+    if (!outbound || !Array.isArray(outbound.outbounds)) return;
+    for (const child of outbound.outbounds) visit(child, [...stack, tag]);
+  };
+
+  for (const outbound of result.outbounds) visit(outbound.tag);
 });
 
 test('sing-box generated config avoids removed geosite and geoip route fields', () => {

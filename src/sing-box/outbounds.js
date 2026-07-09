@@ -97,7 +97,7 @@ function buildOutbounds(proxies) {
     CORE_OUTBOUND_TAGS.auto,
     CORE_OUTBOUND_TAGS.manual,
     ...staticGroupTags,
-    CORE_OUTBOUND_TAGS.directPolicy
+    CORE_OUTBOUND_TAGS.direct
   ];
 
   return [
@@ -107,7 +107,7 @@ function buildOutbounds(proxies) {
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.directPolicy,
-      outbounds: [CORE_OUTBOUND_TAGS.direct, CORE_OUTBOUND_TAGS.proxy]
+      outbounds: [CORE_OUTBOUND_TAGS.direct]
     },
     ...staticGroups,
     {
@@ -130,12 +130,12 @@ function buildOutbounds(proxies) {
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.forceProxy,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.directPolicy]
+      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
     },
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.ai,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.directPolicy]
+      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
     }
   ];
 }
