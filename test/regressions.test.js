@@ -44,14 +44,14 @@ function withTempDir(run) {
 
 function loadRename(argumentsMap) {
   const modulePath = path.join(repoRoot, 'src', 'substore', 'rename.js');
-  delete require.cache[modulePath];
+  delete require.cache[require.resolve(modulePath)];
   global.$arguments = argumentsMap;
   return require(modulePath);
 }
 
 function loadConvert(argumentsMap) {
   const modulePath = path.join(repoRoot, 'src', 'substore', 'convert.js');
-  delete require.cache[modulePath];
+  delete require.cache[require.resolve(modulePath)];
   global.$arguments = argumentsMap;
   return require(modulePath);
 }
@@ -97,6 +97,21 @@ test('rename one removes the full custom separator when only one node remains', 
   const result = rename.operator([{ name: '香港 IPLC' }]);
 
   assert.deepEqual(result, [{ name: '🇭🇰 香港' }]);
+});
+
+test('rename decodes percent-encoded argument values', () => {
+  const rename = loadRename({ name: 'NX%26Co' });
+  const result = rename.operator([{ name: '香港 IPLC' }]);
+
+  assert.equal(result[0].name, 'NX&Co 香港 01');
+});
+
+test('rename preserves existing block-quic when argument is omitted', () => {
+  const rename = loadRename({});
+  const result = rename.operator([{ name: '香港 IPLC', 'block-quic': 'on' }]);
+
+  assert.equal(result.length, 1);
+  assert.equal(result[0]['block-quic'], 'on');
 });
 
 test('lint-rules ignores duplicate proxy entries in config files but still reports duplicated rules', () => {

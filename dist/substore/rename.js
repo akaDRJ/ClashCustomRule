@@ -77,7 +77,7 @@ function parseBool(value) {
 function decodeArg(value, fallback = "") {
   if (value === undefined || value === null) return fallback;
   try {
-    return decodeURI(String(value));
+    return decodeURIComponent(String(value));
   } catch (_error) {
     return String(value);
   }
@@ -585,8 +585,6 @@ function containsRemoveKey(normalizedName) {
 function applyBlockQuic(proxy) {
   if (blockquic === "on" || blockquic === "off") {
     proxy["block-quic"] = blockquic;
-  } else {
-    delete proxy["block-quic"];
   }
 }
 
