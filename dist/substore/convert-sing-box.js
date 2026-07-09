@@ -341,9 +341,9 @@ module.exports = {
 
   },
   "src/sing-box/rule-sets.js": function(module, exports, __require) {
-const REMOTE_RULE_SET_BASE = 'https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/sing-box';
-const REMOTE_GEOSITE_BASE = 'https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set';
-const REMOTE_GEOIP_BASE = 'https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set';
+const REMOTE_RULE_SET_BASE = 'https://cdn.jsdelivr.net/gh/akaDRJ/ClashCustomRule@master/dist/rulesets/sing-box';
+const REMOTE_GEOSITE_BASE = 'https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set';
+const REMOTE_GEOIP_BASE = 'https://cdn.jsdelivr.net/gh/SagerNet/sing-geoip@rule-set';
 
 function ruleSetTagFromFile(fileName) {
   return fileName.replace(/\.ya?ml$/i, '');

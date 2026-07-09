@@ -401,11 +401,11 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
     tls: { enabled: true, server_name: 'example.com', insecure: true }
   });
   assert.equal(ruleSets.ai.type, 'remote');
-  assert.match(ruleSets.ai.url, /dist\/rulesets\/sing-box\/ai\.json$/);
+  assert.match(ruleSets.ai.url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/akaDRJ\/ClashCustomRule@master\/dist\/rulesets\/sing-box\/ai\.json$/);
   assert.equal(ruleSets['geosite-youtube'].format, 'binary');
-  assert.match(ruleSets['geosite-youtube'].url, /SagerNet\/sing-geosite\/rule-set\/geosite-youtube\.srs$/);
+  assert.match(ruleSets['geosite-youtube'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/SagerNet\/sing-geosite@rule-set\/geosite-youtube\.srs$/);
   assert.equal(ruleSets['geoip-cn'].format, 'binary');
-  assert.match(ruleSets['geoip-cn'].url, /SagerNet\/sing-geoip\/rule-set\/geoip-cn\.srs$/);
+  assert.match(ruleSets['geoip-cn'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/SagerNet\/sing-geoip@rule-set\/geoip-cn\.srs$/);
   assert.equal(JSON.stringify(result.route.rules).includes('"geosite"'), false);
   assert.equal(JSON.stringify(result.route.rules).includes('"geoip"'), false);
   assert.deepEqual(result.route.rules.slice(0, 4), [
@@ -431,6 +431,7 @@ test('sing-box generated config avoids removed geosite and geoip route fields', 
   assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geosite-youtube' && rule.outbound === 'YouTube'));
   assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geoip-cn' && rule.outbound === 'direct'));
   assert.equal(result.route.rule_set.some((ruleSet) => ['geoip-netflix', 'geoip-google', 'geoip-telegram'].includes(ruleSet.tag)), false);
+  assert.equal(result.route.rule_set.some((ruleSet) => ruleSet.url.includes('raw.githubusercontent.com')), false);
   assert.ok(result.route.rules.some((rule) => rule.ip_is_private === true && rule.outbound === 'direct'));
 });
 
