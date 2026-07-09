@@ -101,11 +101,15 @@ function buildDnsConfig() {
   return {
     servers: [
       { type: 'udp', tag: 'bootstrap', server: '223.5.5.5' },
-      { type: 'https', tag: 'alidns', server: 'dns.alidns.com', path: '/dns-query', domain_resolver: 'bootstrap' },
-      { type: 'https', tag: 'dnspod', server: 'doh.pub', path: '/dns-query', domain_resolver: 'bootstrap' }
+      { type: 'https', tag: 'local', server: 'dns.alidns.com', path: '/dns-query', domain_resolver: 'bootstrap' },
+      { type: 'tls', tag: 'remote', server: '8.8.8.8', detour: CORE_OUTBOUND_TAGS.proxy }
     ],
-    final: 'alidns',
-    strategy: 'ipv4_only'
+    rules: [
+      { rule_set: ['geosite-private', 'geosite-cn'], server: 'local' }
+    ],
+    final: 'remote',
+    strategy: 'ipv4_only',
+    timeout: '5s'
   };
 }
 
@@ -116,6 +120,7 @@ function buildInbounds() {
       tag: 'tun-in',
       address: ['172.19.0.1/30'],
       auto_route: true,
+      strict_route: true,
       stack: 'mixed'
     },
     {
@@ -128,10 +133,18 @@ function buildInbounds() {
 }
 
 function buildRouteConfig(options = {}) {
-  const rules = [];
+  const rules = [
+    { action: 'sniff' },
+    {
+      type: 'logical',
+      mode: 'or',
+      rules: [{ protocol: 'dns' }, { port: 53 }],
+      action: 'hijack-dns'
+    }
+  ];
 
   if (!options.quicEnabled) {
-    rules.push({ network: 'udp', port: 443, action: 'reject' });
+    rules.push({ type: 'logical', mode: 'or', rules: [{ network: 'udp', port: 443 }, { port: 853 }], action: 'reject' });
   }
 
   for (const [ruleSet, outbound] of ROUTE_RULES) {
