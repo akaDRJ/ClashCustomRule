@@ -44,9 +44,6 @@ const GEOSITE_RULES = Object.freeze([
 ]);
 
 const GEOIP_RULES = Object.freeze([
-  ['netflix', 'Netflix'],
-  ['google', 'Google'],
-  ['telegram', 'Telegram'],
   ['cn', CORE_OUTBOUND_TAGS.direct]
 ]);
 

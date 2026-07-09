@@ -430,6 +430,7 @@ test('sing-box generated config avoids removed geosite and geoip route fields', 
   assert.equal(rulesJson.includes('"geoip"'), false);
   assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geosite-youtube' && rule.outbound === 'YouTube'));
   assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geoip-cn' && rule.outbound === 'direct'));
+  assert.equal(result.route.rule_set.some((ruleSet) => ['geoip-netflix', 'geoip-google', 'geoip-telegram'].includes(ruleSet.tag)), false);
   assert.ok(result.route.rules.some((rule) => rule.ip_is_private === true && rule.outbound === 'direct'));
 });
 
