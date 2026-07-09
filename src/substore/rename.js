@@ -1,17 +1,16 @@
 /**
  * rename.js - Sub-Store 节点重命名与过滤脚本
- * 更新日期：2026-05-06
  *
- * 功能概述：
- * - 自动识别节点所属国家/地区（支持国旗、中文、英文简写/全称）
- * - 统一节点命名格式（国旗 + 地区名 + 序号）
- * - 按关键词过滤/保留节点
- * - 添加机场前缀、保留倍率标识、ISP标签等
+ * 功能：
+ * - 自动识别节点所属国家/地区（国旗、中文、英文简写/全称）
+ * - 统一输出为「国旗 + 地区名 + 序号」格式
+ * - 按关键词删除/保留节点，保留倍率、ISP、线路标签等原始信息
  *
- * 使用方式：
- * 在 Sub-Store 脚本操作中添加，URL 后接 # 参数，多个参数用 & 连接
- * 示例：https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/rename.js#flag=true&name=NX&rmkey=Premium
- * 禁用缓存：在 URL 末尾添加 #noCache
+ * 使用：
+ * - 在 Sub-Store 脚本操作中添加本脚本，URL 后接 # 参数
+ * - 多个参数用 & 分隔；参数值会按 URL component 解码，值里含 &、=、% 等字符时请先 URL 编码
+ * - 示例：https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/rename.js#flag=true&name=NX&rmkey=Premium
+ * - 禁用缓存：在 URL 末尾添加 #noCache
  *
  * ==================== 核心参数 ====================
  *
@@ -57,11 +56,10 @@
  * [nm]       保留未匹配到国家/地区的节点（默认删除）
  *
  * 【其他】
- * [blockquic=on/off]  设置 block-quic 属性
+ * [blockquic=on/off]  显式覆盖 block-quic；未传时保留节点原值
  * [dictcheck]         启用字典回归测试（调试模式）
  */
 
-// const inArg = {'blkey':'iplc+GPT>GPTnewName+IPLC', 'flag':true };
 const inArgRaw = typeof $arguments === "object" && $arguments !== null ? $arguments : {};
 
 function parseBool(value) {
