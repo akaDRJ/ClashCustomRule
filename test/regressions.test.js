@@ -388,6 +388,8 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.equal(result.experimental.clash_api.external_controller, '127.0.0.1:9090');
   assert.equal(outbounds['节点选择'].type, 'selector');
   assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '台湾节点', '日本节点', 'direct']);
+  assert.deepEqual(outbounds['YouTube'].outbounds, ['节点选择', '香港节点', '台湾节点', '日本节点', '自动选择', '手动切换', 'direct']);
+  assert.deepEqual(outbounds['人工智能'].outbounds, ['节点选择', '香港节点', '台湾节点', '日本节点', '自动选择', '手动切换', 'direct']);
   assert.equal(outbounds['自动选择'].type, 'urltest');
   assert.deepEqual(outbounds['自动选择'].outbounds, ['香港 01', '日本 01', '台湾 01']);
   assert.equal(outbounds['手动切换'].type, 'selector');
@@ -396,7 +398,7 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.deepEqual(outbounds['台湾节点'].outbounds, ['台湾 01']);
   assert.deepEqual(outbounds['日本节点'].outbounds, ['日本 01']);
   assert.deepEqual(outbounds['全球直连'].outbounds, ['direct']);
-  assert.deepEqual(outbounds['强制代理'].outbounds, ['节点选择', '手动切换', 'direct']);
+  assert.deepEqual(outbounds['强制代理'].outbounds, ['节点选择', '香港节点', '台湾节点', '日本节点', '自动选择', '手动切换', 'direct']);
   assert.equal(outbounds['香港 01'].type, 'shadowsocks');
   assert.equal(outbounds['日本 01'].type, 'trojan');
   assert.deepEqual(outbounds['台湾 01'], {
@@ -409,6 +411,7 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   });
   assert.equal(ruleSets.ai.type, 'remote');
   assert.match(ruleSets.ai.url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/akaDRJ\/ClashCustomRule@master\/dist\/rulesets\/sing-box\/ai\.json$/);
+  assert.equal(Object.prototype.hasOwnProperty.call(ruleSets.ai, 'download_detour'), false);
   assert.equal(ruleSets['geosite-youtube'].format, 'binary');
   assert.match(ruleSets['geosite-youtube'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/SagerNet\/sing-geosite@rule-set\/geosite-youtube\.srs$/);
   assert.equal(ruleSets['geoip-cn'].format, 'binary');
@@ -422,6 +425,8 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
     { rule_set: 'ai', outbound: '人工智能' }
   ]);
   assert.equal(result.route.default_domain_resolver, 'bootstrap');
+  assert.deepEqual(result.http_clients, [{ tag: 'rule-set-download', detour: 'direct' }]);
+  assert.equal(result.route.default_http_client, 'rule-set-download');
   assert.equal(result.route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator(result.outbounds.slice(-2))).route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator({ proxies: result.outbounds.slice(-2) })).route.final, '节点选择');
@@ -538,6 +543,12 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
         port: 443
       },
       {
+        name: '🇨🇳 台湾 02',
+        type: 'ss',
+        server: '163.223.125.8',
+        port: 25578
+      },
+      {
         name: '🇹🇼 落地 台湾 01',
         type: 'vmess',
         server: '83.147.12.131',
@@ -549,7 +560,7 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
   const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
 
   assert.equal(groups['AKCDN 兜底'].type, 'fallback');
-  assert.deepEqual(groups['AKCDN 兜底'].proxies, ['🇨🇳 台湾 01', '🇹🇼 落地 台湾 01']);
+  assert.deepEqual(groups['AKCDN 兜底'].proxies, ['🇨🇳 台湾 01', '🇨🇳 台湾 02', '🇹🇼 落地 台湾 01']);
   assert.equal(groups['AKCDN 兜底'].lazy, false);
   assert.equal(groups['节点选择'].proxies[0], 'AKCDN 兜底');
   assert.equal(groups['GLOBAL'].proxies.includes('AKCDN 兜底'), true);

@@ -93,12 +93,13 @@ function buildOutbounds(proxies) {
   const selectableTags = proxyTags.length ? proxyTags : [CORE_OUTBOUND_TAGS.direct];
   const staticGroups = buildStaticGroups(proxyTags);
   const staticGroupTags = staticGroups.map((group) => group.tag);
-  const policyChoices = [
+  const nodeSelectionChoices = [
     CORE_OUTBOUND_TAGS.auto,
     CORE_OUTBOUND_TAGS.manual,
     ...staticGroupTags,
     CORE_OUTBOUND_TAGS.direct
   ];
+  const policyChoices = buildPolicyChoices(staticGroupTags);
 
   return [
     { type: 'direct', tag: CORE_OUTBOUND_TAGS.direct },
@@ -113,7 +114,7 @@ function buildOutbounds(proxies) {
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.proxy,
-      outbounds: policyChoices
+      outbounds: nodeSelectionChoices
     },
     {
       type: 'urltest',
@@ -130,13 +131,23 @@ function buildOutbounds(proxies) {
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.forceProxy,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
+      outbounds: policyChoices
     },
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.ai,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
+      outbounds: policyChoices
     }
+  ];
+}
+
+function buildPolicyChoices(staticGroupTags) {
+  return [
+    CORE_OUTBOUND_TAGS.proxy,
+    ...staticGroupTags,
+    CORE_OUTBOUND_TAGS.auto,
+    CORE_OUTBOUND_TAGS.manual,
+    CORE_OUTBOUND_TAGS.direct
   ];
 }
 
@@ -175,6 +186,7 @@ function copyPort(from, to) {
 module.exports = {
   CORE_OUTBOUND_TAGS,
   buildOutbounds,
+  buildPolicyChoices,
   buildStaticGroups,
   normalizeProxy
 };

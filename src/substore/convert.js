@@ -326,7 +326,7 @@ const countryIconURLs = {
 
 const ISP_EXCLUDE_PATTERN =
   '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地';
-const AKCDN_PATTERN = '(?i)\\bAKCDN\\b|\\bIX\\b|162\\.14\\.111\\.30|39\\.108\\.228\\.6';
+const AKCDN_PATTERN = '(?i)\\bAKCDN\\b|\\bIX\\b|163\\.223\\.125\\.8|162\\.14\\.111\\.30|39\\.108\\.228\\.6';
 const TRANSIT_EXCLUDE_PATTERN = [ISP_EXCLUDE_PATTERN, AKCDN_PATTERN]
   .map((pattern) => pattern.replace(/^\\(\\?i\\)/, ''))
   .join('|');

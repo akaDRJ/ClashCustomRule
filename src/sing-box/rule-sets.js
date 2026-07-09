@@ -55,7 +55,6 @@ function buildRemoteRuleSets(tags) {
         : geoip
           ? `${REMOTE_GEOIP_BASE}/${tag}.srs`
           : `${REMOTE_RULE_SET_BASE}/${tag}.json`,
-      download_detour: 'direct',
       update_interval: '24h'
     };
   });

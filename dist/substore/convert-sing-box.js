@@ -52,7 +52,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
   },
   "src/sing-box/config.js": function(module, exports, __require) {
-const { buildOutbounds, CORE_OUTBOUND_TAGS } = __require('src/sing-box/outbounds.js');
+const { buildOutbounds, buildPolicyChoices, CORE_OUTBOUND_TAGS } = __require('src/sing-box/outbounds.js');
 const { buildRemoteRuleSets } = __require('src/sing-box/rule-sets.js');
 
 const ROUTE_RULES = Object.freeze([
@@ -120,11 +120,18 @@ function buildSingBoxConfig(input = {}, options = {}) {
   return {
     log: { level: 'info' },
     dns: buildDnsConfig(),
+    http_clients: buildHttpClients(),
     inbounds: buildInbounds(),
     outbounds: addMissingPolicyOutbounds(outbounds),
     route: buildRouteConfig(options),
     experimental: buildExperimentalConfig()
   };
+}
+
+function buildHttpClients() {
+  return [
+    { tag: 'rule-set-download', detour: CORE_OUTBOUND_TAGS.direct }
+  ];
 }
 
 function buildExperimentalConfig() {
@@ -192,6 +199,7 @@ function buildRouteConfig(options = {}) {
     rules,
     rule_set: buildRemoteRuleSets(RULE_SET_TAGS),
     default_domain_resolver: 'bootstrap',
+    default_http_client: 'rule-set-download',
     final: CORE_OUTBOUND_TAGS.proxy,
     auto_detect_interface: true
   };
@@ -218,15 +226,27 @@ function addMissingPolicyOutbounds(outbounds) {
     'Speedtest'
   ];
 
+  const policyChoices = buildPolicyChoices(getStaticPolicyTags(outbounds));
   const additions = policies
     .filter((tag) => !existing.has(tag))
     .map((tag) => ({
       type: 'selector',
       tag,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
+      outbounds: policyChoices
     }));
 
   return [...outbounds, ...additions];
+}
+
+function getStaticPolicyTags(outbounds) {
+  const selector = outbounds.find((outbound) => outbound.tag === CORE_OUTBOUND_TAGS.proxy);
+  return Array.isArray(selector && selector.outbounds)
+    ? selector.outbounds.filter((tag) => ![
+        CORE_OUTBOUND_TAGS.auto,
+        CORE_OUTBOUND_TAGS.manual,
+        CORE_OUTBOUND_TAGS.direct
+      ].includes(tag))
+    : [];
 }
 
 module.exports = {
@@ -338,12 +358,13 @@ function buildOutbounds(proxies) {
   const selectableTags = proxyTags.length ? proxyTags : [CORE_OUTBOUND_TAGS.direct];
   const staticGroups = buildStaticGroups(proxyTags);
   const staticGroupTags = staticGroups.map((group) => group.tag);
-  const policyChoices = [
+  const nodeSelectionChoices = [
     CORE_OUTBOUND_TAGS.auto,
     CORE_OUTBOUND_TAGS.manual,
     ...staticGroupTags,
     CORE_OUTBOUND_TAGS.direct
   ];
+  const policyChoices = buildPolicyChoices(staticGroupTags);
 
   return [
     { type: 'direct', tag: CORE_OUTBOUND_TAGS.direct },
@@ -358,7 +379,7 @@ function buildOutbounds(proxies) {
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.proxy,
-      outbounds: policyChoices
+      outbounds: nodeSelectionChoices
     },
     {
       type: 'urltest',
@@ -375,13 +396,23 @@ function buildOutbounds(proxies) {
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.forceProxy,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
+      outbounds: policyChoices
     },
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.ai,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
+      outbounds: policyChoices
     }
+  ];
+}
+
+function buildPolicyChoices(staticGroupTags) {
+  return [
+    CORE_OUTBOUND_TAGS.proxy,
+    ...staticGroupTags,
+    CORE_OUTBOUND_TAGS.auto,
+    CORE_OUTBOUND_TAGS.manual,
+    CORE_OUTBOUND_TAGS.direct
   ];
 }
 
@@ -420,6 +451,7 @@ function copyPort(from, to) {
 module.exports = {
   CORE_OUTBOUND_TAGS,
   buildOutbounds,
+  buildPolicyChoices,
   buildStaticGroups,
   normalizeProxy
 };
@@ -483,7 +515,6 @@ function buildRemoteRuleSets(tags) {
         : geoip
           ? `${REMOTE_GEOIP_BASE}/${tag}.srs`
           : `${REMOTE_RULE_SET_BASE}/${tag}.json`,
-      download_detour: 'direct',
       update_interval: '24h'
     };
   });

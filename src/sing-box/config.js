@@ -1,4 +1,4 @@
-const { buildOutbounds, CORE_OUTBOUND_TAGS } = require('./outbounds');
+const { buildOutbounds, buildPolicyChoices, CORE_OUTBOUND_TAGS } = require('./outbounds');
 const { buildRemoteRuleSets } = require('./rule-sets');
 
 const ROUTE_RULES = Object.freeze([
@@ -66,11 +66,18 @@ function buildSingBoxConfig(input = {}, options = {}) {
   return {
     log: { level: 'info' },
     dns: buildDnsConfig(),
+    http_clients: buildHttpClients(),
     inbounds: buildInbounds(),
     outbounds: addMissingPolicyOutbounds(outbounds),
     route: buildRouteConfig(options),
     experimental: buildExperimentalConfig()
   };
+}
+
+function buildHttpClients() {
+  return [
+    { tag: 'rule-set-download', detour: CORE_OUTBOUND_TAGS.direct }
+  ];
 }
 
 function buildExperimentalConfig() {
@@ -138,6 +145,7 @@ function buildRouteConfig(options = {}) {
     rules,
     rule_set: buildRemoteRuleSets(RULE_SET_TAGS),
     default_domain_resolver: 'bootstrap',
+    default_http_client: 'rule-set-download',
     final: CORE_OUTBOUND_TAGS.proxy,
     auto_detect_interface: true
   };
@@ -164,15 +172,27 @@ function addMissingPolicyOutbounds(outbounds) {
     'Speedtest'
   ];
 
+  const policyChoices = buildPolicyChoices(getStaticPolicyTags(outbounds));
   const additions = policies
     .filter((tag) => !existing.has(tag))
     .map((tag) => ({
       type: 'selector',
       tag,
-      outbounds: [CORE_OUTBOUND_TAGS.proxy, CORE_OUTBOUND_TAGS.auto, CORE_OUTBOUND_TAGS.manual, CORE_OUTBOUND_TAGS.direct]
+      outbounds: policyChoices
     }));
 
   return [...outbounds, ...additions];
+}
+
+function getStaticPolicyTags(outbounds) {
+  const selector = outbounds.find((outbound) => outbound.tag === CORE_OUTBOUND_TAGS.proxy);
+  return Array.isArray(selector && selector.outbounds)
+    ? selector.outbounds.filter((tag) => ![
+        CORE_OUTBOUND_TAGS.auto,
+        CORE_OUTBOUND_TAGS.manual,
+        CORE_OUTBOUND_TAGS.direct
+      ].includes(tag))
+    : [];
 }
 
 module.exports = {
