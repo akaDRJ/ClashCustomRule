@@ -489,6 +489,19 @@ test('sing-box generated config uses static groups instead of Clash-only filters
   assert.equal(outbounds['落地节点'], undefined);
 });
 
+test('sing-box builder keeps already produced sing-box outbound tags', () => {
+  const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
+  const result = buildSingBoxConfig({
+    proxies: [
+      { tag: '🇭🇰 NX 香港 01', type: 'anytls', server: 'hk.example.com', server_port: 443, password: 'redacted' }
+    ]
+  });
+  const outbounds = Object.fromEntries(result.outbounds.map((outbound) => [outbound.tag, outbound]));
+
+  assert.equal(outbounds['🇭🇰 NX 香港 01'].server_port, 443);
+  assert.deepEqual(outbounds['香港节点'].outbounds, ['🇭🇰 NX 香港 01']);
+});
+
 test('sing-box remote rule-set tags all have generated source files', () => {
   const { RULE_SET_TAGS } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
   const generatedTags = new Set(

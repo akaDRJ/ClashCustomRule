@@ -51,16 +51,22 @@ function asArray(value) {
 }
 
 function normalizeProxy(proxy) {
-  if (!proxy || typeof proxy !== 'object' || !proxy.name || !proxy.type) return null;
+  const tag = proxy && (proxy.name || proxy.tag);
+  if (!proxy || typeof proxy !== 'object' || !tag || !proxy.type) return null;
 
   const type = TYPE_MAP[String(proxy.type).toLowerCase()];
   if (!type) return null;
 
   if (type === 'direct') {
-    return { type: 'direct', tag: proxy.name };
+    return { type: 'direct', tag };
   }
 
-  const outbound = { type, tag: proxy.name };
+  if (proxy.tag && !proxy.name && proxy.server_port) {
+    const outbound = { ...proxy, type, tag };
+    return outbound.server && outbound.server_port ? outbound : null;
+  }
+
+  const outbound = { type, tag };
 
   copy(proxy, outbound, 'server');
   copyPort(proxy, outbound);
