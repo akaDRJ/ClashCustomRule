@@ -364,6 +364,15 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
         server: 'jp.example.com',
         port: 443,
         password: 'redacted'
+      },
+      {
+        name: '台湾 01',
+        type: 'anytls',
+        server: 'tw.example.com',
+        port: 8443,
+        password: 'redacted',
+        sni: 'example.com',
+        'skip-cert-verify': true
       }
     ]
   });
@@ -376,11 +385,19 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.equal(outbounds['节点选择'].type, 'selector');
   assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', 'direct']);
   assert.equal(outbounds['自动选择'].type, 'urltest');
-  assert.deepEqual(outbounds['自动选择'].outbounds, ['香港 01', '日本 01']);
+  assert.deepEqual(outbounds['自动选择'].outbounds, ['香港 01', '日本 01', '台湾 01']);
   assert.equal(outbounds['手动切换'].type, 'selector');
-  assert.deepEqual(outbounds['手动切换'].outbounds, ['香港 01', '日本 01']);
+  assert.deepEqual(outbounds['手动切换'].outbounds, ['香港 01', '日本 01', '台湾 01']);
   assert.equal(outbounds['香港 01'].type, 'shadowsocks');
   assert.equal(outbounds['日本 01'].type, 'trojan');
+  assert.deepEqual(outbounds['台湾 01'], {
+    type: 'anytls',
+    tag: '台湾 01',
+    server: 'tw.example.com',
+    server_port: 8443,
+    password: 'redacted',
+    tls: { enabled: true, server_name: 'example.com', insecure: true }
+  });
   assert.equal(ruleSets.ai.type, 'remote');
   assert.match(ruleSets.ai.url, /dist\/rulesets\/sing-box\/ai\.json$/);
   assert.deepEqual(result.route.rules.slice(0, 4), [

@@ -228,6 +228,7 @@ const TYPE_MAP = Object.freeze({
   hy2: 'hysteria2',
   hysteria: 'hysteria',
   tuic: 'tuic',
+  anytls: 'anytls',
   wireguard: 'wireguard',
   direct: 'direct'
 });
@@ -262,8 +263,12 @@ function normalizeProxy(proxy) {
   if (proxy.cipher) outbound.method = proxy.cipher;
   if (proxy.sni || proxy.servername || proxy['server-name']) {
     outbound.tls = { enabled: true, server_name: proxy.sni || proxy.servername || proxy['server-name'] };
-  } else if (proxy.tls === true || proxy.tls === 'true') {
+  } else if (proxy.tls === true || proxy.tls === 'true' || type === 'anytls') {
     outbound.tls = { enabled: true };
+  }
+
+  if (outbound.tls && (proxy['skip-cert-verify'] === true || proxy['skip-cert-verify'] === 'true')) {
+    outbound.tls.insecure = true;
   }
 
   return outbound.server && outbound.server_port ? outbound : null;
