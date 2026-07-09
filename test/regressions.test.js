@@ -381,6 +381,8 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
 
   assert.equal(result.log.level, 'info');
   assert.equal(result.dns.strategy, 'ipv4_only');
+  assert.ok(result.dns.servers.some((server) => server.tag === 'bootstrap' && server.type === 'udp'));
+  assert.equal(result.dns.servers.filter((server) => server.type === 'https').every((server) => server.domain_resolver === 'bootstrap'), true);
   assert.equal(result.inbounds[0].type, 'mixed');
   assert.equal(outbounds['节点选择'].type, 'selector');
   assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', 'direct']);
@@ -400,16 +402,35 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   });
   assert.equal(ruleSets.ai.type, 'remote');
   assert.match(ruleSets.ai.url, /dist\/rulesets\/sing-box\/ai\.json$/);
+  assert.equal(ruleSets['geosite-youtube'].format, 'binary');
+  assert.match(ruleSets['geosite-youtube'].url, /SagerNet\/sing-geosite\/rule-set\/geosite-youtube\.srs$/);
+  assert.equal(ruleSets['geoip-cn'].format, 'binary');
+  assert.match(ruleSets['geoip-cn'].url, /SagerNet\/sing-geoip\/rule-set\/geoip-cn\.srs$/);
+  assert.equal(JSON.stringify(result.route.rules).includes('"geosite"'), false);
+  assert.equal(JSON.stringify(result.route.rules).includes('"geoip"'), false);
   assert.deepEqual(result.route.rules.slice(0, 4), [
     { network: 'udp', port: 443, action: 'reject' },
     { rule_set: 'forcedirect', outbound: 'direct' },
     { rule_set: 'forceproxy', outbound: '节点选择' },
     { rule_set: 'ai', outbound: '人工智能' }
   ]);
+  assert.equal(result.route.default_domain_resolver, 'bootstrap');
   assert.equal(result.route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator(result.outbounds.slice(-2))).route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator({ proxies: result.outbounds.slice(-2) })).route.final, '节点选择');
   assert.equal(JSON.parse(convert.main({ proxies: result.outbounds.slice(-2) })).route.final, '节点选择');
+});
+
+test('sing-box generated config avoids removed geosite and geoip route fields', () => {
+  const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
+  const result = buildSingBoxConfig({ proxies: [] });
+  const rulesJson = JSON.stringify(result.route.rules);
+
+  assert.equal(rulesJson.includes('"geosite"'), false);
+  assert.equal(rulesJson.includes('"geoip"'), false);
+  assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geosite-youtube' && rule.outbound === 'YouTube'));
+  assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geoip-cn' && rule.outbound === 'direct'));
+  assert.ok(result.route.rules.some((rule) => rule.ip_is_private === true && rule.outbound === 'direct'));
 });
 
 test('sing-box remote rule-set tags all have generated source files', () => {
@@ -420,7 +441,7 @@ test('sing-box remote rule-set tags all have generated source files', () => {
   );
 
   assert.deepEqual(
-    RULE_SET_TAGS.filter((tag) => !generatedTags.has(tag)),
+    RULE_SET_TAGS.filter((tag) => !tag.startsWith('geosite-') && !tag.startsWith('geoip-') && !generatedTags.has(tag)),
     []
   );
 });

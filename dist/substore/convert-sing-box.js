@@ -65,6 +65,45 @@ const ROUTE_RULES = Object.freeze([
   ['mining', '加密货币']
 ]);
 
+const GEOSITE_RULES = Object.freeze([
+  ['category-pt', CORE_OUTBOUND_TAGS.direct],
+  ['google-play@cn', CORE_OUTBOUND_TAGS.direct],
+  ['youtube@cn', CORE_OUTBOUND_TAGS.direct],
+  ['youtube', 'YouTube'],
+  ['paypal@cn', CORE_OUTBOUND_TAGS.direct],
+  ['paypal', 'PayPal'],
+  ['telegram', 'Telegram'],
+  ['disney', 'Disney'],
+  ['netflix', 'Netflix'],
+  ['spotify', 'Spotify'],
+  ['twitter', 'Twitter(X)'],
+  ['ookla-speedtest', 'Speedtest'],
+  ['category-dev', '开发者资源'],
+  ['category-ai-chat-!cn', CORE_OUTBOUND_TAGS.ai],
+  ['steam@cn', CORE_OUTBOUND_TAGS.direct],
+  ['category-games@cn', CORE_OUTBOUND_TAGS.direct],
+  ['category-game-platforms-download', '游戏下载'],
+  ['category-games', '游戏平台'],
+  ['category-scholar-cn', CORE_OUTBOUND_TAGS.direct],
+  ['category-scholar-!cn', '学术资源'],
+  ['category-cryptocurrency', '加密货币'],
+  ['apple@cn', CORE_OUTBOUND_TAGS.direct],
+  ['apple', 'Apple'],
+  ['microsoft@cn', CORE_OUTBOUND_TAGS.direct],
+  ['microsoft', 'Microsoft'],
+  ['googlefcm', CORE_OUTBOUND_TAGS.direct],
+  ['google', 'Google'],
+  ['cn', CORE_OUTBOUND_TAGS.direct],
+  ['private', CORE_OUTBOUND_TAGS.direct]
+]);
+
+const GEOIP_RULES = Object.freeze([
+  ['netflix', 'Netflix'],
+  ['google', 'Google'],
+  ['telegram', 'Telegram'],
+  ['cn', CORE_OUTBOUND_TAGS.direct]
+]);
+
 const RULE_SET_TAGS = Object.freeze([
   'forcedirect',
   'forceproxy',
@@ -72,7 +111,9 @@ const RULE_SET_TAGS = Object.freeze([
   'outlook',
   'pt',
   'crypto',
-  'mining'
+  'mining',
+  ...GEOSITE_RULES.map(([tag]) => `geosite-${tag}`),
+  ...GEOIP_RULES.map(([tag]) => `geoip-${tag}`)
 ]);
 
 function buildSingBoxConfig(input = {}, options = {}) {
@@ -84,15 +125,17 @@ function buildSingBoxConfig(input = {}, options = {}) {
     dns: buildDnsConfig(),
     inbounds: buildInbounds(),
     outbounds: addMissingPolicyOutbounds(outbounds),
-    route: buildRouteConfig(options)
+    route: buildRouteConfig(options),
+    experimental: { cache_file: { enabled: true } }
   };
 }
 
 function buildDnsConfig() {
   return {
     servers: [
-      { type: 'https', tag: 'alidns', server: 'dns.alidns.com', path: '/dns-query' },
-      { type: 'https', tag: 'dnspod', server: 'doh.pub', path: '/dns-query' }
+      { type: 'udp', tag: 'bootstrap', server: '223.5.5.5' },
+      { type: 'https', tag: 'alidns', server: 'dns.alidns.com', path: '/dns-query', domain_resolver: 'bootstrap' },
+      { type: 'https', tag: 'dnspod', server: 'doh.pub', path: '/dns-query', domain_resolver: 'bootstrap' }
     ],
     final: 'alidns',
     strategy: 'ipv4_only'
@@ -121,46 +164,20 @@ function buildRouteConfig(options = {}) {
     rules.push({ rule_set: ruleSet, outbound });
   }
 
-  rules.push(
-    { geosite: 'category-pt', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'google-play@cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'youtube@cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'youtube', outbound: 'YouTube' },
-    { geosite: 'paypal@cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'paypal', outbound: 'PayPal' },
-    { geosite: 'telegram', outbound: 'Telegram' },
-    { geosite: 'disney', outbound: 'Disney' },
-    { geosite: 'netflix', outbound: 'Netflix' },
-    { geosite: 'spotify', outbound: 'Spotify' },
-    { geosite: 'twitter', outbound: 'Twitter(X)' },
-    { geosite: 'ookla-speedtest', outbound: 'Speedtest' },
-    { geosite: 'category-dev', outbound: '开发者资源' },
-    { geosite: 'category-ai-chat-!cn', outbound: CORE_OUTBOUND_TAGS.ai },
-    { geosite: 'steam@cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'category-games@cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'category-game-platforms-download', outbound: '游戏下载' },
-    { geosite: 'category-games', outbound: '游戏平台' },
-    { geosite: 'category-scholar-cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'category-scholar-!cn', outbound: '学术资源' },
-    { geosite: 'category-cryptocurrency', outbound: '加密货币' },
-    { geosite: 'apple@cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'apple', outbound: 'Apple' },
-    { geosite: 'microsoft@cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'microsoft', outbound: 'Microsoft' },
-    { geosite: 'googlefcm', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'google', outbound: 'Google' },
-    { geosite: 'cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geosite: 'private', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geoip: 'netflix', outbound: 'Netflix' },
-    { geoip: 'google', outbound: 'Google' },
-    { geoip: 'telegram', outbound: 'Telegram' },
-    { geoip: 'cn', outbound: CORE_OUTBOUND_TAGS.direct },
-    { geoip: 'private', outbound: CORE_OUTBOUND_TAGS.direct }
-  );
+  for (const [geosite, outbound] of GEOSITE_RULES) {
+    rules.push({ rule_set: `geosite-${geosite}`, outbound });
+  }
+
+  for (const [geoip, outbound] of GEOIP_RULES) {
+    rules.push({ rule_set: `geoip-${geoip}`, outbound });
+  }
+
+  rules.push({ ip_is_private: true, outbound: CORE_OUTBOUND_TAGS.direct });
 
   return {
     rules,
     rule_set: buildRemoteRuleSets(RULE_SET_TAGS),
+    default_domain_resolver: 'bootstrap',
     final: CORE_OUTBOUND_TAGS.proxy,
     auto_detect_interface: true
   };
@@ -199,6 +216,8 @@ function addMissingPolicyOutbounds(outbounds) {
 }
 
 module.exports = {
+  GEOIP_RULES,
+  GEOSITE_RULES,
   ROUTE_RULES,
   RULE_SET_TAGS,
   buildDnsConfig,
@@ -326,6 +345,8 @@ module.exports = {
   },
   "src/sing-box/rule-sets.js": function(module, exports, __require) {
 const REMOTE_RULE_SET_BASE = 'https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/sing-box';
+const REMOTE_GEOSITE_BASE = 'https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set';
+const REMOTE_GEOIP_BASE = 'https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set';
 
 function ruleSetTagFromFile(fileName) {
   return fileName.replace(/\.ya?ml$/i, '');
@@ -367,17 +388,28 @@ function buildSourceRuleSet(payload) {
 }
 
 function buildRemoteRuleSets(tags) {
-  return tags.map((tag) => ({
-    type: 'remote',
-    tag,
-    format: 'source',
-    url: `${REMOTE_RULE_SET_BASE}/${tag}.json`,
-    download_detour: 'direct',
-    update_interval: '24h'
-  }));
+  return tags.map((tag) => {
+    const geosite = tag.startsWith('geosite-');
+    const geoip = tag.startsWith('geoip-');
+
+    return {
+      type: 'remote',
+      tag,
+      format: geosite || geoip ? 'binary' : 'source',
+      url: geosite
+        ? `${REMOTE_GEOSITE_BASE}/${tag}.srs`
+        : geoip
+          ? `${REMOTE_GEOIP_BASE}/${tag}.srs`
+          : `${REMOTE_RULE_SET_BASE}/${tag}.json`,
+      download_detour: 'direct',
+      update_interval: '24h'
+    };
+  });
 }
 
 module.exports = {
+  REMOTE_GEOIP_BASE,
+  REMOTE_GEOSITE_BASE,
   REMOTE_RULE_SET_BASE,
   buildRemoteRuleSets,
   buildSourceRuleSet,

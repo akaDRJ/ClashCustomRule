@@ -1,4 +1,6 @@
 const REMOTE_RULE_SET_BASE = 'https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/sing-box';
+const REMOTE_GEOSITE_BASE = 'https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set';
+const REMOTE_GEOIP_BASE = 'https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set';
 
 function ruleSetTagFromFile(fileName) {
   return fileName.replace(/\.ya?ml$/i, '');
@@ -40,17 +42,28 @@ function buildSourceRuleSet(payload) {
 }
 
 function buildRemoteRuleSets(tags) {
-  return tags.map((tag) => ({
-    type: 'remote',
-    tag,
-    format: 'source',
-    url: `${REMOTE_RULE_SET_BASE}/${tag}.json`,
-    download_detour: 'direct',
-    update_interval: '24h'
-  }));
+  return tags.map((tag) => {
+    const geosite = tag.startsWith('geosite-');
+    const geoip = tag.startsWith('geoip-');
+
+    return {
+      type: 'remote',
+      tag,
+      format: geosite || geoip ? 'binary' : 'source',
+      url: geosite
+        ? `${REMOTE_GEOSITE_BASE}/${tag}.srs`
+        : geoip
+          ? `${REMOTE_GEOIP_BASE}/${tag}.srs`
+          : `${REMOTE_RULE_SET_BASE}/${tag}.json`,
+      download_detour: 'direct',
+      update_interval: '24h'
+    };
+  });
 }
 
 module.exports = {
+  REMOTE_GEOIP_BASE,
+  REMOTE_GEOSITE_BASE,
   REMOTE_RULE_SET_BASE,
   buildRemoteRuleSets,
   buildSourceRuleSet,
