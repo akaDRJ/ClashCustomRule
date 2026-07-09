@@ -502,6 +502,26 @@ test('sing-box builder keeps already produced sing-box outbound tags', () => {
   assert.deepEqual(outbounds['香港节点'].outbounds, ['🇭🇰 NX 香港 01']);
 });
 
+test('sing-box builder defines pre-proxy selector for detoured landing nodes', () => {
+  const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
+  const result = buildSingBoxConfig({
+    proxies: [
+      { tag: '🇭🇰 NX 香港 01', type: 'anytls', server: 'hk.example.com', server_port: 443, password: 'redacted' },
+      { tag: '🇹🇼 落地 台湾 01', type: 'vmess', server: 'tw.example.com', server_port: 443, uuid: 'redacted', detour: '前置代理' }
+    ]
+  });
+  const outbounds = Object.fromEntries(result.outbounds.map((outbound) => [outbound.tag, outbound]));
+  const tags = new Set(result.outbounds.map((outbound) => outbound.tag));
+
+  assert.equal(outbounds['🇹🇼 落地 台湾 01'].detour, '前置代理');
+  assert.deepEqual(outbounds['前置代理'].outbounds, ['香港节点', '🇭🇰 NX 香港 01', 'direct']);
+  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '前置代理', 'direct']);
+  for (const outbound of result.outbounds) {
+    for (const child of outbound.outbounds || []) assert.equal(tags.has(child), true, `missing child outbound ${child}`);
+    if (outbound.detour) assert.equal(tags.has(outbound.detour), true, `missing detour outbound ${outbound.detour}`);
+  }
+});
+
 test('sing-box remote rule-set tags all have generated source files', () => {
   const { RULE_SET_TAGS } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
   const generatedTags = new Set(

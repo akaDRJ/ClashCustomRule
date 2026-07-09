@@ -270,6 +270,7 @@ const CORE_OUTBOUND_TAGS = Object.freeze({
   ai: '人工智能',
   forceProxy: '强制代理',
   directPolicy: '全球直连',
+  preProxy: '前置代理',
   direct: 'direct',
   block: 'block'
 });
@@ -313,6 +314,16 @@ const TYPE_MAP = Object.freeze({
 
 function asArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+function uniqueStrings(values) {
+  const result = [];
+  for (const value of values) {
+    if (typeof value === 'string' && value && !result.includes(value)) {
+      result.push(value);
+    }
+  }
+  return result;
 }
 
 function normalizeProxy(proxy) {
@@ -364,10 +375,13 @@ function buildOutbounds(proxies) {
   const selectableTags = proxyTags.length ? proxyTags : [CORE_OUTBOUND_TAGS.direct];
   const staticGroups = buildStaticGroups(proxyTags);
   const staticGroupTags = staticGroups.map((group) => group.tag);
+  const preProxySelector = buildPreProxySelector(proxyOutbounds, staticGroupTags);
+  const preProxyTags = preProxySelector ? [preProxySelector.tag] : [];
   const nodeSelectionChoices = [
     CORE_OUTBOUND_TAGS.auto,
     CORE_OUTBOUND_TAGS.manual,
     ...staticGroupTags,
+    ...preProxyTags,
     CORE_OUTBOUND_TAGS.direct
   ];
   const policyChoices = buildPolicyChoices(staticGroupTags);
@@ -382,6 +396,7 @@ function buildOutbounds(proxies) {
       outbounds: [CORE_OUTBOUND_TAGS.direct]
     },
     ...staticGroups,
+    ...(preProxySelector ? [preProxySelector] : []),
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.proxy,
@@ -410,6 +425,29 @@ function buildOutbounds(proxies) {
       outbounds: policyChoices
     }
   ];
+}
+
+function buildPreProxySelector(proxyOutbounds, staticGroupTags) {
+  const hasPreProxyDependency = proxyOutbounds.some(
+    (outbound) => outbound.detour === CORE_OUTBOUND_TAGS.preProxy
+  );
+  const alreadyDefined = proxyOutbounds.some((outbound) => outbound.tag === CORE_OUTBOUND_TAGS.preProxy);
+  if (!hasPreProxyDependency || alreadyDefined) return null;
+
+  const transitTags = proxyOutbounds
+    .map((outbound) => outbound.tag)
+    .filter((tag) => tag && !LANDING_RE.test(tag));
+  const outbounds = uniqueStrings([
+    ...staticGroupTags,
+    ...transitTags,
+    CORE_OUTBOUND_TAGS.direct
+  ]);
+
+  return {
+    type: 'selector',
+    tag: CORE_OUTBOUND_TAGS.preProxy,
+    outbounds: outbounds.length ? outbounds : [CORE_OUTBOUND_TAGS.direct]
+  };
 }
 
 function buildPolicyChoices(staticGroupTags) {
@@ -458,6 +496,7 @@ module.exports = {
   CORE_OUTBOUND_TAGS,
   buildOutbounds,
   buildPolicyChoices,
+  buildPreProxySelector,
   buildStaticGroups,
   normalizeProxy
 };
