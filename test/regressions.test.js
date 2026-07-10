@@ -476,6 +476,7 @@ test('sing-box Momo target needs no manual compatibility rewrite', () => {
   assert.equal(tun.auto_route, false);
   assert.deepEqual(dns, { type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 });
   assert.equal(mixed.listen_port, 7899);
+  assert.equal(result.experimental.clash_api.external_controller, '0.0.0.0:19091');
 });
 
 test('sing-box generated config avoids removed geosite and geoip route fields', () => {

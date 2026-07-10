@@ -70,7 +70,7 @@ function buildSingBoxConfig(input = {}, options = {}) {
     inbounds: buildInbounds(options),
     outbounds: addMissingPolicyOutbounds(outbounds),
     route: buildRouteConfig(options),
-    experimental: buildExperimentalConfig()
+    experimental: buildExperimentalConfig(options)
   };
 }
 
@@ -80,11 +80,11 @@ function buildHttpClients() {
   ];
 }
 
-function buildExperimentalConfig() {
+function buildExperimentalConfig(options = {}) {
   return {
     cache_file: { enabled: true },
     clash_api: {
-      external_controller: '127.0.0.1:9090',
+      external_controller: options.momo ? '0.0.0.0:19091' : '127.0.0.1:9090',
       default_mode: 'Rule',
       access_control_allow_origin: [
         'http://127.0.0.1',
