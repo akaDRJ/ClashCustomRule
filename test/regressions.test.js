@@ -465,13 +465,16 @@ test('sing-box Momo target needs no manual compatibility rewrite', () => {
   const result = convert.build({ proxies: [] });
   const tun = result.inbounds.find((inbound) => inbound.type === 'tun');
   const mixed = result.inbounds.find((inbound) => inbound.type === 'mixed');
+  const dns = result.inbounds.find((inbound) => inbound.tag === 'dns-in');
 
   assert.equal(Object.prototype.hasOwnProperty.call(result.dns, 'timeout'), false);
+  assert.equal(result.dns.reverse_mapping, true);
   assert.equal(Object.prototype.hasOwnProperty.call(result, 'http_clients'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(result.route, 'default_http_client'), false);
   assert.equal(tun.tag, 'tun-in');
   assert.equal(tun.interface_name, 'momo-tun');
   assert.equal(tun.auto_route, false);
+  assert.deepEqual(dns, { type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 });
   assert.equal(mixed.listen_port, 7899);
 });
 

@@ -174,7 +174,8 @@ function buildDnsConfig(options = {}) {
     strategy: 'ipv4_only'
   };
 
-  if (!options.momo) config.timeout = '5s';
+  if (options.momo) config.reverse_mapping = true;
+  else config.timeout = '5s';
   return config;
 }
 
@@ -189,6 +190,7 @@ function buildInbounds(options = {}) {
       stack: 'mixed',
       ...(options.momo && { interface_name: 'momo-tun' })
     },
+    ...(options.momo ? [{ type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 }] : []),
     {
       type: 'mixed',
       tag: 'mixed-in',
