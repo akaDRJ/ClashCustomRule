@@ -7,6 +7,7 @@ const __modules = {
  * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert-sing-box.js
  *
  * Sub-Store 没有 sing-box 专用类型时，使用「文件」输出本脚本生成的 JSON。
+ * Momo 1.13.x：脚本参数 momo=true；需要避开默认端口时再加 mixedPort=7899。
  */
 
 const { buildSingBoxConfig } = __require('src/sing-box/config.js');
@@ -24,13 +25,21 @@ function parseBool(value) {
   return false;
 }
 
+function parsePort(value, fallback) {
+  const port = Number(value);
+  return Number.isInteger(port) && port > 0 && port <= 65535 ? port : fallback;
+}
+
 function normalizeInput(input) {
   return Array.isArray(input) ? { proxies: input } : input || {};
 }
 
-function build(config) {
+function build(config, options = {}) {
+  const args = { ...runtimeArgs, ...options };
   return buildSingBoxConfig(normalizeInput(config), {
-    quicEnabled: parseBool(runtimeArgs.quic)
+    quicEnabled: parseBool(args.quic),
+    momo: parseBool(args.momo),
+    mixedPort: parsePort(args.mixedPort, 7890)
   });
 }
 
@@ -119,9 +128,9 @@ function buildSingBoxConfig(input = {}, options = {}) {
 
   return {
     log: { level: 'info' },
-    dns: buildDnsConfig(),
-    http_clients: buildHttpClients(),
-    inbounds: buildInbounds(),
+    dns: buildDnsConfig(options),
+    ...(!options.momo && { http_clients: buildHttpClients() }),
+    inbounds: buildInbounds(options),
     outbounds: addMissingPolicyOutbounds(outbounds),
     route: buildRouteConfig(options),
     experimental: buildExperimentalConfig()
@@ -151,8 +160,8 @@ function buildExperimentalConfig() {
   };
 }
 
-function buildDnsConfig() {
-  return {
+function buildDnsConfig(options = {}) {
+  const config = {
     servers: [
       { type: 'udp', tag: 'bootstrap', server: '223.5.5.5' },
       { type: 'https', tag: 'local', server: 'dns.alidns.com', path: '/dns-query', domain_resolver: 'bootstrap' },
@@ -162,26 +171,29 @@ function buildDnsConfig() {
       { rule_set: ['geosite-private', 'geosite-cn'], server: 'local' }
     ],
     final: 'remote',
-    strategy: 'ipv4_only',
-    timeout: '5s'
+    strategy: 'ipv4_only'
   };
+
+  if (!options.momo) config.timeout = '5s';
+  return config;
 }
 
-function buildInbounds() {
+function buildInbounds(options = {}) {
   return [
     {
       type: 'tun',
       tag: 'tun-in',
       address: ['172.19.0.1/30'],
-      auto_route: true,
+      auto_route: !options.momo,
       strict_route: true,
-      stack: 'mixed'
+      stack: 'mixed',
+      ...(options.momo && { interface_name: 'momo-tun' })
     },
     {
       type: 'mixed',
       tag: 'mixed-in',
       listen: '0.0.0.0',
-      listen_port: 7890
+      listen_port: options.mixedPort || 7890
     }
   ];
 }
@@ -215,14 +227,16 @@ function buildRouteConfig(options = {}) {
 
   rules.push({ ip_is_private: true, outbound: CORE_OUTBOUND_TAGS.directPolicy });
 
-  return {
+  const config = {
     rules,
     rule_set: buildRemoteRuleSets(RULE_SET_TAGS),
     default_domain_resolver: 'bootstrap',
-    default_http_client: 'rule-set-download',
     final: CORE_OUTBOUND_TAGS.proxy,
     auto_detect_interface: true
   };
+
+  if (!options.momo) config.default_http_client = 'rule-set-download';
+  return config;
 }
 
 function addMissingPolicyOutbounds(outbounds) {

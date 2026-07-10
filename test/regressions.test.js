@@ -460,6 +460,21 @@ test('sing-box generated selector policies have no circular outbound dependencie
   for (const outbound of result.outbounds) visit(outbound.tag);
 });
 
+test('sing-box Momo target needs no manual compatibility rewrite', () => {
+  const convert = require(path.join(repoRoot, 'src', 'substore', 'convert-sing-box.js'));
+  const result = convert.build({ proxies: [] }, { momo: true, mixedPort: 7899 });
+  const tun = result.inbounds.find((inbound) => inbound.type === 'tun');
+  const mixed = result.inbounds.find((inbound) => inbound.type === 'mixed');
+
+  assert.equal(Object.prototype.hasOwnProperty.call(result.dns, 'timeout'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(result, 'http_clients'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(result.route, 'default_http_client'), false);
+  assert.equal(tun.tag, 'tun-in');
+  assert.equal(tun.interface_name, 'momo-tun');
+  assert.equal(tun.auto_route, false);
+  assert.equal(mixed.listen_port, 7899);
+});
+
 test('sing-box generated config avoids removed geosite and geoip route fields', () => {
   const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
   const result = buildSingBoxConfig({ proxies: [] });
