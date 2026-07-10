@@ -461,8 +461,8 @@ test('sing-box generated selector policies have no circular outbound dependencie
 });
 
 test('sing-box Momo target needs no manual compatibility rewrite', () => {
-  const convert = require(path.join(repoRoot, 'src', 'substore', 'convert-sing-box.js'));
-  const result = convert.build({ proxies: [] }, { momo: true, mixedPort: 7899 });
+  const convert = loadSingBoxConvert({ momo: true, mixedPort: '7899' });
+  const result = convert.build({ proxies: [] });
   const tun = result.inbounds.find((inbound) => inbound.type === 'tun');
   const mixed = result.inbounds.find((inbound) => inbound.type === 'mixed');
 
