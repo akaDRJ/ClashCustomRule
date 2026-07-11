@@ -601,7 +601,7 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
       {
         name: '🇨🇳 台湾 01',
         type: 'anytls',
-        server: '162.14.111.30',
+        server: '43.136.98.179',
         port: 443
       },
       {
@@ -621,11 +621,11 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
   });
   const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
 
-  assert.equal(groups['AKCDN 兜底'].type, 'fallback');
-  assert.deepEqual(groups['AKCDN 兜底'].proxies, ['🇨🇳 台湾 01', '🇨🇳 台湾 02', '🇹🇼 落地 台湾 01']);
-  assert.equal(groups['AKCDN 兜底'].lazy, false);
-  assert.equal(groups['节点选择'].proxies[0], 'AKCDN 兜底');
-  assert.equal(groups['GLOBAL'].proxies.includes('AKCDN 兜底'), true);
+  assert.equal(groups['AKCDN 容灾'].type, 'fallback');
+  assert.deepEqual(groups['AKCDN 容灾'].proxies, ['🇨🇳 台湾 01', '🇨🇳 台湾 02', '🇹🇼 落地 台湾 01']);
+  assert.equal(groups['AKCDN 容灾'].lazy, false);
+  assert.equal(groups['节点选择'].proxies[0], 'AKCDN 容灾');
+  assert.equal(groups['GLOBAL'].proxies.includes('AKCDN 容灾'), true);
   assert.equal(Object.prototype.hasOwnProperty.call(groups['自动选择'], 'proxies'), false);
   assert.equal(groups['前置代理'].type, 'select');
   assert.deepEqual(groups['前置代理'].proxies, [
@@ -662,7 +662,7 @@ test('akcdn fallback convert omits fallback when no independent transit node exi
   });
 
   assert.equal(
-    result['proxy-groups'].some((group) => group.name === 'AKCDN 兜底'),
+    result['proxy-groups'].some((group) => group.name === 'AKCDN 容灾'),
     false
   );
 });
@@ -677,7 +677,7 @@ test('akcdn fallback convert keeps base behavior when no AKCDN and dialer pair e
   });
 
   assert.equal(
-    result['proxy-groups'].some((group) => group.name === 'AKCDN 兜底'),
+    result['proxy-groups'].some((group) => group.name === 'AKCDN 容灾'),
     false
   );
 });

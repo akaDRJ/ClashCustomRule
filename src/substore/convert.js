@@ -45,7 +45,7 @@
  *                       落地/低倍率组同样使用正则匹配
  *
  * [akcdnfallback]  启用 AKCDN IX → Dialer 落地自动兜底（默认关闭）
- *                  自动创建「AKCDN 兜底」fallback 组：优先使用 AKCDN IX，
+ *                  自动创建「AKCDN 容灾」fallback 组：优先使用 AKCDN IX，
  *                  健康检查失败时切到 dialer-proxy 落地节点
  *                  「前置代理」会收敛为独立机场中转分组，避免再走 AKCDN/落地自环
  *                  开启后会自动启用落地/前置代理分组，避免 dialer 节点悬空
@@ -65,9 +65,7 @@
  * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#quic=true&ipv6=true
  *
  * AKCDN IX 优先、故障切 Dialer 落地：
- * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert-akcdn-fallback.js
- * 或：
- * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#akcdnfallback=true
+ * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#akcdnfallback=true&landing=true
  *
  * ==================== 导出接口 ====================
  *
@@ -326,7 +324,7 @@ const countryIconURLs = {
 
 const ISP_EXCLUDE_PATTERN =
   '(?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地';
-const AKCDN_PATTERN = '(?i)\\bAKCDN\\b|\\bIX\\b|163\\.223\\.125\\.8|162\\.14\\.111\\.30|39\\.108\\.228\\.6';
+const AKCDN_PATTERN = '(?i)\\bAKCDN\\b|\\bIX\\b|163\\.223\\.125\\.8|43\\.136\\.98\\.179|162\\.14\\.111\\.30|39\\.108\\.228\\.6';
 const TRANSIT_EXCLUDE_PATTERN = [ISP_EXCLUDE_PATTERN, AKCDN_PATTERN]
   .map((pattern) => pattern.replace(/^\\(\\?i\\)/, ''))
   .join('|');
@@ -748,18 +746,18 @@ function buildProxyGroups(
   insertUniqueAt(defaultProxiesDirect, 2, countryProxies);
 
   if (hasAkcdnFallbackGroup) {
-    insertAfter(defaultProxies, '自动选择', 'AKCDN 兜底');
-    if (!defaultSelector.includes('AKCDN 兜底')) {
-      defaultSelector.unshift('AKCDN 兜底');
+    insertAfter(defaultProxies, '自动选择', 'AKCDN 容灾');
+    if (!defaultSelector.includes('AKCDN 容灾')) {
+      defaultSelector.unshift('AKCDN 容灾');
     }
-    insertAfter(globalProxies, '自动选择', 'AKCDN 兜底');
+    insertAfter(globalProxies, '自动选择', 'AKCDN 容灾');
   }
 
   if (hasLandingGroup) {
     insertAfter(defaultProxies, '自动选择', '落地节点');
     if (!defaultSelector.includes('落地节点')) {
       if (hasAkcdnFallbackGroup) {
-        insertAfter(defaultSelector, 'AKCDN 兜底', '落地节点');
+        insertAfter(defaultSelector, 'AKCDN 容灾', '落地节点');
       } else {
         defaultSelector.unshift('落地节点');
       }
@@ -774,7 +772,7 @@ function buildProxyGroups(
     : [];
   const preProxySelector = hasAkcdnFallbackGroup
     ? transitProxyGroups.map((group) => group.name)
-    : defaultSelector.filter((name) => name !== '落地节点' && name !== 'AKCDN 兜底');
+    : defaultSelector.filter((name) => name !== '落地节点' && name !== 'AKCDN 容灾');
   const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
   const serviceGroups = buildServiceGroups(defaultProxies, directFallbackProxies);
 
@@ -788,7 +786,7 @@ function buildProxyGroups(
 
     hasAkcdnFallbackGroup
       ? {
-          name: 'AKCDN 兜底',
+          name: 'AKCDN 容灾',
           icon: ICON('Auto.png'),
           type: 'fallback',
           url: 'http://cp.cloudflare.com/generate_204',
