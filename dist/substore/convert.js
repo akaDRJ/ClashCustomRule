@@ -193,7 +193,8 @@ function buildRules(quicEnabled) {
 
 // ======================= 统一资源与图标 =======================
 const CDN = 'https://gcore.jsdelivr.net';
-const ICON = (path) => `${CDN}/gh/Koolson/Qure@master/IconSet/Color/${path}`;
+const QURE_REF = 'b16b260625f873266f6a6a9b88710132774997b8';
+const ICON = (path) => `${CDN}/gh/Koolson/Qure@${QURE_REF}/IconSet/Color/${path}`;
 const GEOX_CDN = 'https://cdn.jsdelivr.net';
 
 // ================= rule-providers（工厂） =================
@@ -339,21 +340,21 @@ const COUNTRY_REGEX_MAP = new Map(
 );
 
 const SERVICE_GROUP_SPECS = Object.freeze([
-  { name: '人工智能', icon: 'Bot.png', source: 'default' },
-  { name: '加密货币', icon: 'Cryptocurrency_3.png', source: 'default' },
+  { name: '人工智能', icon: 'AI.png', source: 'default' },
+  { name: '加密货币', icon: 'Cryptocurrency_1.png', source: 'default' },
   { name: 'PayPal', icon: 'PayPal.png', source: 'default' },
   { name: 'Telegram', icon: 'Telegram.png', source: 'default' },
   { name: 'Microsoft', icon: 'Microsoft.png', source: 'default' },
-  { name: 'Apple', icon: 'Apple_2.png', source: 'default' },
+  { name: 'Apple', icon: 'Apple_1.png', source: 'default' },
   { name: 'Google', icon: 'Google_Search.png', source: 'default' },
   { name: 'YouTube', icon: 'YouTube.png', source: 'default' },
   { name: 'Disney', icon: 'Disney+.png', source: 'default' },
   { name: 'Netflix', icon: 'Netflix.png', source: 'default' },
   { name: 'Spotify', icon: 'Spotify.png', source: 'default' },
-  { name: 'Twitter(X)', icon: 'Twitter.png', source: 'default' },
+  { name: 'Twitter(X)', icon: 'X.png', source: 'default' },
   { name: '学术资源', icon: 'Scholar.png', source: 'direct' },
   { name: '开发者资源', icon: 'GitHub.png', source: 'default' },
-  { name: '游戏下载', icon: 'Game.png', source: 'default' },
+  { name: '游戏下载', icon: 'Download.png', source: 'default' },
   { name: '游戏平台', icon: 'Game.png', source: 'default' },
   { name: 'Speedtest', icon: 'Speedtest.png', source: 'default' }
 ]);
@@ -624,7 +625,7 @@ function buildTransitProxyGroups(countryList, transitNodes) {
   if (lowCostTransitNodes.length) {
     const lowCostGroup = {
       name: '中转低倍率节点',
-      icon: ICON('Lab.png'),
+      icon: ICON('Pig.png'),
       type: regionalAutoGroupType(),
       proxies: lowCostTransitNodes
     };
@@ -636,7 +637,7 @@ function buildTransitProxyGroups(countryList, transitNodes) {
 
   groups.push({
     name: '中转手动切换',
-    icon: ICON('Proxy.png'),
+    icon: ICON('Static.png'),
     type: 'select',
     proxies: [...uniqueTransitNodes]
   });
@@ -787,7 +788,7 @@ function buildProxyGroups(
     hasAkcdnFallbackGroup
       ? {
           name: 'AKCDN 容灾',
-          icon: ICON('Auto.png'),
+          icon: ICON('Available.png'),
           type: 'fallback',
           url: 'http://cp.cloudflare.com/generate_204',
           interval: 60,
@@ -801,7 +802,7 @@ function buildProxyGroups(
     hasLandingGroup
       ? {
           name: '落地节点',
-          icon: ICON('Airport.png'),
+          icon: ICON('Back.png'),
           type: 'select',
           ...(options.regexFilter
             ? { 'include-all': true, filter: ISP_EXCLUDE_PATTERN }
@@ -812,7 +813,7 @@ function buildProxyGroups(
     hasLandingGroup
       ? {
           name: '前置代理',
-          icon: ICON('Area.png'),
+          icon: ICON('LinkCube.png'),
           type: 'select',
           ...(hasAkcdnFallbackGroup
             ? { proxies: [...preProxySelector] }
@@ -831,7 +832,7 @@ function buildProxyGroups(
     hasLowCostGroup
       ? {
           name: '低倍率节点',
-          icon: ICON('Lab.png'),
+          icon: ICON('Pig.png'),
           type: regionalAutoGroupType(),
           ...(options.regexFilter
             ? { 'include-all': true, filter: LOW_COST_PATTERN }
@@ -841,7 +842,7 @@ function buildProxyGroups(
 
     {
       name: '手动切换',
-      icon: ICON('Proxy.png'),
+      icon: ICON('Static.png'),
       type: 'select',
       'include-all': true
     },

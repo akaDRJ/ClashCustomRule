@@ -641,6 +641,43 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
   assert.deepEqual(groups['中转手动切换'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
 });
 
+test('convert uses pinned Qure icons with distinct policy semantics', () => {
+  const convert = loadAkcdnFallbackConvert({});
+  const result = convert.main({
+    proxies: [
+      { name: '香港 0.5x', type: 'ss', server: 'transit.example', port: 443 },
+      { name: '日本 01', type: 'ss', server: 'jp.example', port: 443 },
+      { name: '台湾 IX 01', type: 'anytls', server: '43.136.98.179', port: 443 },
+      { name: '台湾 IX 02', type: 'ss', server: '163.223.125.8', port: 25578 },
+      {
+        name: '落地 台湾 01',
+        type: 'vmess',
+        server: 'landing.example',
+        port: 443,
+        'dialer-proxy': '前置代理'
+      }
+    ]
+  });
+  const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+  const base = 'https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/';
+
+  assert.equal(groups['人工智能'].icon, `${base}AI.png`);
+  assert.equal(groups['加密货币'].icon, `${base}Cryptocurrency_1.png`);
+  assert.equal(groups.Apple.icon, `${base}Apple_1.png`);
+  assert.equal(groups['Twitter(X)'].icon, `${base}X.png`);
+  assert.equal(groups['游戏下载'].icon, `${base}Download.png`);
+  assert.equal(groups['游戏平台'].icon, `${base}Game.png`);
+  assert.equal(groups['AKCDN 容灾'].icon, `${base}Available.png`);
+  assert.equal(groups['落地节点'].icon, `${base}Back.png`);
+  assert.equal(groups['前置代理'].icon, `${base}LinkCube.png`);
+  assert.equal(groups['低倍率节点'].icon, `${base}Pig.png`);
+  assert.equal(groups['中转低倍率节点'].icon, `${base}Pig.png`);
+  assert.equal(groups['手动切换'].icon, `${base}Static.png`);
+  assert.equal(groups['中转手动切换'].icon, `${base}Static.png`);
+  assert.equal(groups['自动选择'].icon, `${base}Auto.png`);
+  assert.equal(groups['节点选择'].icon, `${base}Proxy.png`);
+});
+
 test('akcdn fallback convert omits fallback when no independent transit node exists', () => {
   const convert = loadAkcdnFallbackConvert({});
   const result = convert.main({
