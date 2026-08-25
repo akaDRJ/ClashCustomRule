@@ -260,6 +260,14 @@ test('convert aggressive mode keeps the old high-risk performance defaults', () 
   assert.equal(result.sniffer.sniff.QUIC['override-destination'], true);
 });
 
+test('convert Android full config omits the Linux-only routing mark', () => {
+  const convert = loadAkcdnFallbackConvert({ full: true, android: true });
+  const result = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
+
+  assert.equal(result['routing-mark'], undefined);
+  assert.equal(result['mixed-port'], 7890);
+});
+
 test('convert main fails fast instead of returning a partial config', () => {
   const convert = loadConvert({});
   const config = { proxies: [{ name: '香港 01', type: 'direct' }] };

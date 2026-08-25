@@ -50,6 +50,9 @@
  *                  「前置代理」会收敛为独立机场中转分组，避免再走 AKCDN/落地自环
  *                  开启后会自动启用落地/前置代理分组，避免 dialer 节点悬空
  *
+ * [android]        面向 Android TUN 客户端；省略仅 Linux 可用的 routing-mark
+ *                  避免 Android 无对应 fwmark 路由表时核心出站不可达
+ *
  * ==================== 使用示例 ====================
  *
  * 基础转换（默认配置，阻止 QUIC，枚举节点）：
@@ -91,7 +94,8 @@ const options = Object.freeze({
   useAggressiveDefaults,
   quicEnabled: parseBool(runtimeArgs.quic),
   regexFilter: parseBool(runtimeArgs.regex),
-  akcdnFallback: parseBool(runtimeArgs.akcdnfallback)
+  akcdnFallback: parseBool(runtimeArgs.akcdnfallback),
+  android: parseBool(runtimeArgs.android)
 });
 
 // ==================== 基础数组（只读基线） ====================
@@ -923,11 +927,13 @@ function main(config) {
   const finalRules = buildRules(options.quicEnabled);
 
   if (options.fullConfig) {
+    if (options.android) delete safeConfig['routing-mark'];
+
     Object.assign(safeConfig, {
       'mixed-port': 7890,
       'redir-port': 7892,
       'tproxy-port': 7893,
-      'routing-mark': 7894,
+      ...(options.android ? {} : { 'routing-mark': 7894 }),
       'allow-lan': true,
       ipv6: options.ipv6Enabled,
       mode: 'rule',
