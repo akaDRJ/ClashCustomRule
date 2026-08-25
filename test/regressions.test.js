@@ -266,6 +266,7 @@ test('convert Android full config omits the Linux-only routing mark', () => {
 
   assert.equal(result['routing-mark'], undefined);
   assert.equal(result['mixed-port'], 7890);
+  assert.equal(result['external-controller'], '127.0.0.1:9999');
 });
 
 test('convert main fails fast instead of returning a partial config', () => {

@@ -941,7 +941,7 @@ function main(config) {
       'tcp-concurrent': resolveTcpConcurrent(options.useAggressiveDefaults),
       'log-level': 'info',
       'geodata-loader': 'standard',
-      'external-controller': ':9999',
+      'external-controller': options.android ? '127.0.0.1:9999' : ':9999',
       'disable-keep-alive': false,
       profile: { 'store-selected': true }
     });
