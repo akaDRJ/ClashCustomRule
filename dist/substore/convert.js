@@ -282,10 +282,10 @@ const dnsConfigBase = {
 };
 
 const geoxURL = {
-  geoip: `${GEOX_CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat`,
-  geosite: `${GEOX_CDN}/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat`,
-  mmdb: `${GEOX_CDN}/gh/Loyalsoldier/geoip@release/Country.mmdb`,
-  asn: `${GEOX_CDN}/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb`
+  geoip: `${GEOX_CDN}/gh/appshubcc/bett-rules@release/geoip.dat`,
+  geosite: `${GEOX_CDN}/gh/appshubcc/bett-rules@release/geosite.dat`,
+  mmdb: `${GEOX_CDN}/gh/appshubcc/bett-rules@release/country.mmdb`,
+  asn: `${GEOX_CDN}/gh/appshubcc/bett-rules@release/GeoLite2-ASN.mmdb`
 };
 
 // ===================== 国家识别与图标 =====================

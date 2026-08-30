@@ -7,6 +7,12 @@ const { spawnSync } = require('node:child_process');
 const YAML = require('yaml');
 
 const repoRoot = path.resolve(__dirname, '..');
+const expectedBettGeoxURLs = {
+  geoip: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@release/geoip.dat',
+  geosite: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@release/geosite.dat',
+  mmdb: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@release/country.mmdb',
+  asn: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@release/GeoLite2-ASN.mmdb'
+};
 const rootPublicFiles = [
   'convert.js',
   'convert-akcdn-fallback.js',
@@ -428,9 +434,9 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.match(ruleSets.ai.url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/akaDRJ\/ClashCustomRule@master\/dist\/rulesets\/sing-box\/ai\.json$/);
   assert.equal(Object.prototype.hasOwnProperty.call(ruleSets.ai, 'download_detour'), false);
   assert.equal(ruleSets['geosite-youtube'].format, 'binary');
-  assert.match(ruleSets['geosite-youtube'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/SagerNet\/sing-geosite@rule-set\/geosite-youtube\.srs$/);
+  assert.match(ruleSets['geosite-youtube'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/appshubcc\/bett-rules@sing\/geo\/geosite\/youtube\.srs$/);
   assert.equal(ruleSets['geoip-cn'].format, 'binary');
-  assert.match(ruleSets['geoip-cn'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/SagerNet\/sing-geoip@rule-set\/geoip-cn\.srs$/);
+  assert.match(ruleSets['geoip-cn'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/appshubcc\/bett-rules@sing\/geo\/geoip\/cn\.srs$/);
   assert.equal(JSON.stringify(result.route.rules).includes('"geosite"'), false);
   assert.equal(JSON.stringify(result.route.rules).includes('"geoip"'), false);
   assert.deepEqual(result.route.rules.slice(0, 6), [
@@ -814,7 +820,10 @@ test('generated configs avoid yaml anchors and aliases for client compatibility'
   }
 });
 
-test('generated geox urls stay compact on one yaml line', () => {
+test('convert and generated configs use available bett-rules geodata assets', () => {
+  const { main } = loadConvert({});
+  assert.deepEqual(main({})['geox-url'], expectedBettGeoxURLs);
+
   const keys = ['geoip', 'geosite', 'mmdb', 'asn'];
 
   for (const file of ['config.yaml', 'config_substore.yaml']) {
@@ -823,6 +832,7 @@ test('generated geox urls stay compact on one yaml line', () => {
     const geoxBlock = raw.match(/^geox-url:\n(?<body>(?:  .+\n)+)/m);
 
     assert.ok(geoxBlock, `${file} missing geox-url block`);
+    assert.deepEqual(parsed['geox-url'], expectedBettGeoxURLs);
     for (const key of keys) {
       assert.match(
         geoxBlock.groups.body,

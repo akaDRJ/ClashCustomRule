@@ -507,8 +507,8 @@ module.exports = {
   },
   "src/sing-box/rule-sets.js": function(module, exports, __require) {
 const REMOTE_RULE_SET_BASE = 'https://cdn.jsdelivr.net/gh/akaDRJ/ClashCustomRule@master/dist/rulesets/sing-box';
-const REMOTE_GEOSITE_BASE = 'https://cdn.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set';
-const REMOTE_GEOIP_BASE = 'https://cdn.jsdelivr.net/gh/SagerNet/sing-geoip@rule-set';
+const REMOTE_GEOSITE_BASE = 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@sing/geo/geosite';
+const REMOTE_GEOIP_BASE = 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@sing/geo/geoip';
 
 function ruleSetTagFromFile(fileName) {
   return fileName.replace(/\.ya?ml$/i, '');
@@ -553,15 +553,20 @@ function buildRemoteRuleSets(tags) {
   return tags.map((tag) => {
     const geosite = tag.startsWith('geosite-');
     const geoip = tag.startsWith('geoip-');
+    const assetName = geosite
+      ? tag.slice('geosite-'.length)
+      : geoip
+        ? tag.slice('geoip-'.length)
+        : tag;
 
     return {
       type: 'remote',
       tag,
       format: geosite || geoip ? 'binary' : 'source',
       url: geosite
-        ? `${REMOTE_GEOSITE_BASE}/${tag}.srs`
+        ? `${REMOTE_GEOSITE_BASE}/${assetName}.srs`
         : geoip
-          ? `${REMOTE_GEOIP_BASE}/${tag}.srs`
+          ? `${REMOTE_GEOIP_BASE}/${assetName}.srs`
           : `${REMOTE_RULE_SET_BASE}/${tag}.json`,
       update_interval: '24h'
     };
