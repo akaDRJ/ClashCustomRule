@@ -36,7 +36,7 @@
  *                  sniffer 覆写 TLS/QUIC 目的地址；仅建议临时 A/B 测试
  *
  * [quic]           启用 QUIC 支持（默认关闭，即阻止 QUIC）
- *                  关闭时：自动添加规则 AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
+ *                  关闭时：仅拦截命中代理策略的 UDP 443，保留直连例外
  *                  开启时：不添加 QUIC 阻止规则
  *
  * [regex]          使用正则运行时匹配模式（默认 false，使用枚举模式）
@@ -141,6 +141,8 @@ const globalProxiesBase = Object.freeze([
 
 // ============== 规则（第一二段小写，第三段保留） ==============
 const rules = [
+  'geosite,private,全球直连',
+  'geoip,private,全球直连,no-resolve',
   'rule-set,forcedirect,全球直连',
   'rule-set,forceproxy,强制代理',
   'rule-set,ai,人工智能',
@@ -158,8 +160,8 @@ const rules = [
   'geosite,spotify,Spotify',
   'geosite,twitter,Twitter(X)',
   'geosite,ookla-speedtest,Speedtest',
-  'geosite,category-dev,开发者资源',
   'geosite,category-ai-chat-!cn,人工智能',
+  'geosite,category-dev,开发者资源',
   'geosite,steam@cn,全球直连',
   'geosite,category-games@cn,全球直连',
   'geosite,category-game-platforms-download,游戏下载',
@@ -177,22 +179,21 @@ const rules = [
   'geosite,google,Google',
   'geosite,cn,全球直连',
   'rule-set,cnsite,全球直连',
-  'geosite,private,全球直连',
 
   'geoip,netflix,Netflix,no-resolve',
   'geoip,google,Google,no-resolve',
   'geoip,telegram,Telegram,no-resolve',
   'geoip,cn,全球直连,no-resolve',
-  'geoip,private,全球直连,no-resolve',
   'match,节点选择'
 ];
 
 function buildRules(quicEnabled) {
-  const ruleList = [...rules];
-  if (!quicEnabled) {
-    ruleList.unshift('AND,((DST-PORT,443),(NETWORK,UDP)),REJECT');
-  }
-  return ruleList;
+  return rules.flatMap((rule) => {
+    const [kind, value, policy, ...extra] = rule.split(',');
+    if (quicEnabled || policy === '全球直连') return [rule];
+    const matcher = kind === 'match' ? '' : `,(${[kind, value, ...extra].join(',')})`;
+    return [`AND,((DST-PORT,443),(NETWORK,UDP)${matcher}),REJECT`, rule];
+  });
 }
 
 // ======================= 统一资源与图标 =======================
@@ -270,7 +271,7 @@ const dnsConfigBase = {
   ipv6: options.ipv6Enabled,
   'prefer-h3': true,
   'enhanced-mode': 'fake-ip',
-  'fake-ip-range': '198.20.0.1/16',
+  'fake-ip-range': '198.18.0.1/16',
   'fake-ip-filter': [
     '+.drj028.com',
     'geosite:cn',
@@ -952,6 +953,8 @@ function main(config) {
   }
 
   Object.assign(safeConfig, {
+    'geo-auto-update': parseBoolWithDefault(runtimeArgs.geoupdate, safeConfig['geo-auto-update'] ?? true),
+    'geo-update-interval': safeConfig['geo-update-interval'] ?? 24,
     'proxy-groups': proxyGroups,
     'rule-providers': ruleProviders,
     rules: finalRules,

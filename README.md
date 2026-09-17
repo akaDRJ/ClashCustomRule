@@ -58,3 +58,16 @@ npm run check
 ```
 
 `npm run refresh:all` rebuilds the published Sub-Store scripts, YAML/MRS/sing-box rulesets, DRJ custom rule INI, and generated configs. `npm run check` runs tests, drift checks, rule linting, and rename dictionary validation.
+
+## Routing policy
+
+- Private destinations take priority; custom exceptions precede service categories.
+- AI precedes developer resources so Copilot and JetBrains AI use the AI policy.
+- Google Play uses the Google policy; its DNS exception precedes domestic DNS in both clients.
+- With `quic=false` (default), UDP 443 is rejected at each proxy-policy match and at the final proxy fallback. Direct-policy matches remain allowed. This follows the configured policy category, not the selector's runtime choice. Set `quic=true` to allow UDP 443 everywhere.
+- sing-box no longer blocks port 853 as a side effect of `quic=false`. Use `blockdot=true` only when intentionally blocking client DoT/DoQ.
+- Mihomo defaults to daily Geo updates, preserving an input config's explicit `geo-auto-update` and `geo-update-interval`. Use `geoupdate=false` when OpenClash manages these downloads; use `geoupdate=true` to explicitly enable core-managed updates.
+- Fake-IP uses `198.18.0.1/16`. When upgrading from `198.20.0.1/16`, refresh the generated config and restart the client to clear old mappings; update any manually maintained Fake-IP routes/firewall ranges too.
+- `steamcontent` remains published for external subscribers, although the bundled policies use the upstream game-download categories. The PT list omits `drj028.com` because the earlier `forcedirect` list already covers it.
+
+Text files use LF via `.gitattributes` so Windows checkouts pass generation checks.

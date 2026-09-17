@@ -36,6 +36,7 @@ function build(config, options = {}) {
   const args = { ...runtimeArgs, ...options };
   return buildSingBoxConfig(normalizeInput(config), {
     quicEnabled: parseBool(args.quic),
+    blockDot: parseBool(args.blockdot),
     momo: parseBool(args.momo),
     mixedPort: parsePort(args.mixedPort, 7890)
   });

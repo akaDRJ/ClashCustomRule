@@ -38,6 +38,7 @@ function build(config, options = {}) {
   const args = { ...runtimeArgs, ...options };
   return buildSingBoxConfig(normalizeInput(config), {
     quicEnabled: parseBool(args.quic),
+    blockDot: parseBool(args.blockdot),
     momo: parseBool(args.momo),
     mixedPort: parsePort(args.mixedPort, 7890)
   });
@@ -76,7 +77,7 @@ const ROUTE_RULES = Object.freeze([
 
 const GEOSITE_RULES = Object.freeze([
   ['category-pt', CORE_OUTBOUND_TAGS.directPolicy],
-  ['google-play@cn', CORE_OUTBOUND_TAGS.directPolicy],
+  ['google-play', 'Google'],
   ['youtube@cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['youtube', 'YouTube'],
   ['paypal@cn', CORE_OUTBOUND_TAGS.directPolicy],
@@ -87,8 +88,8 @@ const GEOSITE_RULES = Object.freeze([
   ['spotify', 'Spotify'],
   ['twitter', 'Twitter(X)'],
   ['ookla-speedtest', 'Speedtest'],
-  ['category-dev', '开发者资源'],
   ['category-ai-chat-!cn', CORE_OUTBOUND_TAGS.ai],
+  ['category-dev', '开发者资源'],
   ['steam@cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['category-games@cn', CORE_OUTBOUND_TAGS.directPolicy],
   ['category-game-platforms-download', '游戏下载'],
@@ -165,9 +166,11 @@ function buildDnsConfig(options = {}) {
     servers: [
       { type: 'udp', tag: 'bootstrap', server: '223.5.5.5' },
       { type: 'https', tag: 'local', server: 'dns.alidns.com', path: '/dns-query', domain_resolver: 'bootstrap' },
-      { type: 'tls', tag: 'remote', server: '8.8.8.8', detour: CORE_OUTBOUND_TAGS.proxy }
+      { type: 'tls', tag: 'remote', server: '8.8.8.8', detour: CORE_OUTBOUND_TAGS.proxy },
+      { type: 'https', tag: 'google', server: '8.8.8.8', path: '/dns-query', detour: 'Google' }
     ],
     rules: [
+      { rule_set: 'geosite-google-play', server: 'google' },
       { rule_set: ['geosite-private', 'geosite-cn'], server: 'local' }
     ],
     final: 'remote',
@@ -211,23 +214,30 @@ function buildRouteConfig(options = {}) {
     }
   ];
 
-  if (!options.quicEnabled) {
-    rules.push({ type: 'logical', mode: 'or', rules: [{ network: 'udp', port: 443 }, { port: 853 }], action: 'reject' });
+  rules.push({ ip_is_private: true, outbound: CORE_OUTBOUND_TAGS.directPolicy });
+  rules.push({ rule_set: 'geosite-private', outbound: CORE_OUTBOUND_TAGS.directPolicy });
+  if (options.blockDot) rules.push({ port: 853, action: 'reject' });
+
+  function addPolicyRule(rule) {
+    if (!options.quicEnabled && rule.outbound !== CORE_OUTBOUND_TAGS.directPolicy) {
+      rules.push({ rule_set: rule.rule_set, network: 'udp', port: 443, action: 'reject' });
+    }
+    rules.push(rule);
   }
 
   for (const [ruleSet, outbound] of ROUTE_RULES) {
-    rules.push({ rule_set: ruleSet, outbound });
+    addPolicyRule({ rule_set: ruleSet, outbound });
   }
 
   for (const [geosite, outbound] of GEOSITE_RULES) {
-    rules.push({ rule_set: `geosite-${geosite}`, outbound });
+    if (geosite !== 'private') addPolicyRule({ rule_set: `geosite-${geosite}`, outbound });
   }
 
   for (const [geoip, outbound] of GEOIP_RULES) {
-    rules.push({ rule_set: `geoip-${geoip}`, outbound });
+    addPolicyRule({ rule_set: `geoip-${geoip}`, outbound });
   }
 
-  rules.push({ ip_is_private: true, outbound: CORE_OUTBOUND_TAGS.directPolicy });
+  if (!options.quicEnabled) rules.push({ network: 'udp', port: 443, action: 'reject' });
 
   const config = {
     rules,

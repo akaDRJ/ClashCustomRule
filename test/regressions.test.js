@@ -414,9 +414,13 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.equal(result.dns.final, 'remote');
   assert.equal(result.dns.timeout, '5s');
   assert.ok(result.dns.servers.some((server) => server.tag === 'bootstrap' && server.type === 'udp'));
-  assert.deepEqual(result.dns.rules, [{ rule_set: ['geosite-private', 'geosite-cn'], server: 'local' }]);
+  assert.deepEqual(result.dns.rules, [
+    { rule_set: 'geosite-google-play', server: 'google' },
+    { rule_set: ['geosite-private', 'geosite-cn'], server: 'local' }
+  ]);
   assert.deepEqual(result.dns.servers.find((server) => server.tag === 'remote'), { type: 'tls', tag: 'remote', server: '8.8.8.8', detour: '节点选择' });
-  assert.equal(result.dns.servers.filter((server) => server.type === 'https').every((server) => server.domain_resolver === 'bootstrap'), true);
+  assert.equal(result.dns.servers.find((server) => server.tag === 'local').domain_resolver, 'bootstrap');
+  assert.equal(result.dns.servers.find((server) => server.tag === 'google').detour, 'Google');
   assert.ok(result.inbounds.some((inbound) => inbound.type === 'mixed'));
   assert.ok(result.inbounds.some((inbound) => inbound.type === 'tun' && inbound.auto_route === true && inbound.strict_route === true));
   assert.equal(result.experimental.clash_api.external_controller, '127.0.0.1:9090');
@@ -457,10 +461,10 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
   assert.deepEqual(result.route.rules.slice(0, 6), [
     { action: 'sniff' },
     { type: 'logical', mode: 'or', rules: [{ protocol: 'dns' }, { port: 53 }], action: 'hijack-dns' },
-    { type: 'logical', mode: 'or', rules: [{ network: 'udp', port: 443 }, { port: 853 }], action: 'reject' },
+    { ip_is_private: true, outbound: '全球直连' },
+    { rule_set: 'geosite-private', outbound: '全球直连' },
     { rule_set: 'forcedirect', outbound: '全球直连' },
-    { rule_set: 'forceproxy', outbound: '强制代理' },
-    { rule_set: 'ai', outbound: '人工智能' }
+    { rule_set: 'forceproxy', network: 'udp', port: 443, action: 'reject' }
   ]);
   assert.equal(result.route.default_domain_resolver, 'bootstrap');
   assert.deepEqual(result.http_clients, [{ tag: 'rule-set-download' }]);

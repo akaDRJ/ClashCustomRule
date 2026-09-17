@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const YAML = require('yaml');
 
 const root = process.cwd();
 const distRoots = [
@@ -84,6 +85,25 @@ for (const file of targetFiles) {
   const raw = fs.readFileSync(file, 'utf8');
   const lines = raw.split(/\r?\n/);
 
+  if (/\.ya?ml$/i.test(file)) {
+    const payload = YAML.parse(raw)?.payload;
+    if (Array.isArray(payload)) {
+      const suffixes = new Set(payload.filter((item) => typeof item === 'string' && item.startsWith('+.')));
+      for (const item of payload) {
+        if (typeof item !== 'string') continue;
+        const domain = item.replace(/^\+\./, '');
+        const labels = domain.split('.');
+        for (let i = item.startsWith('+.') ? 1 : 0; i < labels.length; i++) {
+          const parent = `+.${labels.slice(i).join('.')}`;
+          if (!suffixes.has(parent)) continue;
+          hasIssue = true;
+          console.log(`REDUNDANT ${rel}: ${item} covered by ${parent}`);
+          break;
+        }
+      }
+    }
+  }
+
   const seen = new Map();
   let effective = 0;
   let currentYamlSection = '';
@@ -116,7 +136,7 @@ if (!targetFiles.length) {
 
 if (hasIssue) {
   if (strict) {
-    console.error('\nLint failed (strict): duplicate rules detected.');
+    console.error('\nLint failed (strict): duplicate or redundant rules detected.');
     process.exit(1);
   }
   console.warn('\nLint warning: duplicate rules detected (non-strict mode).');

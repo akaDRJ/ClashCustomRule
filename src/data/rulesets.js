@@ -82,7 +82,6 @@ module.exports = {
     "+.mining-dutch.nl",
     "+.flypool.org",
     "+.solo-pool.com",
-    "+.solo.ckpool.org",
     "+.cruxpool.com",
     "+.hash4life.com",
     "+.bitcoinpool.com",
@@ -208,8 +207,7 @@ module.exports = {
     "+.ptchdbits.co",
     "+.chdbits.co",
     "+.chdbits.xyz",
-    "+.rainbowisland.co",
-    "+.drj028.com"
+    "+.rainbowisland.co"
   ],
   "steamcontent.yaml": [
     "+.steamcontent.com"

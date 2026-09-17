@@ -51,7 +51,7 @@ dns:
   ipv6: false
   prefer-h3: false
   enhanced-mode: fake-ip
-  fake-ip-range: 198.20.0.1/16
+  fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
     - +.drj028.com
     - geosite:cn
@@ -788,47 +788,74 @@ rule-providers:
     url: https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/cn.mrs
     path: ./ruleset/cnsite.mrs
 rules:
-  - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
+  - geosite,private,全球直连
+  - geoip,private,全球直连,no-resolve
   - rule-set,forcedirect,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(rule-set,forceproxy)),REJECT
   - rule-set,forceproxy,强制代理
+  - AND,((DST-PORT,443),(NETWORK,UDP),(rule-set,ai)),REJECT
   - rule-set,ai,人工智能
   - rule-set,outlook,全球直连
   - rule-set,pt,全球直连
   - geosite,category-pt,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,google-play)),REJECT
   - geosite,google-play,Google
   - geosite,youtube@cn,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,youtube)),REJECT
   - geosite,youtube,YouTube
   - geosite,paypal@cn,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,paypal)),REJECT
   - geosite,paypal,PayPal
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,telegram)),REJECT
   - geosite,telegram,Telegram
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,disney)),REJECT
   - geosite,disney,Disney
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,netflix)),REJECT
   - geosite,netflix,Netflix
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,spotify)),REJECT
   - geosite,spotify,Spotify
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,twitter)),REJECT
   - geosite,twitter,Twitter(X)
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,ookla-speedtest)),REJECT
   - geosite,ookla-speedtest,Speedtest
-  - geosite,category-dev,开发者资源
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,category-ai-chat-!cn)),REJECT
   - geosite,category-ai-chat-!cn,人工智能
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,category-dev)),REJECT
+  - geosite,category-dev,开发者资源
   - geosite,steam@cn,全球直连
   - geosite,category-games@cn,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,category-game-platforms-download)),REJECT
   - geosite,category-game-platforms-download,游戏下载
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,category-games)),REJECT
   - geosite,category-games,游戏平台
   - geosite,category-scholar-cn,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,category-scholar-!cn)),REJECT
   - geosite,category-scholar-!cn,学术资源
+  - AND,((DST-PORT,443),(NETWORK,UDP),(rule-set,crypto)),REJECT
   - rule-set,crypto,加密货币
+  - AND,((DST-PORT,443),(NETWORK,UDP),(rule-set,mining)),REJECT
   - rule-set,mining,加密货币
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,category-cryptocurrency)),REJECT
   - geosite,category-cryptocurrency,加密货币
   - geosite,apple@cn,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,apple)),REJECT
   - geosite,apple,Apple
   - geosite,microsoft@cn,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,microsoft)),REJECT
   - geosite,microsoft,Microsoft
   - geosite,googlefcm,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geosite,google)),REJECT
   - geosite,google,Google
   - geosite,cn,全球直连
   - rule-set,cnsite,全球直连
-  - geosite,private,全球直连
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geoip,netflix,no-resolve)),REJECT
   - geoip,netflix,Netflix,no-resolve
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geoip,google,no-resolve)),REJECT
   - geoip,google,Google,no-resolve
+  - AND,((DST-PORT,443),(NETWORK,UDP),(geoip,telegram,no-resolve)),REJECT
   - geoip,telegram,Telegram,no-resolve
   - geoip,cn,全球直连,no-resolve
-  - geoip,private,全球直连,no-resolve
+  - AND,((DST-PORT,443),(NETWORK,UDP)),REJECT
   - match,节点选择
+geo-auto-update: true
+geo-update-interval: 24
