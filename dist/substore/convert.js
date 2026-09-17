@@ -274,12 +274,14 @@ const dnsConfigBase = {
   'fake-ip-range': '198.18.0.1/16',
   'fake-ip-filter': [
     '+.drj028.com',
-    'geosite:cn',
-    'rule-set:cnsite',
     'rule-set:fakeipfilter'
   ],
-  'default-nameserver': ['tls://223.5.5.5', 'tls://223.6.6.6'],
-  nameserver: ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']
+  'respect-rules': false,
+  'default-nameserver': ['tls://223.5.5.5#DIRECT', 'tls://223.6.6.6#DIRECT'],
+  'proxy-server-nameserver': ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'],
+  'direct-nameserver': ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'],
+  'direct-nameserver-follow-policy': false,
+  nameserver: ['https://1.1.1.1/dns-query#DNS代理', 'https://8.8.8.8/dns-query#DNS代理']
 };
 
 const geoxURL = {
@@ -406,11 +408,9 @@ function cloneDnsConfig(useAggressiveDefaults) {
     'prefer-h3': useAggressiveDefaults ? dnsConfigBase['prefer-h3'] : false,
     'fake-ip-filter': [...dnsConfigBase['fake-ip-filter']],
     'default-nameserver': [...dnsConfigBase['default-nameserver']],
-    nameserver: [...dnsConfigBase.nameserver],
-    // Play's CN download domains can return polluted answers from domestic DNS.
-    'nameserver-policy': {
-      'geosite:google-play': ['https://8.8.8.8/dns-query#Google']
-    }
+    'proxy-server-nameserver': [...dnsConfigBase['proxy-server-nameserver']],
+    'direct-nameserver': [...dnsConfigBase['direct-nameserver']],
+    nameserver: [...dnsConfigBase.nameserver]
   };
 }
 
@@ -837,6 +837,19 @@ function buildProxyGroups(
       : null,
 
     ...transitProxyGroups,
+
+    {
+      name: 'DNS代理',
+      type: 'url-test',
+      'include-all': true,
+      'exclude-type': 'direct|compatible|pass',
+      // Keep a reject member: older cores otherwise make an empty group DIRECT.
+      proxies: ['REJECT'],
+      url: 'https://cp.cloudflare.com/generate_204',
+      interval: 300,
+      tolerance: 50,
+      lazy: false
+    },
 
     hasLowCostGroup
       ? {

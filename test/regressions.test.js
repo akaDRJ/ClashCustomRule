@@ -296,11 +296,11 @@ test('Google Play downloads use the Google proxy and proxied DNS before CN excep
   assert.ok(!result.rules.includes('geosite,google-play@cn,全球直连'));
   assert.ok(result.rules.indexOf(playRule) < result.rules.indexOf('geosite,youtube@cn,全球直连'));
   assert.ok(result.rules.indexOf(playRule) < result.rules.indexOf('geosite,cn,全球直连'));
-  assert.deepEqual(result.dns['nameserver-policy']['geosite:google-play'],
-    ['https://8.8.8.8/dns-query#Google']);
-  result.dns['nameserver-policy']['geosite:google-play'].push('bad');
+  assert.equal(result.dns['nameserver-policy'], undefined);
+  assert.ok(result.dns.nameserver.every((server) => server.endsWith('#DNS代理')));
+  result.dns.nameserver.push('bad');
   const next = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
-  assert.equal(next.dns['nameserver-policy']['geosite:google-play'].length, 1);
+  assert.equal(next.dns.nameserver.length, 2);
 });
 
 test('convert routes Google FCM directly before generic Google rules', () => {

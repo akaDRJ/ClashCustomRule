@@ -96,3 +96,25 @@ test('strict lint catches suffix coverage without confusing sibling domains', ()
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('Mihomo DNS has independent resolvers and a fail-closed proxy group', () => {
+  const first = main({});
+  const dns = first.dns;
+  assert.equal(dns['nameserver-policy'], undefined);
+  assert.equal(dns.fallback, undefined);
+  assert.equal(dns['respect-rules'], false);
+  assert.ok(dns.nameserver.every((url) => url.startsWith('https://') && url.endsWith('#DNS代理')));
+  for (const key of ['default-nameserver', 'direct-nameserver', 'proxy-server-nameserver']) {
+    assert.ok(dns[key].every((url) => url.endsWith('#DIRECT')));
+    dns[key].push('invalid');
+    assert.ok(!main({}).dns[key].includes('invalid'));
+  }
+  assert.ok(!dns['fake-ip-filter'].includes('geosite:cn'));
+  assert.ok(!dns['fake-ip-filter'].includes('rule-set:cnsite'));
+  assert.ok(dns['fake-ip-filter'].includes('rule-set:fakeipfilter'));
+  const group = first['proxy-groups'].find((item) => item.name === 'DNS代理');
+  assert.equal(group.type, 'url-test');
+  assert.equal(group['include-all'], true);
+  assert.equal(group['exclude-type'], 'direct|compatible|pass');
+  assert.deepEqual(group.proxies, ['REJECT']);
+});
