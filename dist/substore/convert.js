@@ -147,7 +147,7 @@ const rules = [
   'rule-set,outlook,全球直连',
   'rule-set,pt,全球直连',
   'geosite,category-pt,全球直连',
-  'geosite,google-play@cn,全球直连',
+  'geosite,google-play,Google',
   'geosite,youtube@cn,全球直连',
   'geosite,youtube,YouTube',
   'geosite,paypal@cn,全球直连',
@@ -405,7 +405,11 @@ function cloneDnsConfig(useAggressiveDefaults) {
     'prefer-h3': useAggressiveDefaults ? dnsConfigBase['prefer-h3'] : false,
     'fake-ip-filter': [...dnsConfigBase['fake-ip-filter']],
     'default-nameserver': [...dnsConfigBase['default-nameserver']],
-    nameserver: [...dnsConfigBase.nameserver]
+    nameserver: [...dnsConfigBase.nameserver],
+    // Play's CN download domains can return polluted answers from domestic DNS.
+    'nameserver-policy': {
+      'geosite:google-play': ['https://8.8.8.8/dns-query#Google']
+    }
   };
 }
 

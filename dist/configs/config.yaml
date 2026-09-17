@@ -78,6 +78,9 @@ dns:
   nameserver:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
+  nameserver-policy:
+    geosite:google-play:
+      - https://8.8.8.8/dns-query#Google
   listen: 0.0.0.0:7874
 geodata-mode: true
 geox-url:
@@ -807,7 +810,7 @@ rules:
   - rule-set,outlook,全球直连
   - rule-set,pt,全球直连
   - geosite,category-pt,全球直连
-  - geosite,google-play@cn,全球直连
+  - geosite,google-play,Google
   - geosite,youtube@cn,全球直连
   - geosite,youtube,YouTube
   - geosite,paypal@cn,全球直连
