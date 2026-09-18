@@ -102,6 +102,7 @@ proxy-groups:
       - 手动切换
       - DIRECT
   - name: DNS代理
+    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Server.png
     type: url-test
     include-all: true
     exclude-type: direct|compatible|pass

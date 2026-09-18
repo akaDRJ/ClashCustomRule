@@ -840,6 +840,7 @@ function buildProxyGroups(
 
     {
       name: 'DNS代理',
+      icon: ICON('Server.png'),
       type: 'url-test',
       'include-all': true,
       'exclude-type': 'direct|compatible|pass',
