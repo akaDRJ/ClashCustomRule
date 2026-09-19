@@ -655,11 +655,11 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
   });
   const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
 
-  assert.equal(groups['AKCDN 容灾'].type, 'fallback');
-  assert.deepEqual(groups['AKCDN 容灾'].proxies, ['🇨🇳 台湾 01', '🇨🇳 台湾 02', '🇹🇼 落地 台湾 01']);
-  assert.equal(groups['AKCDN 容灾'].lazy, false);
-  assert.equal(groups['节点选择'].proxies[0], 'AKCDN 容灾');
-  assert.equal(groups['GLOBAL'].proxies.includes('AKCDN 容灾'), true);
+  assert.equal(groups['IX节点'].type, 'fallback');
+  assert.deepEqual(groups['IX节点'].proxies, ['🇨🇳 台湾 01', '🇨🇳 台湾 02', '🇹🇼 落地 台湾 01', '自动选择']);
+  assert.equal(groups['IX节点'].lazy, false);
+  assert.equal(groups['节点选择'].proxies[0], 'IX节点');
+  assert.equal(groups['GLOBAL'].proxies.includes('IX节点'), true);
   assert.equal(Object.prototype.hasOwnProperty.call(groups['自动选择'], 'proxies'), false);
   assert.equal(groups['前置代理'].type, 'select');
   assert.deepEqual(groups['前置代理'].proxies, [
@@ -673,6 +673,33 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
   assert.deepEqual(groups['中转香港节点'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
   assert.equal(groups['中转手动切换'].type, 'select');
   assert.deepEqual(groups['中转手动切换'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
+});
+
+test('landing fallback keeps automatic selection last in enumerated, regex and smart modes', () => {
+  for (const regex of [false, true]) {
+    for (const smart of [false, true]) {
+      const result = loadConvert({ landing: true, regex, smart }).main({
+        proxies: [
+          { name: '香港 01', type: 'ss' },
+          { name: '落地 台湾 01', type: 'ss', 'dialer-proxy': '前置代理' },
+          { name: '家宽 日本 01', type: 'ss' }
+        ]
+      });
+      const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+      const landing = groups['落地节点'];
+      assert.equal(landing.type, 'fallback');
+      assert.deepEqual(landing.proxies, ['落地 台湾 01', '家宽 日本 01', '自动选择']);
+      assert.equal(landing['include-all'], undefined);
+      assert.equal(landing.interval, 60);
+      assert.equal(landing.timeout, 3000);
+      assert.equal(landing.lazy, false);
+      const excluded = new RegExp(groups['自动选择']['exclude-filter'].replace(/^\(\?i\)/, ''), 'i');
+      assert.ok(excluded.test('落地 台湾 01'));
+      assert.ok(excluded.test('家宽 日本 01'));
+      assert.ok(!excluded.test('香港 01'));
+      assert.ok(!groups['前置代理'].proxies.includes('落地节点'));
+    }
+  }
 });
 
 test('convert uses pinned Qure icons with distinct policy semantics', () => {
@@ -701,7 +728,7 @@ test('convert uses pinned Qure icons with distinct policy semantics', () => {
   assert.equal(groups['Twitter(X)'].icon, `${base}X.png`);
   assert.equal(groups['游戏下载'].icon, `${base}Download.png`);
   assert.equal(groups['游戏平台'].icon, `${base}Game.png`);
-  assert.equal(groups['AKCDN 容灾'].icon, `${base}Available.png`);
+  assert.equal(groups['IX节点'].icon, `${base}Available.png`);
   assert.equal(groups['落地节点'].icon, `${base}Back.png`);
   assert.equal(groups['前置代理'].icon, `${base}LinkCube.png`);
   assert.equal(groups['低倍率节点'].icon, `${base}Pig.png`);
@@ -733,7 +760,7 @@ test('akcdn fallback convert omits fallback when no independent transit node exi
   });
 
   assert.equal(
-    result['proxy-groups'].some((group) => group.name === 'AKCDN 容灾'),
+    result['proxy-groups'].some((group) => group.name === 'IX节点'),
     false
   );
 });
@@ -748,7 +775,7 @@ test('akcdn fallback convert keeps base behavior when no AKCDN and dialer pair e
   });
 
   assert.equal(
-    result['proxy-groups'].some((group) => group.name === 'AKCDN 容灾'),
+    result['proxy-groups'].some((group) => group.name === 'IX节点'),
     false
   );
 });

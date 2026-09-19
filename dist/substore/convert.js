@@ -42,11 +42,11 @@
  * [regex]          使用正则运行时匹配模式（默认 false，使用枚举模式）
  *                  false：国家组使用 proxies 列表枚举具体节点名
  *                  true：国家组使用 include-all + filter + exclude-filter 正则匹配
- *                       落地/低倍率组同样使用正则匹配
+ *                       低倍率组同样使用正则匹配；落地组枚举节点以保证兜底顺序
  *
  * [akcdnfallback]  启用 AKCDN IX → Dialer 落地自动兜底（默认关闭）
- *                  自动创建「AKCDN 容灾」fallback 组：优先使用 AKCDN IX，
- *                  健康检查失败时切到 dialer-proxy 落地节点
+ *                  自动创建「IX节点」fallback 组：优先使用 AKCDN IX，
+ *                  健康检查失败时切到 dialer-proxy 落地节点，最后使用自动选择
  *                  「前置代理」会收敛为独立机场中转分组，避免再走 AKCDN/落地自环
  *                  开启后会自动启用落地/前置代理分组，避免 dialer 节点悬空
  *
@@ -756,18 +756,18 @@ function buildProxyGroups(
   insertUniqueAt(defaultProxiesDirect, 2, countryProxies);
 
   if (hasAkcdnFallbackGroup) {
-    insertAfter(defaultProxies, '自动选择', 'AKCDN 容灾');
-    if (!defaultSelector.includes('AKCDN 容灾')) {
-      defaultSelector.unshift('AKCDN 容灾');
+    insertAfter(defaultProxies, '自动选择', 'IX节点');
+    if (!defaultSelector.includes('IX节点')) {
+      defaultSelector.unshift('IX节点');
     }
-    insertAfter(globalProxies, '自动选择', 'AKCDN 容灾');
+    insertAfter(globalProxies, '自动选择', 'IX节点');
   }
 
   if (hasLandingGroup) {
     insertAfter(defaultProxies, '自动选择', '落地节点');
     if (!defaultSelector.includes('落地节点')) {
       if (hasAkcdnFallbackGroup) {
-        insertAfter(defaultSelector, 'AKCDN 容灾', '落地节点');
+        insertAfter(defaultSelector, 'IX节点', '落地节点');
       } else {
         defaultSelector.unshift('落地节点');
       }
@@ -782,7 +782,7 @@ function buildProxyGroups(
     : [];
   const preProxySelector = hasAkcdnFallbackGroup
     ? transitProxyGroups.map((group) => group.name)
-    : defaultSelector.filter((name) => name !== '落地节点' && name !== 'AKCDN 容灾');
+    : defaultSelector.filter((name) => name !== '落地节点' && name !== 'IX节点');
   const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
   const serviceGroups = buildServiceGroups(defaultProxies, directFallbackProxies);
 
@@ -796,7 +796,7 @@ function buildProxyGroups(
 
     hasAkcdnFallbackGroup
       ? {
-          name: 'AKCDN 容灾',
+          name: 'IX节点',
           icon: ICON('Available.png'),
           type: 'fallback',
           url: 'http://cp.cloudflare.com/generate_204',
@@ -804,7 +804,7 @@ function buildProxyGroups(
           timeout: 3000,
           'max-failed-times': 2,
           lazy: false,
-          proxies: [...akcdnFallbackNodes]
+          proxies: [...akcdnFallbackNodes, '自动选择']
         }
       : null,
 
@@ -812,10 +812,14 @@ function buildProxyGroups(
       ? {
           name: '落地节点',
           icon: ICON('Back.png'),
-          type: 'select',
-          ...(options.regexFilter
-            ? { 'include-all': true, filter: ISP_EXCLUDE_PATTERN }
-            : { proxies: [...landingNodes] })
+          type: 'fallback',
+          url: 'http://cp.cloudflare.com/generate_204',
+          interval: 60,
+          timeout: 3000,
+          'max-failed-times': 2,
+          lazy: false,
+          // Enumerate: include-all appends nodes after explicit proxies, breaking fallback order.
+          proxies: [...landingNodes, '自动选择']
         }
       : null,
 
