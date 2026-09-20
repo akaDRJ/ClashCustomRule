@@ -61,4 +61,4 @@ npm run check
 
 Generated settings are intended as a starting point. Refresh client configuration after updates and retain a working copy for rollback.
 
-DNS policy sends `geosite:cn` and `cnsite` queries to domestic DoH resolvers over DIRECT, including when OpenClash's China-IP bypass adds real-IP exclusions. `direct-nameserver` alone does not control the DNS answers returned to clients. Google Play retains proxied DNS ahead of the CN sets; home services under `drj028.com` retain system split DNS. Keep these policies in the final client configuration after subscription refresh.
+Mihomo uses the minimal domestic DNS baseline: AliDNS/DNSPod DoH in `nameserver`, with AliDNS DoT only for bootstrap (`default-nameserver`). Fake-IP and domestic real-IP exclusions remain; there are no separate direct/node resolvers, DNS proxy group, or per-domain DNS policies. LAN overrides such as `drj028.com` belong to the router's local DNS service. Routing rules, including Google Play's proxy route, remain independent of this DNS baseline.

@@ -290,7 +290,7 @@ test('convert main fails fast instead of returning a partial config', () => {
   assert.throws(() => convert.main(config), /write blocked/);
 });
 
-test('Google Play downloads use the Google proxy and proxied DNS before CN exceptions', () => {
+test('Google Play routing stays ahead of CN exceptions with minimal domestic DNS', () => {
   const convert = loadConvert({});
   const result = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
   const playRule = 'geosite,google-play,Google';
@@ -298,9 +298,8 @@ test('Google Play downloads use the Google proxy and proxied DNS before CN excep
   assert.ok(!result.rules.includes('geosite,google-play@cn,全球直连'));
   assert.ok(result.rules.indexOf(playRule) < result.rules.indexOf('geosite,youtube@cn,全球直连'));
   assert.ok(result.rules.indexOf(playRule) < result.rules.indexOf('geosite,cn,全球直连'));
-  assert.equal(result.dns['nameserver-policy']['+.drj028.com'], 'system');
-  assert.deepEqual(result.dns['nameserver-policy']['geosite:google-play'], result.dns.nameserver);
-  assert.ok(result.dns.nameserver.every((server) => server.endsWith('#DNS代理')));
+  assert.equal(result.dns['nameserver-policy'], undefined);
+  assert.deepEqual(result.dns.nameserver, ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']);
   result.dns.nameserver.push('bad');
   const next = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
   assert.equal(next.dns.nameserver.length, 2);
@@ -694,7 +693,7 @@ test('automatic groups share probes while regional groups are lazy and fallback 
         assert.equal(groups[name].interval, 300, name);
         assert.equal(groups[name].lazy, !name.endsWith('自动选择'), name);
       }
-      assert.equal(groups['DNS代理'].lazy, false);
+      assert.equal(groups['DNS代理'], undefined);
       for (const name of ['IX节点', '落地节点']) {
         assert.equal(groups[name].url, 'http://cp.cloudflare.com/generate_204', name);
         assert.equal(groups[name].interval, 60, name);

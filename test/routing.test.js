@@ -97,34 +97,21 @@ test('strict lint catches suffix coverage without confusing sibling domains', ()
   }
 });
 
-test('Mihomo DNS has independent resolvers and a fail-closed proxy group', () => {
+test('Mihomo keeps the minimal domestic DNS baseline without proxy dependencies', () => {
   const first = main({});
   const dns = first.dns;
-  assert.deepEqual(Object.keys(dns['nameserver-policy']), ['+.drj028.com', 'geosite:google-play', 'geosite:cn', 'rule-set:cnsite']);
-  assert.equal(dns['nameserver-policy']['+.drj028.com'], 'system');
-  for (const key of ['geosite:cn', 'rule-set:cnsite']) {
-    assert.deepEqual(dns['nameserver-policy'][key], dns['direct-nameserver']);
-    dns['nameserver-policy'][key].push('invalid');
-    assert.ok(!main({}).dns['nameserver-policy'][key].includes('invalid'));
+  for (const key of ['nameserver-policy', 'direct-nameserver', 'proxy-server-nameserver', 'direct-nameserver-follow-policy', 'respect-rules', 'fallback']) {
+    assert.equal(dns[key], undefined, key);
   }
-  assert.deepEqual(dns['nameserver-policy']['geosite:google-play'], dns.nameserver);
-  assert.equal(dns['direct-nameserver-follow-policy'], true);
-  dns['nameserver-policy']['+.drj028.com'] = 'invalid';
-  assert.equal(main({}).dns['nameserver-policy']['+.drj028.com'], 'system');
-  assert.equal(dns.fallback, undefined);
-  assert.equal(dns['respect-rules'], false);
-  assert.ok(dns.nameserver.every((url) => url.startsWith('https://') && url.endsWith('#DNS代理')));
-  for (const key of ['default-nameserver', 'direct-nameserver', 'proxy-server-nameserver']) {
-    assert.ok(dns[key].every((url) => url.endsWith('#DIRECT')));
+  assert.deepEqual(dns.nameserver, ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']);
+  assert.deepEqual(dns['default-nameserver'], ['tls://223.5.5.5', 'tls://223.6.6.6']);
+  for (const key of ['default-nameserver', 'nameserver', 'fake-ip-filter']) {
     dns[key].push('invalid');
     assert.ok(!main({}).dns[key].includes('invalid'));
   }
-  assert.ok(!dns['fake-ip-filter'].includes('geosite:cn'));
-  assert.ok(!dns['fake-ip-filter'].includes('rule-set:cnsite'));
+  assert.ok(dns['fake-ip-filter'].includes('geosite:cn'));
+  assert.ok(dns['fake-ip-filter'].includes('rule-set:cnsite'));
   assert.ok(dns['fake-ip-filter'].includes('rule-set:fakeipfilter'));
   const group = first['proxy-groups'].find((item) => item.name === 'DNS代理');
-  assert.equal(group.type, 'url-test');
-  assert.equal(group['include-all'], true);
-  assert.equal(group['exclude-type'], 'direct|compatible|pass');
-  assert.deepEqual(group.proxies, ['REJECT']);
+  assert.equal(group, undefined);
 });
