@@ -60,3 +60,5 @@ npm run check
 `npm run refresh:all` rebuilds the published Sub-Store scripts, YAML/MRS/sing-box rulesets, DRJ custom rule INI, and generated configs. `npm run check` runs tests, drift checks, rule linting, and rename dictionary validation.
 
 Generated settings are intended as a starting point. Refresh client configuration after updates and retain a working copy for rollback.
+
+DNS policy sends `geosite:cn` and `cnsite` queries to domestic DoH resolvers over DIRECT, including when OpenClash's China-IP bypass adds real-IP exclusions. `direct-nameserver` alone does not control the DNS answers returned to clients. Google Play retains proxied DNS ahead of the CN sets; home services under `drj028.com` retain system split DNS. Keep these policies in the final client configuration after subscription refresh.

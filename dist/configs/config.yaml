@@ -82,6 +82,15 @@ dns:
     - https://doh.pub/dns-query#DIRECT
   nameserver-policy:
     +.drj028.com: system
+    geosite:google-play:
+      - https://1.1.1.1/dns-query#DNS代理
+      - https://8.8.8.8/dns-query#DNS代理
+    geosite:cn:
+      - https://dns.alidns.com/dns-query#DIRECT
+      - https://doh.pub/dns-query#DIRECT
+    rule-set:cnsite:
+      - https://dns.alidns.com/dns-query#DIRECT
+      - https://doh.pub/dns-query#DIRECT
   direct-nameserver-follow-policy: true
   nameserver:
     - https://1.1.1.1/dns-query#DNS代理

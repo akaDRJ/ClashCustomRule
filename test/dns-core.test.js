@@ -86,12 +86,20 @@ test('real Mihomo isolates DNS paths and refuses proxy DNS when no proxy remains
       'log-level': 'debug', ipv6: false,
       proxies: [{ name: 'TestProxy', type: 'socks5', server: 'node.test', port: socksPort }, { name: 'UnsafeDirect', type: 'direct' }],
       'proxy-groups': [{ ...group, url: 'http://probe.invalid', lazy: true }],
-      'rule-providers': { fakeipfilter: { type: 'inline', behavior: 'domain', payload: ['+.real.test'] } },
+      'rule-providers': {
+        fakeipfilter: { type: 'inline', behavior: 'domain', payload: ['+.real.test'] },
+        cnsite: { type: 'inline', behavior: 'domain', payload: ['+.domestic.real.test', '+.play.real.test'] },
+        play: { type: 'inline', behavior: 'domain', payload: ['+.play.real.test'] }
+      },
       dns: { ...generated.dns, listen: `127.0.0.1:${dnsPort}`,
         nameserver: [`tcp://127.0.0.1:${normalPort}#DNS代理`],
         'default-nameserver': [`tcp://127.0.0.1:${nodePort}#DIRECT`],
         'proxy-server-nameserver': [`tcp://127.0.0.1:${nodePort}#DIRECT`],
-        'nameserver-policy': { '+.drj028.com': `tcp://127.0.0.1:${localPort}#DIRECT` },
+        'nameserver-policy': {
+          '+.drj028.com': `tcp://127.0.0.1:${localPort}#DIRECT`,
+          'rule-set:play': `tcp://127.0.0.1:${normalPort}#DNS代理`,
+          'rule-set:cnsite': `tcp://127.0.0.1:${directPort}#DIRECT`
+        },
         'direct-nameserver': [`tcp://127.0.0.1:${directPort}#DIRECT`] },
       rules: ['MATCH,DIRECT']
     };
@@ -117,6 +125,12 @@ test('real Mihomo isolates DNS paths and refuses proxy DNS when no proxy remains
     assert.ok(queries.node.includes('node.test'));
     assert.ok(socksConnections > 0);
     assert.ok(!queries.direct.includes('proxy.real.test'));
+    assert.deepEqual(await resolver.resolve4('shop.domestic.real.test'), ['127.0.0.1']);
+    assert.ok(queries.direct.includes('shop.domestic.real.test'));
+    assert.ok(!queries.normal.includes('shop.domestic.real.test'));
+    assert.deepEqual(await resolver.resolve4('download.play.real.test'), ['127.0.0.1']);
+    assert.ok(queries.normal.includes('download.play.real.test'));
+    assert.ok(!queries.direct.includes('download.play.real.test'));
     assert.deepEqual(await resolver.resolve4('nas.drj028.com'), ['127.0.0.1']);
     assert.ok(queries.local.includes('nas.drj028.com'));
     assert.ok(!queries.normal.includes('nas.drj028.com'));
@@ -141,6 +155,8 @@ test('real Mihomo isolates DNS paths and refuses proxy DNS when no proxy remains
     const before = queries.normal.length;
     await assert.rejects(resolver.resolve4('blocked.real.test'));
     assert.equal(queries.normal.length, before, 'empty proxy group must not send DNS directly');
+    assert.deepEqual(await resolver.resolve4('offline.domestic.real.test'), ['127.0.0.1']);
+    assert.ok(queries.direct.includes('offline.domestic.real.test'));
     assert.deepEqual(await resolver.resolve4('offline.drj028.com'), ['127.0.0.1']);
     assert.ok(queries.local.includes('offline.drj028.com'));
   } catch (error) {

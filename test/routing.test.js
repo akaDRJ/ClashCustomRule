@@ -100,7 +100,14 @@ test('strict lint catches suffix coverage without confusing sibling domains', ()
 test('Mihomo DNS has independent resolvers and a fail-closed proxy group', () => {
   const first = main({});
   const dns = first.dns;
-  assert.deepEqual(dns['nameserver-policy'], { '+.drj028.com': 'system' });
+  assert.deepEqual(Object.keys(dns['nameserver-policy']), ['+.drj028.com', 'geosite:google-play', 'geosite:cn', 'rule-set:cnsite']);
+  assert.equal(dns['nameserver-policy']['+.drj028.com'], 'system');
+  for (const key of ['geosite:cn', 'rule-set:cnsite']) {
+    assert.deepEqual(dns['nameserver-policy'][key], dns['direct-nameserver']);
+    dns['nameserver-policy'][key].push('invalid');
+    assert.ok(!main({}).dns['nameserver-policy'][key].includes('invalid'));
+  }
+  assert.deepEqual(dns['nameserver-policy']['geosite:google-play'], dns.nameserver);
   assert.equal(dns['direct-nameserver-follow-policy'], true);
   dns['nameserver-policy']['+.drj028.com'] = 'invalid';
   assert.equal(main({}).dns['nameserver-policy']['+.drj028.com'], 'system');

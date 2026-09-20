@@ -280,8 +280,13 @@ const dnsConfigBase = {
   'default-nameserver': ['tls://223.5.5.5#DIRECT', 'tls://223.6.6.6#DIRECT'],
   'proxy-server-nameserver': ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'],
   'direct-nameserver': ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'],
-  // Follow the current network's split DNS for home services, including direct connections.
-  'nameserver-policy': { '+.drj028.com': 'system' },
+  // Real-IP exclusions (including OpenClash's CN bypass) need domestic DNS before routing.
+  'nameserver-policy': {
+    '+.drj028.com': 'system',
+    'geosite:google-play': ['https://1.1.1.1/dns-query#DNS代理', 'https://8.8.8.8/dns-query#DNS代理'],
+    'geosite:cn': ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'],
+    'rule-set:cnsite': ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT']
+  },
   'direct-nameserver-follow-policy': true,
   nameserver: ['https://1.1.1.1/dns-query#DNS代理', 'https://8.8.8.8/dns-query#DNS代理']
 };
@@ -412,7 +417,8 @@ function cloneDnsConfig(useAggressiveDefaults) {
     'default-nameserver': [...dnsConfigBase['default-nameserver']],
     'proxy-server-nameserver': [...dnsConfigBase['proxy-server-nameserver']],
     'direct-nameserver': [...dnsConfigBase['direct-nameserver']],
-    'nameserver-policy': { ...dnsConfigBase['nameserver-policy'] },
+    'nameserver-policy': Object.fromEntries(Object.entries(dnsConfigBase['nameserver-policy'])
+      .map(([key, value]) => [key, Array.isArray(value) ? [...value] : value])),
     nameserver: [...dnsConfigBase.nameserver]
   };
 }
