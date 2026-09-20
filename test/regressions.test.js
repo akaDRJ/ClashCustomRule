@@ -162,7 +162,7 @@ test('lint-rules ignores duplicate proxy entries in config files but still repor
   });
 });
 
-test('sync-drjcustomrule-3 preserves regex filters when a group also defines fixed proxies', () => {
+test('sync-drjcustomrule-3 preserves regex filters and explicit probe URLs', () => {
   withTempDir((tempDir) => {
     const scriptsDir = path.join(tempDir, 'scripts');
     const substoreDir = path.join(tempDir, 'src', 'substore');
@@ -186,7 +186,8 @@ test('sync-drjcustomrule-3 preserves regex filters when a group also defines fix
         "          'include-all': true,",
         "          'exclude-filter': '(?i)家宽|落地',",
         "          proxies: ['自动选择', 'DIRECT']",
-        '        }',
+        '        },',
+        "        { name: '自动选择', type: 'url-test', url: 'https://probe.example/204', interval: 300, tolerance: 20 }",
         '      ]',
         '    };',
         '  },',
@@ -229,6 +230,7 @@ test('sync-drjcustomrule-3 preserves regex filters when a group also defines fix
     assert.match(groupLine, /\[]自动选择/);
     assert.match(groupLine, /\[]DIRECT/);
     assert.match(groupLine, /\(\?i\)\^\(\?!\.\*\(\?:家宽\|落地\)\)\.\*\$/);
+    assert.ok(rendered.includes('custom_proxy_group=自动选择`url-test`.*`https://probe.example/204`300,,20'));
   });
 });
 
@@ -296,7 +298,7 @@ test('Google Play downloads use the Google proxy and proxied DNS before CN excep
   assert.ok(!result.rules.includes('geosite,google-play@cn,全球直连'));
   assert.ok(result.rules.indexOf(playRule) < result.rules.indexOf('geosite,youtube@cn,全球直连'));
   assert.ok(result.rules.indexOf(playRule) < result.rules.indexOf('geosite,cn,全球直连'));
-  assert.equal(result.dns['nameserver-policy'], undefined);
+  assert.deepEqual(result.dns['nameserver-policy'], { '+.drj028.com': 'system' });
   assert.ok(result.dns.nameserver.every((server) => server.endsWith('#DNS代理')));
   result.dns.nameserver.push('bad');
   const next = convert.main({ proxies: [{ name: 'test', type: 'direct' }] });
@@ -673,6 +675,33 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
   assert.deepEqual(groups['中转香港节点'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
   assert.equal(groups['中转手动切换'].type, 'select');
   assert.deepEqual(groups['中转手动切换'].proxies, ['🇭🇰 NX 香港 01', '🇭🇰 YT 香港 01']);
+});
+
+test('automatic groups share probes while regional groups are lazy and fallback remains active', () => {
+  for (const regex of [false, true]) {
+    for (const smart of [false, true]) {
+      const result = loadAkcdnFallbackConvert({ regex, smart }).main({
+        proxies: [
+          { name: '香港 0.5x', type: 'ss' },
+          { name: '台湾 IX 01', type: 'ss', server: '43.136.98.179' },
+          { name: '落地 台湾 01', type: 'ss', 'dialer-proxy': '前置代理' }
+        ]
+      });
+      const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+      for (const name of ['自动选择', '中转自动选择', '香港节点', '中转香港节点', '低倍率节点', '中转低倍率节点']) {
+        assert.equal(groups[name].url, 'https://cp.cloudflare.com/generate_204', name);
+        assert.equal(groups[name].interval, 300, name);
+        assert.equal(groups[name].lazy, !name.endsWith('自动选择'), name);
+      }
+      assert.equal(groups['DNS代理'].lazy, false);
+      for (const name of ['IX节点', '落地节点']) {
+        assert.equal(groups[name].url, 'http://cp.cloudflare.com/generate_204', name);
+        assert.equal(groups[name].interval, 60, name);
+        assert.equal(groups[name].lazy, false, name);
+        assert.equal(groups[name].proxies.at(-1), '自动选择', name);
+      }
+    }
+  }
 });
 
 test('landing fallback keeps automatic selection last in enumerated, regex and smart modes', () => {

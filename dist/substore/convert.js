@@ -280,7 +280,9 @@ const dnsConfigBase = {
   'default-nameserver': ['tls://223.5.5.5#DIRECT', 'tls://223.6.6.6#DIRECT'],
   'proxy-server-nameserver': ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'],
   'direct-nameserver': ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'],
-  'direct-nameserver-follow-policy': false,
+  // Follow the current network's split DNS for home services, including direct connections.
+  'nameserver-policy': { '+.drj028.com': 'system' },
+  'direct-nameserver-follow-policy': true,
   nameserver: ['https://1.1.1.1/dns-query#DNS代理', 'https://8.8.8.8/dns-query#DNS代理']
 };
 
@@ -410,6 +412,7 @@ function cloneDnsConfig(useAggressiveDefaults) {
     'default-nameserver': [...dnsConfigBase['default-nameserver']],
     'proxy-server-nameserver': [...dnsConfigBase['proxy-server-nameserver']],
     'direct-nameserver': [...dnsConfigBase['direct-nameserver']],
+    'nameserver-policy': { ...dnsConfigBase['nameserver-policy'] },
     nameserver: [...dnsConfigBase.nameserver]
   };
 }
@@ -574,8 +577,8 @@ function uniqueStrings(values) {
   return result;
 }
 
-function timedAutoGroupFields() {
-  return { interval: 300, tolerance: 20, lazy: false };
+function timedAutoGroupFields(lazy = false) {
+  return { url: 'https://cp.cloudflare.com/generate_204', interval: 300, tolerance: 20, lazy };
 }
 
 function buildServiceGroups(defaultProxies, directProxies) {
@@ -606,7 +609,7 @@ function buildTransitCountryProxyGroups(countryList, transitNodes) {
     };
 
     if (!options.loadBalance) {
-      Object.assign(group, timedAutoGroupFields());
+      Object.assign(group, timedAutoGroupFields(true));
     }
 
     groups.push(group);
@@ -639,7 +642,7 @@ function buildTransitProxyGroups(countryList, transitNodes) {
       proxies: lowCostTransitNodes
     };
     if (!options.loadBalance) {
-      Object.assign(lowCostGroup, timedAutoGroupFields());
+      Object.assign(lowCostGroup, timedAutoGroupFields(true));
     }
     groups.push(lowCostGroup);
   }
@@ -700,7 +703,7 @@ function buildCountryProxyGroups(countryList, countryBuckets) {
     }
 
     if (!options.loadBalance) {
-      Object.assign(group, { interval: 300, tolerance: 20, lazy: false });
+      Object.assign(group, timedAutoGroupFields(true));
     }
 
     groups.push(group);
@@ -861,6 +864,7 @@ function buildProxyGroups(
           name: '低倍率节点',
           icon: ICON('Pig.png'),
           type: regionalAutoGroupType(),
+          ...(!options.loadBalance ? timedAutoGroupFields(true) : {}),
           ...(options.regexFilter
             ? { 'include-all': true, filter: LOW_COST_PATTERN }
             : { proxies: [...lowCostNodes] })
@@ -880,9 +884,7 @@ function buildProxyGroups(
       type: autoGroupType(),
       'include-all': true,
       'exclude-filter': ISP_EXCLUDE_PATTERN,
-      interval: 300,
-      tolerance: 20,
-      lazy: false
+      ...timedAutoGroupFields()
     },
 
     {

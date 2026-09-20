@@ -100,7 +100,10 @@ test('strict lint catches suffix coverage without confusing sibling domains', ()
 test('Mihomo DNS has independent resolvers and a fail-closed proxy group', () => {
   const first = main({});
   const dns = first.dns;
-  assert.equal(dns['nameserver-policy'], undefined);
+  assert.deepEqual(dns['nameserver-policy'], { '+.drj028.com': 'system' });
+  assert.equal(dns['direct-nameserver-follow-policy'], true);
+  dns['nameserver-policy']['+.drj028.com'] = 'invalid';
+  assert.equal(main({}).dns['nameserver-policy']['+.drj028.com'], 'system');
   assert.equal(dns.fallback, undefined);
   assert.equal(dns['respect-rules'], false);
   assert.ok(dns.nameserver.every((url) => url.startsWith('https://') && url.endsWith('#DNS代理')));

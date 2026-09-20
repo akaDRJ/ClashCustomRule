@@ -137,7 +137,7 @@ function buildGroupLine(group) {
   if (needsHealthCheck(type)) {
     const interval = Number.isFinite(group.interval) ? group.interval : 300;
     const tolerance = Number.isFinite(group.tolerance) ? group.tolerance : 50;
-    parts.push(testUrl);
+    parts.push(group.url || testUrl);
     parts.push(`${interval},,${tolerance}`);
   }
 

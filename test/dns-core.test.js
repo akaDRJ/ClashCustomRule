@@ -12,7 +12,7 @@ const binary = process.env.MIHOMO_BIN || 'mihomo';
 const available = spawnSync(binary, ['-v'], { windowsHide: true }).status === 0;
 
 test('real Mihomo isolates DNS paths and refuses proxy DNS when no proxy remains', { skip: !available, timeout: 20000 }, async () => {
-  const servers = [], sockets = new Set(), queries = { normal: [], direct: [], node: [] };
+  const servers = [], sockets = new Set(), queries = { normal: [], direct: [], node: [], local: [] };
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mihomo-dns-'));
   let core, log = '', socksConnections = 0;
   async function listen(handler) {
@@ -51,6 +51,7 @@ test('real Mihomo isolates DNS paths and refuses proxy DNS when no proxy remains
   }
   try {
     const normalPort = await dnsServer('normal'), directPort = await dnsServer('direct'), nodePort = await dnsServer('node');
+    const localPort = await dnsServer('local');
     const targetPort = await listen((socket) => socket.on('data', () => socket.end('HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK')));
     const socksPort = await listen((socket) => {
       socket.once('data', () => {
@@ -90,6 +91,7 @@ test('real Mihomo isolates DNS paths and refuses proxy DNS when no proxy remains
         nameserver: [`tcp://127.0.0.1:${normalPort}#DNS代理`],
         'default-nameserver': [`tcp://127.0.0.1:${nodePort}#DIRECT`],
         'proxy-server-nameserver': [`tcp://127.0.0.1:${nodePort}#DIRECT`],
+        'nameserver-policy': { '+.drj028.com': `tcp://127.0.0.1:${localPort}#DIRECT` },
         'direct-nameserver': [`tcp://127.0.0.1:${directPort}#DIRECT`] },
       rules: ['MATCH,DIRECT']
     };
@@ -115,13 +117,21 @@ test('real Mihomo isolates DNS paths and refuses proxy DNS when no proxy remains
     assert.ok(queries.node.includes('node.test'));
     assert.ok(socksConnections > 0);
     assert.ok(!queries.direct.includes('proxy.real.test'));
+    assert.deepEqual(await resolver.resolve4('nas.drj028.com'), ['127.0.0.1']);
+    assert.ok(queries.local.includes('nas.drj028.com'));
+    assert.ok(!queries.normal.includes('nas.drj028.com'));
     const fake = await resolver.resolve4('direct.test');
     assert.ok(fake[0].startsWith('198.18.'));
-    await new Promise((resolve, reject) => {
-      const socket = net.connect(mixedPort, '127.0.0.1', () => socket.write(`GET http://direct.test:${targetPort}/ HTTP/1.1\r\nHost: direct.test:${targetPort}\r\nConnection: close\r\n\r\n`));
-      sockets.add(socket); socket.on('error', reject); socket.on('data', () => { socket.destroy(); resolve(); });
-      socket.setTimeout(3000, () => { socket.destroy(); reject(new Error(log)); });
-    });
+    for (const domain of ['direct.test', 'web.drj028.com']) {
+      await new Promise((resolve, reject) => {
+        const socket = net.connect(mixedPort, '127.0.0.1', () => socket.write(`GET http://${domain}:${targetPort}/ HTTP/1.1\r\nHost: ${domain}:${targetPort}\r\nConnection: close\r\n\r\n`));
+        sockets.add(socket); socket.on('error', reject); socket.on('data', () => { socket.destroy(); resolve(); });
+        socket.setTimeout(3000, () => { socket.destroy(); reject(new Error(log)); });
+      });
+    }
+    assert.ok(queries.local.includes('web.drj028.com'));
+    assert.ok(!queries.direct.includes('web.drj028.com'));
+    assert.ok(!queries.normal.includes('web.drj028.com'));
     assert.ok(queries.direct.includes('direct.test'));
     assert.ok(!queries.normal.includes('direct.test'));
     config.proxies = [{ name: 'UnsafeDirect', type: 'direct' }];
@@ -131,6 +141,8 @@ test('real Mihomo isolates DNS paths and refuses proxy DNS when no proxy remains
     const before = queries.normal.length;
     await assert.rejects(resolver.resolve4('blocked.real.test'));
     assert.equal(queries.normal.length, before, 'empty proxy group must not send DNS directly');
+    assert.deepEqual(await resolver.resolve4('offline.drj028.com'), ['127.0.0.1']);
+    assert.ok(queries.local.includes('offline.drj028.com'));
   } catch (error) {
     error.message += `\n${log}\n${JSON.stringify(queries)}`;
     throw error;
