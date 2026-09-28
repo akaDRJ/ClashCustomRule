@@ -63,6 +63,7 @@ sniffer:
     - +.push.apple.com
 dns:
   enable: true
+  cache-algorithm: arc
   ipv6: false
   prefer-h3: false
   enhanced-mode: fake-ip

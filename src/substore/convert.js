@@ -268,6 +268,7 @@ const snifferConfigBase = {
 
 const dnsConfigBase = {
   enable: true,
+  'cache-algorithm': 'arc',
   ipv6: options.ipv6Enabled,
   'prefer-h3': true,
   'enhanced-mode': 'fake-ip',
