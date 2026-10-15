@@ -26,7 +26,7 @@ test('Sub-Store file operator produces a standard sing-box collection and writes
     tls: { enabled: true, reality: { enabled: true, public_key: 'redacted', short_id: 'abcd' } },
     transport: { type: 'ws', path: '/proxy', headers: { Host: 'example.com' } }
   };
-  const script = loadFileScript({ collection: 'AKCDN Fallback', openwrt: 'true', apiSecret: 'test-api-secret' }, async (request) => {
+  const script = loadFileScript({ collection: 'AKCDN Fallback', momo: 'true', apiSecret: 'test-api-secret' }, async (request) => {
     calls.push(request);
     return JSON.stringify({ outbounds: [relay, landing], endpoints: [] });
   });
@@ -40,7 +40,7 @@ test('Sub-Store file operator produces a standard sing-box collection and writes
   const config = JSON.parse(result.$content);
   assert.deepEqual(config.outbounds.find((outbound) => outbound.tag === landing.tag), landing);
   assert.equal(config.experimental.clash_api.secret, 'test-api-secret');
-  assert.equal(config.experimental.clash_api.external_controller, '0.0.0.0:9090');
+  assert.equal(config.experimental.clash_api.external_controller, '0.0.0.0:19091');
   assert.ok(config.inbounds.some((inbound) => inbound.tag === 'dns-in'));
 });
 
@@ -65,7 +65,7 @@ test('file generation propagates collection and malformed JSON errors', async ()
 
 test('Sub-Store mixedUsers JSON arguments preserve LAN authentication and both loopback exemptions', () => {
   const users = [{ username: 'test-user', password: 'test-password' }];
-  const args = { openwrt: 'true', mixedListen: '10.0.0.1', mixedUsers: JSON.stringify(users), mixedPort: '7893', httpPort: '7890', socksPort: '7891' };
+  const args = { momo: 'true', mixedListen: '10.0.0.1', mixedUsers: JSON.stringify(users), mixedPort: '7893', httpPort: '7890', socksPort: '7891' };
   const script = loadFileScript(args);
   const mixed = script.build({}).inbounds.filter(x => x.type === 'mixed');
   assert.deepEqual(mixed[0], { type: 'mixed', tag: 'mixed-in', listen: '10.0.0.1', listen_port: 7893, users });
@@ -83,13 +83,13 @@ test('Sub-Store mixedUsers JSON arguments preserve LAN authentication and both l
 test('private file-content options preserve authentication without private script arguments or logging', async (t) => {
   const logs = ['log', 'warn', 'error', 'info'].map(method => t.mock.method(console, method, () => {}));
   const users = [{ username: 'private-test-user', password: 'private-test-password' }];
-  const options = { openwrt: true, apiSecret: 'private-test-api-key', mixedUsers: users, mixedListen: '10.0.0.1', mixedPort: 7893, httpPort: 7890, socksPort: 7891 };
+  const options = { momo: true, apiSecret: 'private-test-api-key', mixedUsers: users, mixedListen: '10.0.0.1', mixedPort: 7893, httpPort: 7890, socksPort: 7891 };
   for (const args of [{}, { collection: 'AKCDN Fallback' }]) {
     const script = loadFileScript(args, async () => JSON.stringify({ outbounds: [relay], endpoints: [] }));
     const result = await script.operator({ $content: JSON.stringify({ options, outbounds: [relay] }), $files: [] });
     const config = JSON.parse(result.$content);
     assert.equal(config.experimental.clash_api.secret, options.apiSecret);
-    assert.equal(config.experimental.clash_api.external_controller, '0.0.0.0:9090');
+    assert.equal(config.experimental.clash_api.external_controller, '0.0.0.0:19091');
     assert.equal(config.outbounds.some(outbound => outbound.tag === relay.tag), true);
     for (const [type, port] of [['mixed', 7893], ['http', 7890], ['socks', 7891]]) {
       const listener = config.inbounds.find(inbound => inbound.tag === `${type}-in`);

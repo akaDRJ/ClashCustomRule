@@ -84,9 +84,8 @@ function buildExperimentalConfig(options = {}) {
   return {
     cache_file: { enabled: true },
     clash_api: {
-      external_controller: options.momo ? '0.0.0.0:19091' : options.openwrt && options.apiSecret ? '0.0.0.0:9090' : '127.0.0.1:9090',
+      external_controller: options.momo ? '0.0.0.0:19091' : '127.0.0.1:9090',
       ...(options.apiSecret && { secret: options.apiSecret }),
-      ...(options.openwrt && { external_ui: '/usr/share/sing-box/ui' }),
       default_mode: 'Rule',
       access_control_allow_origin: [
         'http://127.0.0.1',
@@ -115,14 +114,7 @@ function buildDnsConfig(options = {}) {
     strategy: 'ipv4_only'
   };
 
-  if (options.openwrt) {
-    config.servers[0] = {
-      type: 'https', tag: 'bootstrap', server: '223.5.5.5', path: '/dns-query',
-      tls: { enabled: true, server_name: 'dns.alidns.com' }
-    };
-    config.rules.splice(1, 0, { rule_set: ['forcedirect', 'outlook', 'pt'], server: 'local' });
-  }
-  if (options.momo || options.openwrt) config.reverse_mapping = true;
+  if (options.momo) config.reverse_mapping = true;
   if (!options.momo) config.timeout = '5s';
   return config;
 }
@@ -144,14 +136,13 @@ function buildInbounds(options = {}) {
     {
       type: 'tun',
       tag: 'tun-in',
-      address: options.openwrt ? ['172.19.0.1/30', 'fdfe:dcba:9876::1/126'] : ['172.19.0.1/30'],
+      address: ['172.19.0.1/30'],
       auto_route: !options.momo,
       strict_route: true,
       stack: 'mixed',
-      ...(options.openwrt && { interface_name: 'sing-box-tun', auto_redirect: true, dns_mode: 'hijack' }),
       ...(options.momo && { interface_name: 'momo-tun' })
     },
-    ...(options.momo || options.openwrt ? [{ type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 }] : []),
+    ...(options.momo ? [{ type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 }] : []),
     ...listeners.flatMap(([type, port]) => [
       {
         type,

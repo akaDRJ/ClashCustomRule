@@ -6,7 +6,6 @@
  *
  * Sub-Store 没有 sing-box 专用类型时，使用「文件」输出本脚本生成的 JSON。
  * 普通文件可用 JSON 作为来源；collection=组合订阅名称 时直接调用后端生成标准 sing-box 节点。
- * OpenWrt 裸核使用 openwrt=true；LAN 面板认证使用 apiSecret 参数。
  * Momo 1.13.x：脚本参数 momo=true；需要避开默认端口时再加 mixedPort=7899。
  */
 
@@ -50,7 +49,6 @@ function build(config, options = {}) {
     quicEnabled: parseBool(args.quic),
     blockDot: parseBool(args.blockdot),
     momo: parseBool(args.momo),
-    openwrt: parseBool(args.openwrt),
     apiSecret: typeof args.apiSecret === 'string' ? args.apiSecret : '',
     mixedUsers: parseUsers(args.mixedUsers),
     mixedListen: args.mixedListen,
