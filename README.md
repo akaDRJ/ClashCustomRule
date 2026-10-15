@@ -58,6 +58,8 @@ Already converted sing-box outbounds retain their protocol, TLS, transport and `
 
 For a Sub-Store file, set the script argument `collection` to the source collection name. The script uses Sub-Store's native sing-box exporter and writes a complete JSON configuration. Use a separate file with `openwrt=true` for the router; omit it for other clients. Rule-set downloads use the independent front-proxy group (or automatic airport selection), so cold startup does not rely on blocked direct CDN access. Nodes containing unsupported `tls.certificate_sha256` pins are excluded with a warning rather than weakening certificate checks.
 
+In link mode, include public arguments in the script URL fragment, for example `#collection=My%20Collection&openwrt=true#noCache`. Keep private API/proxy credentials in the local file content's JSON `options` object rather than the link. This object can also set `mixedListen`, `mixedPort`, `httpPort`, `socksPort` and `mixedUsers` to retain existing authenticated LAN listeners and unauthenticated IPv4/IPv6 loopback access.
+
 ## Maintenance
 
 ```bash

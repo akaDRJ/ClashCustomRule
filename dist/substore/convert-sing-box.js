@@ -74,12 +74,13 @@ function operator(input) {
 }
 
 async function renderFile(input) {
-  let content = input.$content;
+  const fileSource = JSON.parse(input.$content || '{}');
+  let content = fileSource;
   if (runtimeArgs.collection) {
     if (typeof produceArtifact !== 'function') throw new Error('Sub-Store produceArtifact is unavailable');
-    content = await produceArtifact({ type: 'collection', name: runtimeArgs.collection, platform: 'sing-box' });
+    content = JSON.parse(await produceArtifact({ type: 'collection', name: runtimeArgs.collection, platform: 'sing-box' }));
   }
-  return { ...input, $content: main(JSON.parse(content || '{}')) };
+  return { ...input, $content: `${JSON.stringify(build(content, fileSource && fileSource.options || {}), null, 2)}\n` };
 }
 
 if (typeof module !== 'undefined' && module.exports) {

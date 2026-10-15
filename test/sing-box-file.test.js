@@ -79,3 +79,25 @@ test('Sub-Store mixedUsers JSON arguments preserve LAN authentication and both l
     return true;
   });
 });
+
+test('private file-content options preserve authentication without private script arguments or logging', async (t) => {
+  const logs = ['log', 'warn', 'error', 'info'].map(method => t.mock.method(console, method, () => {}));
+  const users = [{ username: 'private-test-user', password: 'private-test-password' }];
+  const options = { openwrt: true, apiSecret: 'private-test-api-key', mixedUsers: users, mixedListen: '10.0.0.1', mixedPort: 7893, httpPort: 7890, socksPort: 7891 };
+  for (const args of [{}, { collection: 'AKCDN Fallback' }]) {
+    const script = loadFileScript(args, async () => JSON.stringify({ outbounds: [relay], endpoints: [] }));
+    const result = await script.operator({ $content: JSON.stringify({ options, outbounds: [relay] }), $files: [] });
+    const config = JSON.parse(result.$content);
+    assert.equal(config.experimental.clash_api.secret, options.apiSecret);
+    assert.equal(config.experimental.clash_api.external_controller, '0.0.0.0:9090');
+    assert.equal(config.outbounds.some(outbound => outbound.tag === relay.tag), true);
+    for (const [type, port] of [['mixed', 7893], ['http', 7890], ['socks', 7891]]) {
+      const listener = config.inbounds.find(inbound => inbound.tag === `${type}-in`);
+      assert.equal(listener.listen, '10.0.0.1');
+      assert.equal(listener.listen_port, port);
+      assert.equal(listener.users[0].username, users[0].username);
+      assert.equal(listener.users[0].password, users[0].password);
+    }
+  }
+  for (const log of logs) assert.equal(log.mock.callCount(), 0);
+});
