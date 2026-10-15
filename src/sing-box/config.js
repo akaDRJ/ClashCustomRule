@@ -60,13 +60,13 @@ const RULE_SET_TAGS = Object.freeze([
 ]);
 
 function buildSingBoxConfig(input = {}, options = {}) {
-  const proxies = Array.isArray(input) ? input : input.proxies;
+  const proxies = Array.isArray(input) ? input : input.outbounds || input.proxies;
   const outbounds = buildOutbounds(proxies);
 
   return {
     log: { level: 'info' },
     dns: buildDnsConfig(options),
-    ...(!options.momo && { http_clients: buildHttpClients() }),
+    ...(!options.momo && { http_clients: buildHttpClients(outbounds) }),
     inbounds: buildInbounds(options),
     outbounds: addMissingPolicyOutbounds(outbounds),
     route: buildRouteConfig(options),
@@ -74,9 +74,9 @@ function buildSingBoxConfig(input = {}, options = {}) {
   };
 }
 
-function buildHttpClients() {
+function buildHttpClients(outbounds) {
   return [
-    { tag: 'rule-set-download' }
+    { tag: 'rule-set-download', detour: outbounds.some(x => x.tag === CORE_OUTBOUND_TAGS.preProxy) ? CORE_OUTBOUND_TAGS.preProxy : CORE_OUTBOUND_TAGS.auto }
   ];
 }
 
@@ -84,7 +84,9 @@ function buildExperimentalConfig(options = {}) {
   return {
     cache_file: { enabled: true },
     clash_api: {
-      external_controller: options.momo ? '0.0.0.0:19091' : '127.0.0.1:9090',
+      external_controller: options.momo ? '0.0.0.0:19091' : options.openwrt && options.apiSecret ? '0.0.0.0:9090' : '127.0.0.1:9090',
+      ...(options.apiSecret && { secret: options.apiSecret }),
+      ...(options.openwrt && { external_ui: '/usr/share/sing-box/ui' }),
       default_mode: 'Rule',
       access_control_allow_origin: [
         'http://127.0.0.1',
@@ -113,29 +115,56 @@ function buildDnsConfig(options = {}) {
     strategy: 'ipv4_only'
   };
 
-  if (options.momo) config.reverse_mapping = true;
-  else config.timeout = '5s';
+  if (options.openwrt) {
+    config.servers[0] = {
+      type: 'https', tag: 'bootstrap', server: '223.5.5.5', path: '/dns-query',
+      tls: { enabled: true, server_name: 'dns.alidns.com' }
+    };
+    config.rules.splice(1, 0, { rule_set: ['forcedirect', 'outlook', 'pt'], server: 'local' });
+  }
+  if (options.momo || options.openwrt) config.reverse_mapping = true;
+  if (!options.momo) config.timeout = '5s';
   return config;
 }
 
 function buildInbounds(options = {}) {
+  const users = options.mixedUsers === undefined ? [] : options.mixedUsers;
+  if (!Array.isArray(users) || users.some((user) => !user || typeof user.username !== 'string' || !user.username || typeof user.password !== 'string' || !user.password)) {
+    throw new Error('mixedUsers must be an array of nonempty username/password objects');
+  }
+  if (users.length && (typeof options.mixedListen !== 'string' || !options.mixedListen || ['0.0.0.0', '::', '::0', '127.0.0.1', '::1'].includes(options.mixedListen))) {
+    throw new Error('mixedListen must be a specific LAN IP when mixedUsers is configured');
+  }
+  const listeners = [
+    ['mixed', options.mixedPort || 7890],
+    ...(options.httpPort ? [['http', options.httpPort]] : []),
+    ...(options.socksPort ? [['socks', options.socksPort]] : [])
+  ];
   return [
     {
       type: 'tun',
       tag: 'tun-in',
-      address: ['172.19.0.1/30'],
+      address: options.openwrt ? ['172.19.0.1/30', 'fdfe:dcba:9876::1/126'] : ['172.19.0.1/30'],
       auto_route: !options.momo,
       strict_route: true,
       stack: 'mixed',
+      ...(options.openwrt && { interface_name: 'sing-box-tun', auto_redirect: true, dns_mode: 'hijack' }),
       ...(options.momo && { interface_name: 'momo-tun' })
     },
-    ...(options.momo ? [{ type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 }] : []),
-    {
-      type: 'mixed',
-      tag: 'mixed-in',
-      listen: '0.0.0.0',
-      listen_port: options.mixedPort || 7890
-    }
+    ...(options.momo || options.openwrt ? [{ type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 }] : []),
+    ...listeners.flatMap(([type, port]) => [
+      {
+        type,
+        tag: `${type}-in`,
+        listen: users.length ? options.mixedListen : '0.0.0.0',
+        listen_port: port,
+        ...(users.length && { users })
+      },
+      ...(users.length ? [
+        { type, tag: `${type}-loopback`, listen: '127.0.0.1', listen_port: port },
+        { type, tag: `${type}-loopback-v6`, listen: '::1', listen_port: port }
+      ] : [])
+    ])
   ];
 }
 

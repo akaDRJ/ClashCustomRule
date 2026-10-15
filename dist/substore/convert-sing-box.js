@@ -7,6 +7,8 @@ const __modules = {
  * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert-sing-box.js
  *
  * Sub-Store 没有 sing-box 专用类型时，使用「文件」输出本脚本生成的 JSON。
+ * 普通文件可用 JSON 作为来源；collection=组合订阅名称 时直接调用后端生成标准 sing-box 节点。
+ * OpenWrt 裸核使用 openwrt=true；LAN 面板认证使用 apiSecret 参数。
  * Momo 1.13.x：脚本参数 momo=true；需要避开默认端口时再加 mixedPort=7899。
  */
 
@@ -30,7 +32,17 @@ function parsePort(value, fallback) {
   return Number.isInteger(port) && port > 0 && port <= 65535 ? port : fallback;
 }
 
+function parseUsers(value) {
+  if (typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new Error('mixedUsers must be a JSON array of username/password objects');
+  }
+}
+
 function normalizeInput(input) {
+  if (typeof input === 'string') return normalizeInput(JSON.parse(input));
   return Array.isArray(input) ? { proxies: input } : input || {};
 }
 
@@ -40,7 +52,13 @@ function build(config, options = {}) {
     quicEnabled: parseBool(args.quic),
     blockDot: parseBool(args.blockdot),
     momo: parseBool(args.momo),
-    mixedPort: parsePort(args.mixedPort, 7890)
+    openwrt: parseBool(args.openwrt),
+    apiSecret: typeof args.apiSecret === 'string' ? args.apiSecret : '',
+    mixedUsers: parseUsers(args.mixedUsers),
+    mixedListen: args.mixedListen,
+    mixedPort: parsePort(args.mixedPort, 7890),
+    httpPort: parsePort(args.httpPort, 0),
+    socksPort: parsePort(args.socksPort, 0)
   });
 }
 
@@ -49,7 +67,19 @@ function main(config) {
 }
 
 function operator(input) {
+  if (input && typeof input === 'object' && ('$content' in input || '$files' in input)) {
+    return renderFile(input);
+  }
   return main(input);
+}
+
+async function renderFile(input) {
+  let content = input.$content;
+  if (runtimeArgs.collection) {
+    if (typeof produceArtifact !== 'function') throw new Error('Sub-Store produceArtifact is unavailable');
+    content = await produceArtifact({ type: 'collection', name: runtimeArgs.collection, platform: 'sing-box' });
+  }
+  return { ...input, $content: main(JSON.parse(content || '{}')) };
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -124,13 +154,13 @@ const RULE_SET_TAGS = Object.freeze([
 ]);
 
 function buildSingBoxConfig(input = {}, options = {}) {
-  const proxies = Array.isArray(input) ? input : input.proxies;
+  const proxies = Array.isArray(input) ? input : input.outbounds || input.proxies;
   const outbounds = buildOutbounds(proxies);
 
   return {
     log: { level: 'info' },
     dns: buildDnsConfig(options),
-    ...(!options.momo && { http_clients: buildHttpClients() }),
+    ...(!options.momo && { http_clients: buildHttpClients(outbounds) }),
     inbounds: buildInbounds(options),
     outbounds: addMissingPolicyOutbounds(outbounds),
     route: buildRouteConfig(options),
@@ -138,9 +168,9 @@ function buildSingBoxConfig(input = {}, options = {}) {
   };
 }
 
-function buildHttpClients() {
+function buildHttpClients(outbounds) {
   return [
-    { tag: 'rule-set-download' }
+    { tag: 'rule-set-download', detour: outbounds.some(x => x.tag === CORE_OUTBOUND_TAGS.preProxy) ? CORE_OUTBOUND_TAGS.preProxy : CORE_OUTBOUND_TAGS.auto }
   ];
 }
 
@@ -148,7 +178,9 @@ function buildExperimentalConfig(options = {}) {
   return {
     cache_file: { enabled: true },
     clash_api: {
-      external_controller: options.momo ? '0.0.0.0:19091' : '127.0.0.1:9090',
+      external_controller: options.momo ? '0.0.0.0:19091' : options.openwrt && options.apiSecret ? '0.0.0.0:9090' : '127.0.0.1:9090',
+      ...(options.apiSecret && { secret: options.apiSecret }),
+      ...(options.openwrt && { external_ui: '/usr/share/sing-box/ui' }),
       default_mode: 'Rule',
       access_control_allow_origin: [
         'http://127.0.0.1',
@@ -177,29 +209,56 @@ function buildDnsConfig(options = {}) {
     strategy: 'ipv4_only'
   };
 
-  if (options.momo) config.reverse_mapping = true;
-  else config.timeout = '5s';
+  if (options.openwrt) {
+    config.servers[0] = {
+      type: 'https', tag: 'bootstrap', server: '223.5.5.5', path: '/dns-query',
+      tls: { enabled: true, server_name: 'dns.alidns.com' }
+    };
+    config.rules.splice(1, 0, { rule_set: ['forcedirect', 'outlook', 'pt'], server: 'local' });
+  }
+  if (options.momo || options.openwrt) config.reverse_mapping = true;
+  if (!options.momo) config.timeout = '5s';
   return config;
 }
 
 function buildInbounds(options = {}) {
+  const users = options.mixedUsers === undefined ? [] : options.mixedUsers;
+  if (!Array.isArray(users) || users.some((user) => !user || typeof user.username !== 'string' || !user.username || typeof user.password !== 'string' || !user.password)) {
+    throw new Error('mixedUsers must be an array of nonempty username/password objects');
+  }
+  if (users.length && (typeof options.mixedListen !== 'string' || !options.mixedListen || ['0.0.0.0', '::', '::0', '127.0.0.1', '::1'].includes(options.mixedListen))) {
+    throw new Error('mixedListen must be a specific LAN IP when mixedUsers is configured');
+  }
+  const listeners = [
+    ['mixed', options.mixedPort || 7890],
+    ...(options.httpPort ? [['http', options.httpPort]] : []),
+    ...(options.socksPort ? [['socks', options.socksPort]] : [])
+  ];
   return [
     {
       type: 'tun',
       tag: 'tun-in',
-      address: ['172.19.0.1/30'],
+      address: options.openwrt ? ['172.19.0.1/30', 'fdfe:dcba:9876::1/126'] : ['172.19.0.1/30'],
       auto_route: !options.momo,
       strict_route: true,
       stack: 'mixed',
+      ...(options.openwrt && { interface_name: 'sing-box-tun', auto_redirect: true, dns_mode: 'hijack' }),
       ...(options.momo && { interface_name: 'momo-tun' })
     },
-    ...(options.momo ? [{ type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 }] : []),
-    {
-      type: 'mixed',
-      tag: 'mixed-in',
-      listen: '0.0.0.0',
-      listen_port: options.mixedPort || 7890
-    }
+    ...(options.momo || options.openwrt ? [{ type: 'direct', tag: 'dns-in', listen: '127.0.0.1', listen_port: 6450 }] : []),
+    ...listeners.flatMap(([type, port]) => [
+      {
+        type,
+        tag: `${type}-in`,
+        listen: users.length ? options.mixedListen : '0.0.0.0',
+        listen_port: port,
+        ...(users.length && { users })
+      },
+      ...(users.length ? [
+        { type, tag: `${type}-loopback`, listen: '127.0.0.1', listen_port: port },
+        { type, tag: `${type}-loopback-v6`, listen: '::1', listen_port: port }
+      ] : [])
+    ])
   ];
 }
 
@@ -313,6 +372,10 @@ const CORE_OUTBOUND_TAGS = Object.freeze({
   proxy: '节点选择',
   auto: '自动选择',
   manual: '手动切换',
+  landing: '落地节点',
+  preProxy: '前置代理',
+  relay: '中转节点',
+  ix: 'IX节点',
   ai: '人工智能',
   forceProxy: '强制代理',
   directPolicy: '全球直连',
@@ -340,6 +403,7 @@ const COUNTRY_MATCHERS = Object.freeze([
 ]);
 
 const LOW_COST_RE = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
+const IX_RE = /\bIX\b|\bAKCDN\b/i;
 
 const TYPE_MAP = Object.freeze({
   ss: 'shadowsocks',
@@ -360,9 +424,24 @@ function asArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function hasUnsupportedCertificatePin(proxy) {
+  const pin = proxy && proxy.tls && proxy.tls.certificate_sha256;
+  return Boolean(Array.isArray(pin) ? pin.length : pin);
+}
+
 function normalizeProxy(proxy) {
-  const tag = proxy && (proxy.name || proxy.tag);
+  const tag = proxy && (proxy.tag || proxy.name);
   if (!proxy || typeof proxy !== 'object' || !tag || !proxy.type) return null;
+  // Certificate fingerprints cannot be substituted for official sing-box public-key pins.
+  if (hasUnsupportedCertificatePin(proxy)) return null;
+
+  if (proxy.tag && proxy.server && proxy.server_port) {
+    const outbound = { ...proxy, type: TYPE_MAP[String(proxy.type).toLowerCase()] || proxy.type, tag };
+    if (!outbound.detour && proxy['dialer-proxy']) outbound.detour = proxy['dialer-proxy'];
+    delete outbound.name;
+    delete outbound['dialer-proxy'];
+    return outbound;
+  }
 
   const type = TYPE_MAP[String(proxy.type).toLowerCase()];
   if (!type) return null;
@@ -371,12 +450,8 @@ function normalizeProxy(proxy) {
     return { type: 'direct', tag };
   }
 
-  if (proxy.tag && !proxy.name && proxy.server_port) {
-    const outbound = withoutDetourFields({ ...proxy, type, tag });
-    return outbound.server && outbound.server_port ? outbound : null;
-  }
-
   const outbound = { type, tag };
+  if (proxy.detour || proxy['dialer-proxy']) outbound.detour = proxy.detour || proxy['dialer-proxy'];
 
   copy(proxy, outbound, 'server');
   copyPort(proxy, outbound);
@@ -403,26 +478,50 @@ function normalizeProxy(proxy) {
   return outbound.server && outbound.server_port ? outbound : null;
 }
 
-function withoutDetourFields(outbound) {
-  const cleaned = { ...outbound };
-  delete cleaned.detour;
-  delete cleaned['dialer-proxy'];
-  return cleaned;
-}
-
 function buildOutbounds(proxies) {
+  const excludedPins = asArray(proxies).filter(hasUnsupportedCertificatePin).length;
+  if (excludedPins) {
+    console.warn(`[sing-box] Excluded ${excludedPins} nodes: tls.certificate_sha256 is unsupported by official sing-box; certificate pins were not removed or converted.`);
+  }
   const proxyOutbounds = asArray(proxies).map(normalizeProxy).filter(Boolean);
-  const proxyTags = proxyOutbounds.map((outbound) => outbound.tag);
+  const landingTags = proxyOutbounds.filter((outbound) => outbound.detour).map((outbound) => outbound.tag);
+  const hasLanding = landingTags.length > 0;
+  const proxyTags = proxyOutbounds
+    .filter((outbound) => !hasLanding || (!outbound.detour && !/落地/.test(outbound.tag) && !IX_RE.test(outbound.tag)))
+    .map((outbound) => outbound.tag);
+  if (hasLanding && !proxyTags.length) throw new Error('No independent nodes available for 前置代理');
   const selectableTags = proxyTags.length ? proxyTags : [CORE_OUTBOUND_TAGS.direct];
   const staticGroups = buildStaticGroups(proxyTags);
   const staticGroupTags = staticGroups.map((group) => group.tag);
+  const landingGroups = [];
+  if (hasLanding) {
+    const ixTags = proxyOutbounds.filter((outbound) => IX_RE.test(outbound.tag)).map((outbound) => outbound.tag);
+    landingGroups.push(
+      { type: 'selector', tag: CORE_OUTBOUND_TAGS.landing, outbounds: landingTags, default: landingTags[0] },
+      buildUrlTestGroup(CORE_OUTBOUND_TAGS.relay, proxyTags),
+      {
+        type: 'selector',
+        tag: CORE_OUTBOUND_TAGS.preProxy,
+        outbounds: [CORE_OUTBOUND_TAGS.relay, ...staticGroupTags, CORE_OUTBOUND_TAGS.manual],
+        default: CORE_OUTBOUND_TAGS.relay
+      }
+    );
+    if (ixTags.length) landingGroups.push({ type: 'selector', tag: CORE_OUTBOUND_TAGS.ix, outbounds: ixTags });
+    for (const group of landingGroups) {
+      if (proxyOutbounds.some((outbound) => outbound.tag === group.tag)) {
+        throw new Error(`Proxy tag conflicts with generated group: ${group.tag}`);
+      }
+    }
+  }
+  const landingChoices = landingGroups.filter((group) => [CORE_OUTBOUND_TAGS.landing, CORE_OUTBOUND_TAGS.ix].includes(group.tag)).map((group) => group.tag);
   const nodeSelectionChoices = [
+    ...landingChoices,
     CORE_OUTBOUND_TAGS.auto,
     CORE_OUTBOUND_TAGS.manual,
     ...staticGroupTags,
     CORE_OUTBOUND_TAGS.direct
   ];
-  const policyChoices = buildPolicyChoices(staticGroupTags);
+  const policyChoices = buildPolicyChoices([...landingChoices, ...staticGroupTags]);
 
   return [
     { type: 'direct', tag: CORE_OUTBOUND_TAGS.direct },
@@ -434,10 +533,12 @@ function buildOutbounds(proxies) {
       outbounds: [CORE_OUTBOUND_TAGS.direct]
     },
     ...staticGroups,
+    ...landingGroups,
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.proxy,
-      outbounds: nodeSelectionChoices
+      outbounds: nodeSelectionChoices,
+      ...(hasLanding ? { default: CORE_OUTBOUND_TAGS.landing } : {})
     },
     {
       type: 'urltest',
@@ -516,9 +617,9 @@ module.exports = {
 
   },
   "src/sing-box/rule-sets.js": function(module, exports, __require) {
-const REMOTE_RULE_SET_BASE = 'https://cdn.jsdelivr.net/gh/akaDRJ/ClashCustomRule@master/dist/rulesets/sing-box';
-const REMOTE_GEOSITE_BASE = 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@sing/geo/geosite';
-const REMOTE_GEOIP_BASE = 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@sing/geo/geoip';
+const REMOTE_RULE_SET_BASE = 'https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/sing-box';
+const REMOTE_GEOSITE_BASE = 'https://raw.githubusercontent.com/appshubcc/bett-rules/sing/geo/geosite';
+const REMOTE_GEOIP_BASE = 'https://raw.githubusercontent.com/appshubcc/bett-rules/sing/geo/geoip';
 
 function ruleSetTagFromFile(fileName) {
   return fileName.replace(/\.ya?ml$/i, '');

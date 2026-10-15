@@ -452,12 +452,12 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
     tls: { enabled: true, server_name: 'example.com', insecure: true }
   });
   assert.equal(ruleSets.ai.type, 'remote');
-  assert.match(ruleSets.ai.url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/akaDRJ\/ClashCustomRule@master\/dist\/rulesets\/sing-box\/ai\.json$/);
+  assert.match(ruleSets.ai.url, /^https:\/\/raw\.githubusercontent\.com\/akaDRJ\/ClashCustomRule\/master\/dist\/rulesets\/sing-box\/ai\.json$/);
   assert.equal(Object.prototype.hasOwnProperty.call(ruleSets.ai, 'download_detour'), false);
   assert.equal(ruleSets['geosite-youtube'].format, 'binary');
-  assert.match(ruleSets['geosite-youtube'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/appshubcc\/bett-rules@sing\/geo\/geosite\/youtube\.srs$/);
+  assert.match(ruleSets['geosite-youtube'].url, /^https:\/\/raw\.githubusercontent\.com\/appshubcc\/bett-rules\/sing\/geo\/geosite\/youtube\.srs$/);
   assert.equal(ruleSets['geoip-cn'].format, 'binary');
-  assert.match(ruleSets['geoip-cn'].url, /^https:\/\/cdn\.jsdelivr\.net\/gh\/appshubcc\/bett-rules@sing\/geo\/geoip\/cn\.srs$/);
+  assert.match(ruleSets['geoip-cn'].url, /^https:\/\/raw\.githubusercontent\.com\/appshubcc\/bett-rules\/sing\/geo\/geoip\/cn\.srs$/);
   assert.equal(JSON.stringify(result.route.rules).includes('"geosite"'), false);
   assert.equal(JSON.stringify(result.route.rules).includes('"geoip"'), false);
   assert.deepEqual(result.route.rules.slice(0, 6), [
@@ -469,7 +469,7 @@ test('sing-box convert builds modular Sub-Store config with selectors, rule sets
     { rule_set: 'forceproxy', network: 'udp', port: 443, action: 'reject' }
   ]);
   assert.equal(result.route.default_domain_resolver, 'bootstrap');
-  assert.deepEqual(result.http_clients, [{ tag: 'rule-set-download' }]);
+  assert.deepEqual(result.http_clients, [{ tag: 'rule-set-download', detour: '自动选择' }]);
   assert.equal(result.route.default_http_client, 'rule-set-download');
   assert.equal(result.route.final, '节点选择');
   assert.equal(JSON.parse(convert.operator(result.outbounds.slice(-2))).route.final, '节点选择');
@@ -525,7 +525,8 @@ test('sing-box generated config avoids removed geosite and geoip route fields', 
   assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geosite-youtube' && rule.outbound === 'YouTube'));
   assert.ok(result.route.rules.some((rule) => rule.rule_set === 'geoip-cn' && rule.outbound === '全球直连'));
   assert.equal(result.route.rule_set.some((ruleSet) => ['geoip-netflix', 'geoip-google', 'geoip-telegram'].includes(ruleSet.tag)), false);
-  assert.equal(result.route.rule_set.some((ruleSet) => ruleSet.url.includes('raw.githubusercontent.com')), false);
+  assert.ok(result.route.rule_set.every((ruleSet) => ruleSet.url.startsWith('https://raw.githubusercontent.com/')));
+  assert.equal(result.http_clients[0].detour, '自动选择');
   assert.ok(result.route.rules.some((rule) => rule.ip_is_private === true && rule.outbound === '全球直连'));
 });
 
@@ -566,7 +567,7 @@ test('sing-box builder keeps already produced sing-box outbound tags', () => {
   assert.deepEqual(outbounds['香港节点'].outbounds, ['🇭🇰 NX 香港 01']);
 });
 
-test('sing-box builder strips legacy detours instead of generating pre-proxy fallback', () => {
+test('sing-box builder preserves landing detours with manual selectors and independent relay nodes', () => {
   const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
   const result = buildSingBoxConfig({
     proxies: [
@@ -577,13 +578,16 @@ test('sing-box builder strips legacy detours instead of generating pre-proxy fal
   const outbounds = Object.fromEntries(result.outbounds.map((outbound) => [outbound.tag, outbound]));
   const tags = new Set(result.outbounds.map((outbound) => outbound.tag));
 
-  assert.equal(outbounds['🇹🇼 落地 台湾 01'].detour, undefined);
-  assert.equal(outbounds['前置代理'], undefined);
-  assert.deepEqual(outbounds['台湾节点'].outbounds, ['🇹🇼 落地 台湾 01']);
-  assert.deepEqual(outbounds['节点选择'].outbounds, ['自动选择', '手动切换', '香港节点', '台湾节点', 'direct']);
+  assert.equal(outbounds['🇹🇼 落地 台湾 01'].detour, '前置代理');
+  assert.equal(outbounds['前置代理'].type, 'selector');
+  assert.equal(outbounds['前置代理'].default, '中转节点');
+  assert.equal(outbounds['台湾节点'], undefined);
+  assert.deepEqual(outbounds['落地节点'].outbounds, ['🇹🇼 落地 台湾 01']);
+  assert.deepEqual(outbounds['节点选择'].outbounds, ['落地节点', '自动选择', '手动切换', '香港节点', 'direct']);
+  assert.equal(outbounds['节点选择'].default, '落地节点');
   for (const outbound of result.outbounds) {
     for (const child of outbound.outbounds || []) assert.equal(tags.has(child), true, `missing child outbound ${child}`);
-    assert.equal(outbound.detour, undefined);
+    if (outbound.detour) assert.equal(tags.has(outbound.detour), true, `missing detour ${outbound.detour}`);
   }
 });
 

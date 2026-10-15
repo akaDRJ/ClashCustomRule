@@ -2,6 +2,10 @@ const CORE_OUTBOUND_TAGS = Object.freeze({
   proxy: '节点选择',
   auto: '自动选择',
   manual: '手动切换',
+  landing: '落地节点',
+  preProxy: '前置代理',
+  relay: '中转节点',
+  ix: 'IX节点',
   ai: '人工智能',
   forceProxy: '强制代理',
   directPolicy: '全球直连',
@@ -29,6 +33,7 @@ const COUNTRY_MATCHERS = Object.freeze([
 ]);
 
 const LOW_COST_RE = /0\.[0-5]|低倍率|省流|大流量|实验性/i;
+const IX_RE = /\bIX\b|\bAKCDN\b/i;
 
 const TYPE_MAP = Object.freeze({
   ss: 'shadowsocks',
@@ -49,9 +54,24 @@ function asArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function hasUnsupportedCertificatePin(proxy) {
+  const pin = proxy && proxy.tls && proxy.tls.certificate_sha256;
+  return Boolean(Array.isArray(pin) ? pin.length : pin);
+}
+
 function normalizeProxy(proxy) {
-  const tag = proxy && (proxy.name || proxy.tag);
+  const tag = proxy && (proxy.tag || proxy.name);
   if (!proxy || typeof proxy !== 'object' || !tag || !proxy.type) return null;
+  // Certificate fingerprints cannot be substituted for official sing-box public-key pins.
+  if (hasUnsupportedCertificatePin(proxy)) return null;
+
+  if (proxy.tag && proxy.server && proxy.server_port) {
+    const outbound = { ...proxy, type: TYPE_MAP[String(proxy.type).toLowerCase()] || proxy.type, tag };
+    if (!outbound.detour && proxy['dialer-proxy']) outbound.detour = proxy['dialer-proxy'];
+    delete outbound.name;
+    delete outbound['dialer-proxy'];
+    return outbound;
+  }
 
   const type = TYPE_MAP[String(proxy.type).toLowerCase()];
   if (!type) return null;
@@ -60,12 +80,8 @@ function normalizeProxy(proxy) {
     return { type: 'direct', tag };
   }
 
-  if (proxy.tag && !proxy.name && proxy.server_port) {
-    const outbound = withoutDetourFields({ ...proxy, type, tag });
-    return outbound.server && outbound.server_port ? outbound : null;
-  }
-
   const outbound = { type, tag };
+  if (proxy.detour || proxy['dialer-proxy']) outbound.detour = proxy.detour || proxy['dialer-proxy'];
 
   copy(proxy, outbound, 'server');
   copyPort(proxy, outbound);
@@ -92,26 +108,50 @@ function normalizeProxy(proxy) {
   return outbound.server && outbound.server_port ? outbound : null;
 }
 
-function withoutDetourFields(outbound) {
-  const cleaned = { ...outbound };
-  delete cleaned.detour;
-  delete cleaned['dialer-proxy'];
-  return cleaned;
-}
-
 function buildOutbounds(proxies) {
+  const excludedPins = asArray(proxies).filter(hasUnsupportedCertificatePin).length;
+  if (excludedPins) {
+    console.warn(`[sing-box] Excluded ${excludedPins} nodes: tls.certificate_sha256 is unsupported by official sing-box; certificate pins were not removed or converted.`);
+  }
   const proxyOutbounds = asArray(proxies).map(normalizeProxy).filter(Boolean);
-  const proxyTags = proxyOutbounds.map((outbound) => outbound.tag);
+  const landingTags = proxyOutbounds.filter((outbound) => outbound.detour).map((outbound) => outbound.tag);
+  const hasLanding = landingTags.length > 0;
+  const proxyTags = proxyOutbounds
+    .filter((outbound) => !hasLanding || (!outbound.detour && !/落地/.test(outbound.tag) && !IX_RE.test(outbound.tag)))
+    .map((outbound) => outbound.tag);
+  if (hasLanding && !proxyTags.length) throw new Error('No independent nodes available for 前置代理');
   const selectableTags = proxyTags.length ? proxyTags : [CORE_OUTBOUND_TAGS.direct];
   const staticGroups = buildStaticGroups(proxyTags);
   const staticGroupTags = staticGroups.map((group) => group.tag);
+  const landingGroups = [];
+  if (hasLanding) {
+    const ixTags = proxyOutbounds.filter((outbound) => IX_RE.test(outbound.tag)).map((outbound) => outbound.tag);
+    landingGroups.push(
+      { type: 'selector', tag: CORE_OUTBOUND_TAGS.landing, outbounds: landingTags, default: landingTags[0] },
+      buildUrlTestGroup(CORE_OUTBOUND_TAGS.relay, proxyTags),
+      {
+        type: 'selector',
+        tag: CORE_OUTBOUND_TAGS.preProxy,
+        outbounds: [CORE_OUTBOUND_TAGS.relay, ...staticGroupTags, CORE_OUTBOUND_TAGS.manual],
+        default: CORE_OUTBOUND_TAGS.relay
+      }
+    );
+    if (ixTags.length) landingGroups.push({ type: 'selector', tag: CORE_OUTBOUND_TAGS.ix, outbounds: ixTags });
+    for (const group of landingGroups) {
+      if (proxyOutbounds.some((outbound) => outbound.tag === group.tag)) {
+        throw new Error(`Proxy tag conflicts with generated group: ${group.tag}`);
+      }
+    }
+  }
+  const landingChoices = landingGroups.filter((group) => [CORE_OUTBOUND_TAGS.landing, CORE_OUTBOUND_TAGS.ix].includes(group.tag)).map((group) => group.tag);
   const nodeSelectionChoices = [
+    ...landingChoices,
     CORE_OUTBOUND_TAGS.auto,
     CORE_OUTBOUND_TAGS.manual,
     ...staticGroupTags,
     CORE_OUTBOUND_TAGS.direct
   ];
-  const policyChoices = buildPolicyChoices(staticGroupTags);
+  const policyChoices = buildPolicyChoices([...landingChoices, ...staticGroupTags]);
 
   return [
     { type: 'direct', tag: CORE_OUTBOUND_TAGS.direct },
@@ -123,10 +163,12 @@ function buildOutbounds(proxies) {
       outbounds: [CORE_OUTBOUND_TAGS.direct]
     },
     ...staticGroups,
+    ...landingGroups,
     {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.proxy,
-      outbounds: nodeSelectionChoices
+      outbounds: nodeSelectionChoices,
+      ...(hasLanding ? { default: CORE_OUTBOUND_TAGS.landing } : {})
     },
     {
       type: 'urltest',

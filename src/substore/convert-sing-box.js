@@ -5,6 +5,8 @@
  * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert-sing-box.js
  *
  * Sub-Store 没有 sing-box 专用类型时，使用「文件」输出本脚本生成的 JSON。
+ * 普通文件可用 JSON 作为来源；collection=组合订阅名称 时直接调用后端生成标准 sing-box 节点。
+ * OpenWrt 裸核使用 openwrt=true；LAN 面板认证使用 apiSecret 参数。
  * Momo 1.13.x：脚本参数 momo=true；需要避开默认端口时再加 mixedPort=7899。
  */
 
@@ -28,7 +30,17 @@ function parsePort(value, fallback) {
   return Number.isInteger(port) && port > 0 && port <= 65535 ? port : fallback;
 }
 
+function parseUsers(value) {
+  if (typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new Error('mixedUsers must be a JSON array of username/password objects');
+  }
+}
+
 function normalizeInput(input) {
+  if (typeof input === 'string') return normalizeInput(JSON.parse(input));
   return Array.isArray(input) ? { proxies: input } : input || {};
 }
 
@@ -38,7 +50,13 @@ function build(config, options = {}) {
     quicEnabled: parseBool(args.quic),
     blockDot: parseBool(args.blockdot),
     momo: parseBool(args.momo),
-    mixedPort: parsePort(args.mixedPort, 7890)
+    openwrt: parseBool(args.openwrt),
+    apiSecret: typeof args.apiSecret === 'string' ? args.apiSecret : '',
+    mixedUsers: parseUsers(args.mixedUsers),
+    mixedListen: args.mixedListen,
+    mixedPort: parsePort(args.mixedPort, 7890),
+    httpPort: parsePort(args.httpPort, 0),
+    socksPort: parsePort(args.socksPort, 0)
   });
 }
 
@@ -47,7 +65,19 @@ function main(config) {
 }
 
 function operator(input) {
+  if (input && typeof input === 'object' && ('$content' in input || '$files' in input)) {
+    return renderFile(input);
+  }
   return main(input);
+}
+
+async function renderFile(input) {
+  let content = input.$content;
+  if (runtimeArgs.collection) {
+    if (typeof produceArtifact !== 'function') throw new Error('Sub-Store produceArtifact is unavailable');
+    content = await produceArtifact({ type: 'collection', name: runtimeArgs.collection, platform: 'sing-box' });
+  }
+  return { ...input, $content: main(JSON.parse(content || '{}')) };
 }
 
 if (typeof module !== 'undefined' && module.exports) {

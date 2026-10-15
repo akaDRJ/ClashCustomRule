@@ -1,6 +1,6 @@
-const REMOTE_RULE_SET_BASE = 'https://cdn.jsdelivr.net/gh/akaDRJ/ClashCustomRule@master/dist/rulesets/sing-box';
-const REMOTE_GEOSITE_BASE = 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@sing/geo/geosite';
-const REMOTE_GEOIP_BASE = 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@sing/geo/geoip';
+const REMOTE_RULE_SET_BASE = 'https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/rulesets/sing-box';
+const REMOTE_GEOSITE_BASE = 'https://raw.githubusercontent.com/appshubcc/bett-rules/sing/geo/geosite';
+const REMOTE_GEOIP_BASE = 'https://raw.githubusercontent.com/appshubcc/bett-rules/sing/geo/geoip';
 
 function ruleSetTagFromFile(fileName) {
   return fileName.replace(/\.ya?ml$/i, '');
