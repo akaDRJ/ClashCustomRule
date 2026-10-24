@@ -18,7 +18,7 @@
  *                  loadbalance=true 时国家组和低倍率组仍使用 load-balance
  *
  * [landing]        启用落地节点支持
- *                  添加「落地节点」分组（匹配家宽/商宽/星链等 ISP 关键词）
+ *                  按国家添加「台湾落地」「新加坡落地」等分组（匹配 ISP／落地关键词）
  *                  添加「前置代理」分组（自动选择排除 ISP 的节点）
  *
  * [ipv6]           启用 IPv6 支持（默认关闭）
@@ -821,16 +821,14 @@ function buildProxyGroups(
   }
 
   if (hasLandingGroup) {
-    insertAfter(defaultProxies, '自动选择', '落地节点');
-    if (!defaultSelector.includes('落地节点')) {
-      if (hasAkcdnFallbackGroup) {
-        insertAfter(defaultSelector, 'IX节点', '落地节点');
-      } else {
-        defaultSelector.unshift('落地节点');
-      }
+    if (!hasAkcdnFallbackGroup && landingCountryGroupNames.length) {
+      const defaultLanding = landingCountryGroupNames.includes('台湾落地')
+        ? '台湾落地'
+        : landingCountryGroupNames[0];
+      defaultSelector.splice(defaultSelector.indexOf(defaultLanding), 1);
+      defaultSelector.unshift(defaultLanding);
     }
-    insertAfter(globalProxies, '自动选择', '落地节点');
-    insertAfter(globalProxies, '落地节点', '前置代理');
+    insertAfter(globalProxies, '自动选择', '前置代理');
   }
   appendUnique(globalProxies, countryProxies);
 
@@ -851,7 +849,6 @@ function buildProxyGroups(
     : defaultSelector
         .filter(
           (name) =>
-            name !== '落地节点' &&
             name !== 'IX节点' &&
             !landingCountryGroupNames.includes(name)
         )
@@ -881,21 +878,6 @@ function buildProxyGroups(
           'max-failed-times': 2,
           lazy: false,
           proxies: [...akcdnFallbackNodes, '自动选择']
-        }
-      : null,
-
-    hasLandingGroup
-      ? {
-          name: '落地节点',
-          icon: ICON('Back.png'),
-          type: 'fallback',
-          url: 'http://cp.cloudflare.com/generate_204',
-          interval: 60,
-          timeout: 3000,
-          'max-failed-times': 2,
-          lazy: false,
-          // Enumerate: include-all appends nodes after explicit proxies, breaking fallback order.
-          proxies: [...landingCountryData.defaultNodes, '自动选择']
         }
       : null,
 

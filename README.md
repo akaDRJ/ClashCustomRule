@@ -52,7 +52,9 @@ For sing-box via Sub-Store, create a Sub-Store "file" output and attach `dist/su
 
 For OpenWrt, use Momo to manage the service and transparent routing. The existing `momo=true` compatibility mode targets sing-box 1.13.x with `momo-tun`, `auto_route: false`, a local DNS listener at `127.0.0.1:6450`, and DNS reverse mapping. The standalone `openwrt=true` target has been retired. A newer Momo/core combination must be validated before deployment.
 
-Already converted sing-box outbounds retain their protocol, TLS, transport and `detour` fields. With chained nodes, the converter creates manual `落地节点` and `前置代理` selectors; the latter defaults to ordinary URL testing over independent airport nodes. It also exposes an independent `IX节点` selector when present. Ordered fallback and Mihomo Smart are not used.
+Landing choices are country-specific: `台湾落地` contains only Taiwan landings and `新加坡落地` only Singapore landings. There is no mixed or generic `落地节点` group, and country landing groups never fall back to ordinary airport nodes. Mihomo uses ordered fallback within each country; sing-box uses URL testing. Where the root selector defaults to a landing, Taiwan remains preferred when available.
+
+Already converted sing-box outbounds retain their protocol, TLS, transport and `detour` fields. With chained nodes, the converter creates a manual `前置代理` selector which defaults to ordinary URL testing over independent airport nodes. It also exposes an independent `IX节点` selector when present. Ordered fallback and Mihomo Smart are not used in sing-box.
 
 For a Sub-Store file, set the script argument `collection` to the source collection name. The script uses Sub-Store's native sing-box exporter and writes a complete JSON configuration. Use `momo=true` only for the Momo compatibility target; omit it for general sing-box 1.14+ clients. The general target downloads rule sets through the independent front-proxy group (or automatic airport selection). Nodes containing unsupported `tls.certificate_sha256` pins are excluded with a warning rather than weakening certificate checks.
 

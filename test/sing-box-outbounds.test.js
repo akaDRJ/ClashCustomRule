@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { buildOutbounds, normalizeProxy } = require('../src/sing-box/outbounds');
+const { buildOutbounds, normalizeProxy, CORE_OUTBOUND_TAGS } = require('../src/sing-box/outbounds');
 
 test('native sing-box nodes retain complete transport, TLS, multiplex and protocol parameters', () => {
   const nodes = [
@@ -30,11 +30,12 @@ test('legacy dialer-proxy maps to detour without overriding an existing native c
   assert.equal(native['dialer-proxy'], undefined);
 });
 
-test('landing defaults are selectable and every relay choice excludes chained, landing and IX nodes', () => {
+test('country landing groups are isolated and Taiwan stays the root default regardless of input order', () => {
   const node = (tag, detour) => ({ type: 'anytls', tag, server: 'example.com', server_port: 443, password: 'redacted', ...(detour ? { detour } : {}) });
   const outbounds = buildOutbounds([
+    node('新加坡落地 01', '前置代理'), node('台湾落地 01', '前置代理'),
     node('香港 01'), node('台湾 02'), node('美国 0.5x'), node('🇨🇳 IX 台湾 01'),
-    node('落地 台湾 01', '前置代理'), node('另一链式', '香港 01'), node('落地 台湾 直连')
+    node('另一链式', '香港 01'), node('落地 台湾 直连')
   ]);
   const byTag = Object.fromEntries(outbounds.map((outbound) => [outbound.tag, outbound]));
   const relayTags = ['香港 01', '台湾 02', '美国 0.5x'];
@@ -42,14 +43,18 @@ test('landing defaults are selectable and every relay choice excludes chained, l
   assert.deepEqual(byTag['中转节点'].outbounds, relayTags);
   assert.deepEqual(byTag['手动切换'].outbounds, relayTags);
   assert.deepEqual(byTag['台湾节点'].outbounds, ['台湾 02']);
+  assert.deepEqual(byTag['台湾落地'].outbounds, ['台湾落地 01']);
+  assert.deepEqual(byTag['新加坡落地'].outbounds, ['新加坡落地 01']);
+  assert.equal(byTag['台湾落地'].type, 'urltest');
+  assert.equal(byTag['新加坡落地'].type, 'urltest');
   assert.deepEqual(byTag['IX节点'].outbounds, ['🇨🇳 IX 台湾 01']);
   assert.equal(byTag['IX节点'].type, 'selector');
-  assert.equal(byTag['落地节点'].type, 'selector');
-  assert.equal(byTag['落地节点'].default, '落地 台湾 01');
-  assert.ok(byTag['落地节点'].outbounds.includes(byTag['落地节点'].default));
-  assert.equal(byTag['节点选择'].default, '落地节点');
-  assert.ok(byTag['节点选择'].outbounds.includes('落地节点'));
+  assert.equal(byTag['节点选择'].default, '台湾落地');
+  assert.ok(byTag['节点选择'].outbounds.includes('台湾落地'));
+  assert.ok(byTag['节点选择'].outbounds.includes('新加坡落地'));
   assert.equal(byTag['前置代理'].default, '中转节点');
+  assert.equal(CORE_OUTBOUND_TAGS.landing, undefined);
+  assert.equal(JSON.stringify(outbounds).includes('"落地节点"'), false);
   assert.equal(outbounds.some((outbound) => ['fallback', 'smart'].includes(outbound.type)), false);
 
   const visit = (tag, parents = []) => {
@@ -61,6 +66,33 @@ test('landing defaults are selectable and every relay choice excludes chained, l
   for (const outbound of outbounds) visit(outbound.tag);
   for (const tag of byTag['前置代理'].outbounds) {
     assert.deepEqual(byTag[tag].outbounds.every((child) => relayTags.includes(child)), true);
+  }
+});
+
+test('Singapore is the root default when it is the only classified landing country', () => {
+  const node = (tag, detour) => ({ type: 'anytls', tag, server: 'example.com', server_port: 443, password: 'redacted', ...(detour ? { detour } : {}) });
+  const outbounds = buildOutbounds([node('新加坡落地 01', '前置代理'), node('香港 01')]);
+  const byTag = Object.fromEntries(outbounds.map((outbound) => [outbound.tag, outbound]));
+
+  assert.equal(byTag['节点选择'].default, '新加坡落地');
+  assert.deepEqual(byTag['新加坡落地'].outbounds, ['新加坡落地 01']);
+  assert.equal(byTag['台湾落地'], undefined);
+  assert.equal(JSON.stringify(outbounds).includes('"落地节点"'), false);
+});
+
+test('unclassified chained nodes default to automatic independent routing', () => {
+  const node = (tag, detour) => ({ type: 'anytls', tag, server: 'example.com', server_port: 443, password: 'redacted', ...(detour ? { detour } : {}) });
+  const outbounds = buildOutbounds([node('Residential Exit', '前置代理'), node('independent route')]);
+  const byTag = Object.fromEntries(outbounds.map((outbound) => [outbound.tag, outbound]));
+
+  assert.equal(byTag['节点选择'].default, '自动选择');
+  assert.ok(byTag['节点选择'].outbounds.includes('自动选择'));
+  assert.deepEqual(byTag['自动选择'].outbounds, ['independent route']);
+  assert.equal(byTag['台湾落地'], undefined);
+  assert.equal(byTag['新加坡落地'], undefined);
+  for (const outbound of outbounds) {
+    if (outbound.default) assert.ok(byTag[outbound.default], `missing default ${outbound.default}`);
+    for (const tag of outbound.outbounds || []) assert.ok(byTag[tag], `missing outbound ${tag}`);
   }
 });
 

@@ -2,7 +2,6 @@ const CORE_OUTBOUND_TAGS = Object.freeze({
   proxy: '节点选择',
   auto: '自动选择',
   manual: '手动切换',
-  landing: '落地节点',
   preProxy: '前置代理',
   relay: '中转节点',
   ix: 'IX节点',
@@ -128,7 +127,6 @@ function buildOutbounds(proxies) {
   if (hasLanding) {
     const ixTags = proxyOutbounds.filter((outbound) => IX_RE.test(outbound.tag)).map((outbound) => outbound.tag);
     landingGroups.push(
-      { type: 'selector', tag: CORE_OUTBOUND_TAGS.landing, outbounds: landingTags, default: landingTags[0] },
       buildUrlTestGroup(CORE_OUTBOUND_TAGS.relay, proxyTags),
       {
         type: 'selector',
@@ -150,7 +148,7 @@ function buildOutbounds(proxies) {
     }
   }
   const landingChoices = [
-    ...landingGroups.filter((group) => [CORE_OUTBOUND_TAGS.landing, CORE_OUTBOUND_TAGS.ix].includes(group.tag)).map((group) => group.tag),
+    ...landingGroups.filter((group) => group.tag === CORE_OUTBOUND_TAGS.ix).map((group) => group.tag),
     ...landingCountryGroups.map((group) => group.tag)
   ];
   const nodeSelectionChoices = [
@@ -161,6 +159,7 @@ function buildOutbounds(proxies) {
     CORE_OUTBOUND_TAGS.direct
   ];
   const policyChoices = buildPolicyChoices([...landingChoices, ...staticGroupTags]);
+  const defaultLandingGroup = landingCountryGroups.find((group) => group.tag === '台湾落地') || landingCountryGroups[0];
 
   return [
     { type: 'direct', tag: CORE_OUTBOUND_TAGS.direct },
@@ -177,7 +176,7 @@ function buildOutbounds(proxies) {
       type: 'selector',
       tag: CORE_OUTBOUND_TAGS.proxy,
       outbounds: nodeSelectionChoices,
-      ...(hasLanding ? { default: CORE_OUTBOUND_TAGS.landing } : {})
+      ...(hasLanding ? { default: defaultLandingGroup ? defaultLandingGroup.tag : CORE_OUTBOUND_TAGS.auto } : {})
     },
     {
       type: 'urltest',

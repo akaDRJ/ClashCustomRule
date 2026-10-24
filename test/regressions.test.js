@@ -582,9 +582,10 @@ test('sing-box builder preserves landing detours with manual selectors and indep
   assert.equal(outbounds['前置代理'].type, 'selector');
   assert.equal(outbounds['前置代理'].default, '中转节点');
   assert.equal(outbounds['台湾节点'], undefined);
-  assert.deepEqual(outbounds['落地节点'].outbounds, ['🇹🇼 落地 台湾 01']);
-  assert.deepEqual(outbounds['节点选择'].outbounds, ['落地节点', '台湾落地', '自动选择', '手动切换', '香港节点', 'direct']);
-  assert.equal(outbounds['节点选择'].default, '落地节点');
+  assert.equal(outbounds['落地节点'], undefined);
+  assert.deepEqual(outbounds['台湾落地'].outbounds, ['🇹🇼 落地 台湾 01']);
+  assert.deepEqual(outbounds['节点选择'].outbounds, ['台湾落地', '自动选择', '手动切换', '香港节点', 'direct']);
+  assert.equal(outbounds['节点选择'].default, '台湾落地');
   for (const outbound of result.outbounds) {
     for (const child of outbound.outbounds || []) assert.equal(tags.has(child), true, `missing child outbound ${child}`);
     if (outbound.detour) assert.equal(tags.has(outbound.detour), true, `missing detour ${outbound.detour}`);
@@ -616,13 +617,10 @@ test('sing-box exposes country-isolated landing groups without adding landing no
   assert.deepEqual(outbounds['台湾落地'].outbounds, ['🇹🇼 落地 台湾 01', '🇹🇼 落地 台湾 02']);
   assert.equal(outbounds['新加坡落地'].type, 'urltest');
   assert.deepEqual(outbounds['新加坡落地'].outbounds, ['🇸🇬 落地 新加坡 01', '🇸🇬 落地 新加坡 02']);
-  // The legacy mixed-country landing choice stays manual; automatic selection is country-isolated.
-  assert.equal(outbounds['落地节点'].type, 'selector');
-  assert.deepEqual(outbounds['落地节点'].outbounds, landingNodes);
-  assert.equal(outbounds['落地节点'].outbounds.includes('自动选择'), false);
-  assert.equal(outbounds['落地节点'].default, landingNodes[0]);
-  assert.equal(outbounds['节点选择'].default, '落地节点');
-  assert.equal(outbounds['节点选择'].outbounds[0], '落地节点');
+  assert.equal(outbounds['落地节点'], undefined);
+  assert.equal(outbounds['节点选择'].default, '台湾落地');
+  assert.equal(outbounds['节点选择'].outbounds[0], '台湾落地');
+  assert.equal(JSON.stringify(result).includes('落地节点'), false);
   for (const policy of ['节点选择', 'YouTube', '人工智能', '强制代理']) {
     assert.ok(outbounds[policy].outbounds.includes('台湾落地'), `${policy} missing 台湾落地`);
     assert.ok(outbounds[policy].outbounds.includes('新加坡落地'), `${policy} missing 新加坡落地`);
@@ -753,32 +751,37 @@ test('automatic groups share probes while regional groups are lazy and fallback 
         assert.equal(groups[name].lazy, !name.endsWith('自动选择'), name);
       }
       assert.equal(groups['DNS代理'], undefined);
-      for (const name of ['IX节点', '落地节点']) {
+      for (const name of ['IX节点', '台湾落地']) {
         assert.equal(groups[name].url, 'http://cp.cloudflare.com/generate_204', name);
         assert.equal(groups[name].interval, 60, name);
         assert.equal(groups[name].lazy, false, name);
-        assert.equal(groups[name].proxies.at(-1), '自动选择', name);
       }
+      assert.equal(groups['IX节点'].proxies.at(-1), '自动选择');
+      assert.deepEqual(groups['台湾落地'].proxies, ['落地 台湾 01']);
     }
   }
 });
 
-test('landing fallback keeps automatic selection last in enumerated, regex and smart modes', () => {
+test('country landings contain only their own nodes in enumerated, regex and smart modes', () => {
   for (const regex of [false, true]) {
     for (const smart of [false, true]) {
       const result = loadConvert({ landing: true, regex, smart }).main({
         proxies: [
+          { name: '🇸🇬 落地 新加坡 01 AnyTLS', type: 'anytls', 'dialer-proxy': '前置代理' },
           { name: '香港 01', type: 'ss' },
           { name: '落地 台湾 01', type: 'ss', 'dialer-proxy': '前置代理' },
           { name: '家宽 日本 01', type: 'ss' }
         ]
       });
       const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
-      const landing = groups['落地节点'];
+      const landing = groups['台湾落地'];
       assert.equal(landing.type, 'fallback');
-      assert.deepEqual(landing.proxies, ['落地 台湾 01', '自动选择']);
-      assert.deepEqual(groups['台湾落地'].proxies, ['落地 台湾 01']);
+      assert.deepEqual(landing.proxies, ['落地 台湾 01']);
+      assert.deepEqual(groups['新加坡落地'].proxies, ['🇸🇬 落地 新加坡 01 AnyTLS']);
       assert.deepEqual(groups['日本落地'].proxies, ['家宽 日本 01']);
+      assert.equal(groups['落地节点'], undefined);
+      assert.equal(groups['节点选择'].proxies[0], '台湾落地');
+      assert.equal(JSON.stringify(result).includes('落地节点'), false);
       assert.equal(landing['include-all'], undefined);
       assert.equal(landing.interval, 60);
       assert.equal(landing.timeout, 3000);
@@ -813,7 +816,8 @@ test('convert prefers Taiwan landings in legacy fallbacks and excludes unclassif
     assert.equal(groups[name].type, 'fallback');
     assert.notEqual(groups[name].proxies.at(-1), '自动选择');
   }
-  assert.deepEqual(groups['落地节点'].proxies, [...taiwanLandings, '自动选择']);
+  assert.equal(groups['落地节点'], undefined);
+  assert.equal(JSON.stringify(result).includes('落地节点'), false);
   assert.deepEqual(groups['IX节点'].proxies, [
     '🇨🇳 IX 台湾 01', ...taiwanLandings, '自动选择'
   ]);
@@ -845,7 +849,8 @@ test('convert prefers Taiwan landings in legacy fallbacks and excludes unclassif
     ]
   });
   const noTaiwanGroups = Object.fromEntries(noTaiwan['proxy-groups'].map((group) => [group.name, group]));
-  assert.deepEqual(noTaiwanGroups['落地节点'].proxies, [...singaporeLandings, '自动选择']);
+  assert.equal(noTaiwanGroups['落地节点'], undefined);
+  assert.deepEqual(noTaiwanGroups['新加坡落地'].proxies, singaporeLandings);
   assert.deepEqual(noTaiwanGroups['IX节点'].proxies, [
     '🇨🇳 IX 台湾 01', ...singaporeLandings, '自动选择'
   ]);
@@ -960,7 +965,7 @@ test('convert uses pinned Qure icons with distinct policy semantics', () => {
   assert.equal(groups['游戏下载'].icon, `${base}Download.png`);
   assert.equal(groups['游戏平台'].icon, `${base}Game.png`);
   assert.equal(groups['IX节点'].icon, `${base}Available.png`);
-  assert.equal(groups['落地节点'].icon, `${base}Back.png`);
+  assert.equal(groups['台湾落地'].icon, `${base}Taiwan.png`);
   assert.equal(groups['前置代理'].icon, `${base}LinkCube.png`);
   assert.equal(groups['低倍率节点'].icon, `${base}Pig.png`);
   assert.equal(groups['中转低倍率节点'].icon, `${base}Pig.png`);
