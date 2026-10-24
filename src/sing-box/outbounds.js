@@ -124,6 +124,7 @@ function buildOutbounds(proxies) {
   const staticGroups = buildStaticGroups(proxyTags);
   const staticGroupTags = staticGroups.map((group) => group.tag);
   const landingGroups = [];
+  const landingCountryGroups = [];
   if (hasLanding) {
     const ixTags = proxyOutbounds.filter((outbound) => IX_RE.test(outbound.tag)).map((outbound) => outbound.tag);
     landingGroups.push(
@@ -137,13 +138,21 @@ function buildOutbounds(proxies) {
       }
     );
     if (ixTags.length) landingGroups.push({ type: 'selector', tag: CORE_OUTBOUND_TAGS.ix, outbounds: ixTags });
+    for (const [country, regex] of COUNTRY_MATCHERS) {
+      const nodes = landingTags.filter((tag) => regex.test(tag));
+      if (nodes.length) landingCountryGroups.push(buildUrlTestGroup(`${country}落地`, nodes));
+    }
+    landingGroups.push(...landingCountryGroups);
     for (const group of landingGroups) {
       if (proxyOutbounds.some((outbound) => outbound.tag === group.tag)) {
         throw new Error(`Proxy tag conflicts with generated group: ${group.tag}`);
       }
     }
   }
-  const landingChoices = landingGroups.filter((group) => [CORE_OUTBOUND_TAGS.landing, CORE_OUTBOUND_TAGS.ix].includes(group.tag)).map((group) => group.tag);
+  const landingChoices = [
+    ...landingGroups.filter((group) => [CORE_OUTBOUND_TAGS.landing, CORE_OUTBOUND_TAGS.ix].includes(group.tag)).map((group) => group.tag),
+    ...landingCountryGroups.map((group) => group.tag)
+  ];
   const nodeSelectionChoices = [
     ...landingChoices,
     CORE_OUTBOUND_TAGS.auto,

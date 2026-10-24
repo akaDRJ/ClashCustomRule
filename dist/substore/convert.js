@@ -501,12 +501,12 @@ function parseAkcdnFallbackNodes(proxies, transitNodes) {
     .filter(Boolean);
 
   if (!akcdnNodes.length || !dialerLandingNodes.length) return [];
-  return [...akcdnNodes, ...dialerLandingNodes];
+  return [...akcdnNodes, ...parseLandingCountryGroups(dialerLandingNodes).defaultNodes];
 }
 
-function parseLowCostNodes(proxies) {
+function parseLowCostNodes(proxies, excludeDialerProxyNodes) {
   return proxies
-    .filter((proxy) => isLowCostName(proxy.name))
+    .filter((proxy) => (!excludeDialerProxyNodes || !proxy['dialer-proxy']) && isLowCostName(proxy.name))
     .map((proxy) => proxy.name);
 }
 
@@ -516,12 +516,33 @@ function parseLandingNodes(proxies) {
     .map((proxy) => proxy.name);
 }
 
-function parseCountryBuckets(proxies, countryList) {
+function parseLandingCountryGroups(landingNodes) {
+  const groups = new Map();
+
+  for (const name of landingNodes) {
+    const match = COUNTRY_ENTRIES.find(({ regex }) => regex.test(name));
+    if (!match) continue;
+
+    if (!groups.has(match.country)) groups.set(match.country, []);
+    groups.get(match.country).push(name);
+  }
+
+  return {
+    groups: [...groups].map(([country, nodes]) => ({
+      country,
+      name: `${country}落地`,
+      nodes
+    })),
+    defaultNodes: groups.get('台湾') || groups.values().next().value || []
+  };
+}
+
+function parseCountryBuckets(proxies, countryList, excludeDialerProxyNodes) {
   const buckets = Object.fromEntries(countryList.map((country) => [country, []]));
 
   for (const proxy of proxies) {
     const name = asString(proxy.name);
-    if (!name || isIspName(name)) continue;
+    if (!name || (excludeDialerProxyNodes && proxy['dialer-proxy']) || isIspName(name)) continue;
 
     for (const country of countryList) {
       const regex = COUNTRY_REGEX_MAP.get(country);
@@ -569,6 +590,21 @@ function uniqueStrings(values) {
     }
   }
   return result;
+}
+
+function proxyNameExcludePattern(proxies) {
+  const names = uniqueStrings(
+    proxies.filter((proxy) => proxy['dialer-proxy']).map((proxy) => proxy.name)
+  ).map((name) => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return names.length ? `^(${names.join('|')})$` : '';
+}
+
+function addExcludePattern(pattern, additionalPattern) {
+  if (!additionalPattern) return pattern;
+  return `(?i)${[pattern, additionalPattern]
+    .filter(Boolean)
+    .map((value) => String(value).replace(/\(\?i\)/g, ''))
+    .join('|')}`;
 }
 
 function timedAutoGroupFields(lazy = false) {
@@ -652,11 +688,11 @@ function buildTransitProxyGroups(countryList, transitNodes) {
 }
 
 // ======================== 国家解析 ========================
-function parseCountries(proxies) {
+function parseCountries(proxies, excludeDialerProxyNodes) {
   const matched = new Set();
 
   for (const proxy of proxies) {
-    if (isIspName(proxy.name)) continue;
+    if ((excludeDialerProxyNodes && proxy['dialer-proxy']) || isIspName(proxy.name)) continue;
 
     for (const { country, regex } of COUNTRY_ENTRIES) {
       if (!matched.has(country) && regex.test(proxy.name)) {
@@ -671,7 +707,7 @@ function parseCountries(proxies) {
 }
 
 // ========== 国家组（无智能兜底，固定排除 ISP/落地） ==========
-function buildCountryProxyGroups(countryList, countryBuckets) {
+function buildCountryProxyGroups(countryList, countryBuckets, dialerProxyExcludePattern) {
   const groups = [];
   const groupType = regionalAutoGroupType();
 
@@ -688,7 +724,7 @@ function buildCountryProxyGroups(countryList, countryBuckets) {
       Object.assign(group, {
         'include-all': true,
         filter: countryRegex[country],
-        'exclude-filter': ISP_EXCLUDE_PATTERN
+        'exclude-filter': addExcludePattern(ISP_EXCLUDE_PATTERN, dialerProxyExcludePattern)
       });
     } else {
       const nodes = countryBuckets[country] || [];
@@ -720,9 +756,12 @@ function buildProxyGroups(
   countryProxyGroups,
   lowCostNodes,
   landingNodes,
+  landingCountryData,
   akcdnFallbackNodes,
   transitNodes,
-  defaults
+  defaults,
+  proxies,
+  dialerProxyExcludePattern
 ) {
   const {
     defaultProxies,
@@ -736,12 +775,33 @@ function buildProxyGroups(
   const hasLandingGroup =
     (options.landing || hasAkcdnFallbackGroup) &&
     (options.regexFilter || landingNodes.length > 0);
+  const landingCountryProxyGroups = hasLandingGroup
+    ? landingCountryData.groups.map(({ country, name, nodes }) => ({
+        name,
+        icon: countryIconURLs[country],
+        type: 'fallback',
+        url: 'http://cp.cloudflare.com/generate_204',
+        interval: 60,
+        timeout: 3000,
+        'max-failed-times': 2,
+        lazy: false,
+        proxies: [...nodes]
+      }))
+    : [];
+  const landingCountryGroupNames = landingCountryProxyGroups.map((group) => group.name);
+  const proxyNames = new Set(proxies.map((proxy) => proxy.name));
+  for (const name of landingCountryGroupNames) {
+    if (proxyNames.has(name)) {
+      throw new Error(`Proxy name conflicts with generated group: ${name}`);
+    }
+  }
   const countryProxies = [];
 
   for (const country of countryList) {
     const groupName = `${country}节点`;
     countryProxies.push(groupName);
   }
+  appendUnique(countryProxies, landingCountryGroupNames);
 
   if (hasLowCostGroup) {
     insertAfter(globalProxies, '自动选择', '低倍率节点');
@@ -777,9 +837,28 @@ function buildProxyGroups(
   const transitProxyGroups = hasAkcdnFallbackGroup
     ? buildTransitProxyGroups(countryList, transitNodes)
     : [];
+  const basicPreProxyManualGroup =
+    hasLandingGroup && !hasAkcdnFallbackGroup && transitNodes.length
+      ? {
+          name: '中转手动切换',
+          icon: ICON('Static.png'),
+          type: 'select',
+          proxies: uniqueStrings(transitNodes)
+        }
+      : null;
   const preProxySelector = hasAkcdnFallbackGroup
     ? transitProxyGroups.map((group) => group.name)
-    : defaultSelector.filter((name) => name !== '落地节点' && name !== 'IX节点');
+    : defaultSelector
+        .filter(
+          (name) =>
+            name !== '落地节点' &&
+            name !== 'IX节点' &&
+            !landingCountryGroupNames.includes(name)
+        )
+        .flatMap((name) => {
+          if (name !== '手动切换') return [name];
+          return basicPreProxyManualGroup ? [basicPreProxyManualGroup.name] : [];
+        });
   const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
   const serviceGroups = buildServiceGroups(defaultProxies, directFallbackProxies);
 
@@ -816,9 +895,11 @@ function buildProxyGroups(
           'max-failed-times': 2,
           lazy: false,
           // Enumerate: include-all appends nodes after explicit proxies, breaking fallback order.
-          proxies: [...landingNodes, '自动选择']
+          proxies: [...landingCountryData.defaultNodes, '自动选择']
         }
       : null,
+
+    ...landingCountryProxyGroups,
 
     hasLandingGroup
       ? {
@@ -830,7 +911,7 @@ function buildProxyGroups(
             : options.regexFilter
             ? {
                 'include-all': true,
-                'exclude-filter': TRANSIT_EXCLUDE_PATTERN,
+                'exclude-filter': addExcludePattern(TRANSIT_EXCLUDE_PATTERN, dialerProxyExcludePattern),
                 proxies: [...preProxySelector]
               }
             : { proxies: [...preProxySelector] })
@@ -838,6 +919,7 @@ function buildProxyGroups(
       : null,
 
     ...transitProxyGroups,
+    basicPreProxyManualGroup,
 
     hasLowCostGroup
       ? {
@@ -846,7 +928,13 @@ function buildProxyGroups(
           type: regionalAutoGroupType(),
           ...(!options.loadBalance ? timedAutoGroupFields(true) : {}),
           ...(options.regexFilter
-            ? { 'include-all': true, filter: LOW_COST_PATTERN }
+            ? {
+                'include-all': true,
+                filter: LOW_COST_PATTERN,
+                ...(dialerProxyExcludePattern
+                  ? { 'exclude-filter': dialerProxyExcludePattern }
+                  : {})
+              }
             : { proxies: [...lowCostNodes] })
         }
       : null,
@@ -863,7 +951,7 @@ function buildProxyGroups(
       icon: ICON('Auto.png'),
       type: autoGroupType(),
       'include-all': true,
-      'exclude-filter': ISP_EXCLUDE_PATTERN,
+      'exclude-filter': addExcludePattern(ISP_EXCLUDE_PATTERN, dialerProxyExcludePattern),
       ...timedAutoGroupFields()
     },
 
@@ -907,27 +995,37 @@ function main(config) {
   const dnsConfig = cloneDnsConfig(options.useAggressiveDefaults);
   const snifferConfig = cloneSnifferConfig(options.useAggressiveDefaults);
 
-  const countryList = parseCountries(proxies);
-  const lowCostNodes = parseLowCostNodes(proxies);
+  const landingEnabled = options.landing || options.akcdnFallback;
+  const dialerProxyExcludePattern = landingEnabled ? proxyNameExcludePattern(proxies) : '';
+  const countryList = parseCountries(proxies, landingEnabled);
+  const lowCostNodes = parseLowCostNodes(proxies, landingEnabled);
   const landingNodes =
-    options.landing || options.akcdnFallback ? parseLandingNodes(proxies) : [];
-  const transitNodes = options.akcdnFallback ? parseTransitNodes(proxies) : [];
+    landingEnabled ? parseLandingNodes(proxies) : [];
+  const landingCountryData = parseLandingCountryGroups(landingNodes);
+  const transitNodes = landingEnabled ? parseTransitNodes(proxies) : [];
   const akcdnFallbackNodes = options.akcdnFallback
     ? parseAkcdnFallbackNodes(proxies, transitNodes)
     : [];
   const countryBuckets = options.regexFilter
     ? {}
-    : parseCountryBuckets(proxies, countryList);
-  const countryProxyGroups = buildCountryProxyGroups(countryList, countryBuckets);
+    : parseCountryBuckets(proxies, countryList, landingEnabled);
+  const countryProxyGroups = buildCountryProxyGroups(
+    countryList,
+    countryBuckets,
+    dialerProxyExcludePattern
+  );
 
   const proxyGroups = buildProxyGroups(
     countryList,
     countryProxyGroups,
     lowCostNodes,
     landingNodes,
+    landingCountryData,
     akcdnFallbackNodes,
     transitNodes,
-    { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies }
+    { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies },
+    proxies,
+    dialerProxyExcludePattern
   );
   const finalRules = buildRules(options.quicEnabled);
 

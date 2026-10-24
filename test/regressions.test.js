@@ -583,12 +583,67 @@ test('sing-box builder preserves landing detours with manual selectors and indep
   assert.equal(outbounds['前置代理'].default, '中转节点');
   assert.equal(outbounds['台湾节点'], undefined);
   assert.deepEqual(outbounds['落地节点'].outbounds, ['🇹🇼 落地 台湾 01']);
-  assert.deepEqual(outbounds['节点选择'].outbounds, ['落地节点', '自动选择', '手动切换', '香港节点', 'direct']);
+  assert.deepEqual(outbounds['节点选择'].outbounds, ['落地节点', '台湾落地', '自动选择', '手动切换', '香港节点', 'direct']);
   assert.equal(outbounds['节点选择'].default, '落地节点');
   for (const outbound of result.outbounds) {
     for (const child of outbound.outbounds || []) assert.equal(tags.has(child), true, `missing child outbound ${child}`);
     if (outbound.detour) assert.equal(tags.has(outbound.detour), true, `missing detour ${outbound.detour}`);
   }
+});
+
+test('sing-box exposes country-isolated landing groups without adding landing nodes to pre-proxy or automatic groups', () => {
+  const { buildSingBoxConfig } = require(path.join(repoRoot, 'src', 'sing-box', 'config.js'));
+  const landingNode = (tag, server) => ({
+    type: 'anytls', tag, server, server_port: 443, password: 'redacted', detour: '前置代理'
+  });
+  const result = buildSingBoxConfig({
+    proxies: [
+      { type: 'anytls', tag: '🇭🇰 香港 01', server: 'hk.example', server_port: 443, password: 'redacted' },
+      { type: 'anytls', tag: '🇹🇼 台湾 01', server: 'tw.example', server_port: 443, password: 'redacted' },
+      landingNode('🇹🇼 落地 台湾 01', 'tw-landing-1.example'),
+      { type: 'anytls', tag: '🇸🇬 新加坡 01', server: 'sg.example', server_port: 443, password: 'redacted' },
+      landingNode('🇸🇬 落地 新加坡 01', 'sg-landing-1.example'),
+      landingNode('🇹🇼 落地 台湾 02', 'tw-landing-2.example'),
+      landingNode('🇸🇬 落地 新加坡 02', 'sg-landing-2.example')
+    ]
+  });
+  const outbounds = Object.fromEntries(result.outbounds.map((outbound) => [outbound.tag, outbound]));
+  const landingNodes = [
+    '🇹🇼 落地 台湾 01', '🇸🇬 落地 新加坡 01', '🇹🇼 落地 台湾 02', '🇸🇬 落地 新加坡 02'
+  ];
+
+  assert.equal(outbounds['台湾落地'].type, 'urltest');
+  assert.deepEqual(outbounds['台湾落地'].outbounds, ['🇹🇼 落地 台湾 01', '🇹🇼 落地 台湾 02']);
+  assert.equal(outbounds['新加坡落地'].type, 'urltest');
+  assert.deepEqual(outbounds['新加坡落地'].outbounds, ['🇸🇬 落地 新加坡 01', '🇸🇬 落地 新加坡 02']);
+  // The legacy mixed-country landing choice stays manual; automatic selection is country-isolated.
+  assert.equal(outbounds['落地节点'].type, 'selector');
+  assert.deepEqual(outbounds['落地节点'].outbounds, landingNodes);
+  assert.equal(outbounds['落地节点'].outbounds.includes('自动选择'), false);
+  assert.equal(outbounds['落地节点'].default, landingNodes[0]);
+  assert.equal(outbounds['节点选择'].default, '落地节点');
+  assert.equal(outbounds['节点选择'].outbounds[0], '落地节点');
+  for (const policy of ['节点选择', 'YouTube', '人工智能', '强制代理']) {
+    assert.ok(outbounds[policy].outbounds.includes('台湾落地'), `${policy} missing 台湾落地`);
+    assert.ok(outbounds[policy].outbounds.includes('新加坡落地'), `${policy} missing 新加坡落地`);
+  }
+  assert.equal(outbounds['前置代理'].outbounds.includes('台湾落地'), false);
+  assert.equal(outbounds['前置代理'].outbounds.includes('新加坡落地'), false);
+  for (const groupName of ['自动选择', '台湾节点', '新加坡节点', '中转节点']) {
+    assert.equal(outbounds[groupName].outbounds.some((tag) => landingNodes.includes(tag)), false, groupName);
+  }
+  assert.deepEqual(outbounds['台湾节点'].outbounds, ['🇹🇼 台湾 01']);
+  assert.deepEqual(outbounds['新加坡节点'].outbounds, ['🇸🇬 新加坡 01']);
+
+  const visit = (tag, parents = []) => {
+    assert.equal(parents.includes(tag), false, `circular outbound dependency: ${[...parents, tag].join('->')}`);
+    const outbound = outbounds[tag];
+    if (!outbound) return;
+    for (const child of [...(outbound.outbounds || []), ...(outbound.detour ? [outbound.detour] : [])]) {
+      visit(child, [...parents, tag]);
+    }
+  };
+  for (const outbound of result.outbounds) visit(outbound.tag);
 });
 
 test('sing-box remote rule-set tags all have generated source files', () => {
@@ -721,7 +776,9 @@ test('landing fallback keeps automatic selection last in enumerated, regex and s
       const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
       const landing = groups['落地节点'];
       assert.equal(landing.type, 'fallback');
-      assert.deepEqual(landing.proxies, ['落地 台湾 01', '家宽 日本 01', '自动选择']);
+      assert.deepEqual(landing.proxies, ['落地 台湾 01', '自动选择']);
+      assert.deepEqual(groups['台湾落地'].proxies, ['落地 台湾 01']);
+      assert.deepEqual(groups['日本落地'].proxies, ['家宽 日本 01']);
       assert.equal(landing['include-all'], undefined);
       assert.equal(landing.interval, 60);
       assert.equal(landing.timeout, 3000);
@@ -733,6 +790,147 @@ test('landing fallback keeps automatic selection last in enumerated, regex and s
       assert.ok(!groups['前置代理'].proxies.includes('落地节点'));
     }
   }
+});
+
+test('convert prefers Taiwan landings in legacy fallbacks and excludes unclassified landings', () => {
+  const proxies = [
+    { name: '🇸🇬 落地 新加坡 01', type: 'ss', server: 'sg1.example', port: 443, 'dialer-proxy': '前置代理' },
+    { name: '家庭宽带 未分类 01', type: 'ss', server: 'unknown.example', port: 443, 'dialer-proxy': '前置代理' },
+    { name: '🇹🇼 落地 台湾 01', type: 'ss', server: 'tw1.example', port: 443, 'dialer-proxy': '前置代理' },
+    { name: '🇹🇼 落地 台湾 02', type: 'ss', server: 'tw2.example', port: 443, 'dialer-proxy': '前置代理' },
+    { name: '🇸🇬 落地 新加坡 02', type: 'ss', server: 'sg2.example', port: 443, 'dialer-proxy': '前置代理' },
+    { name: '🇨🇳 IX 台湾 01', type: 'ss', server: '43.136.98.179', port: 443 },
+    { name: '🇭🇰 香港 中转 01', type: 'ss', server: 'transit.example', port: 443 }
+  ];
+  const result = loadAkcdnFallbackConvert({}).main({ proxies });
+  const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+  const taiwanLandings = ['🇹🇼 落地 台湾 01', '🇹🇼 落地 台湾 02'];
+  const singaporeLandings = ['🇸🇬 落地 新加坡 01', '🇸🇬 落地 新加坡 02'];
+
+  assert.deepEqual(groups['台湾落地'].proxies, taiwanLandings);
+  assert.deepEqual(groups['新加坡落地'].proxies, singaporeLandings);
+  for (const name of ['台湾落地', '新加坡落地']) {
+    assert.equal(groups[name].type, 'fallback');
+    assert.notEqual(groups[name].proxies.at(-1), '自动选择');
+  }
+  assert.deepEqual(groups['落地节点'].proxies, [...taiwanLandings, '自动选择']);
+  assert.deepEqual(groups['IX节点'].proxies, [
+    '🇨🇳 IX 台湾 01', ...taiwanLandings, '自动选择'
+  ]);
+  assert.equal(groups['手动切换']['include-all'], true);
+  assert.equal(groups['手动切换']['exclude-filter'], undefined);
+  assert.equal(groups['节点选择'].proxies[0], 'IX节点');
+  assert.ok(groups['节点选择'].proxies.includes('台湾落地'));
+  assert.ok(groups['节点选择'].proxies.includes('新加坡落地'));
+  assert.ok(groups.YouTube.proxies.includes('台湾落地'));
+  assert.ok(groups.YouTube.proxies.includes('新加坡落地'));
+  assert.ok(groups.GLOBAL.proxies.includes('台湾落地'));
+  assert.ok(groups.GLOBAL.proxies.includes('新加坡落地'));
+  assert.equal(groups['前置代理'].proxies.includes('台湾落地'), false);
+  assert.equal(groups['前置代理'].proxies.includes('新加坡落地'), false);
+  assert.equal(groups['前置代理'].proxies.some((name) => [...taiwanLandings, ...singaporeLandings].includes(name)), false);
+  assert.deepEqual(groups['台湾节点'].proxies, ['🇨🇳 IX 台湾 01']);
+  assert.equal(groups['新加坡节点'], undefined);
+  const excluded = new RegExp(groups['自动选择']['exclude-filter'].replace(/^\(\?i\)/, ''), 'i');
+  for (const name of [...taiwanLandings, ...singaporeLandings]) assert.equal(excluded.test(name), true);
+
+  const noTaiwan = loadAkcdnFallbackConvert({}).main({
+    proxies: [
+      { name: singaporeLandings[0], type: 'ss', 'dialer-proxy': '前置代理' },
+      { name: '🇯🇵 落地 日本 01', type: 'ss', 'dialer-proxy': '前置代理' },
+      { name: singaporeLandings[1], type: 'ss', 'dialer-proxy': '前置代理' },
+      { name: '🇯🇵 落地 日本 02', type: 'ss', 'dialer-proxy': '前置代理' },
+      { name: '🇨🇳 IX 台湾 01', type: 'ss', server: '43.136.98.179' },
+      { name: '🇭🇰 香港 中转 01', type: 'ss', server: 'transit.example' }
+    ]
+  });
+  const noTaiwanGroups = Object.fromEntries(noTaiwan['proxy-groups'].map((group) => [group.name, group]));
+  assert.deepEqual(noTaiwanGroups['落地节点'].proxies, [...singaporeLandings, '自动选择']);
+  assert.deepEqual(noTaiwanGroups['IX节点'].proxies, [
+    '🇨🇳 IX 台湾 01', ...singaporeLandings, '自动选择'
+  ]);
+});
+
+test('basic landing pre-proxy uses only independent manual transit nodes', () => {
+  const taiwan = '🇹🇼 落地 台湾 01';
+  const singapore = '🇸🇬 落地 新加坡 01';
+  const transit = '🇭🇰 香港 中转 01';
+  const result = loadConvert({ landing: true }).main({
+    proxies: [
+      { name: taiwan, type: 'ss', server: 'tw.example', port: 443, 'dialer-proxy': '前置代理' },
+      { name: singapore, type: 'ss', server: 'sg.example', port: 443, 'dialer-proxy': '前置代理' },
+      { name: transit, type: 'ss', server: 'transit.example', port: 443 }
+    ]
+  });
+  const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+
+  assert.deepEqual(groups['前置代理'].proxies, ['自动选择', '香港节点', '中转手动切换', 'DIRECT']);
+  assert.deepEqual(groups['中转手动切换'].proxies, [transit]);
+  assert.equal(groups['前置代理'].proxies.includes('手动切换'), false);
+  assert.equal(groups['手动切换']['include-all'], true);
+  assert.equal(groups['中转手动切换'].proxies.includes(taiwan), false);
+  assert.equal(groups['中转手动切换'].proxies.includes(singapore), false);
+
+  const noTransit = loadConvert({ landing: true }).main({
+    proxies: [
+      { name: taiwan, type: 'ss', server: 'tw.example', port: 443, 'dialer-proxy': '前置代理' },
+      { name: singapore, type: 'ss', server: 'sg.example', port: 443, 'dialer-proxy': '前置代理' }
+    ]
+  });
+  const noTransitGroups = Object.fromEntries(noTransit['proxy-groups'].map((group) => [group.name, group]));
+  assert.equal(noTransitGroups['前置代理'].proxies.includes('手动切换'), false);
+  assert.equal(noTransitGroups['中转手动切换'], undefined);
+});
+
+test('landing pre-proxy has no dialer-proxy cycle in enum or regex mode', () => {
+  const chainedNode = { name: '🇹🇼 落地 台湾 01', type: 'ss', server: 'tw.example', port: 443, 'dialer-proxy': '前置代理' };
+  const independentNodes = [
+    { name: '🇹🇼 台湾 02', type: 'ss', server: 'tw2.example', port: 443 },
+    { name: '🇭🇰 香港 01', type: 'ss', server: 'hk.example', port: 443 }
+  ];
+  const matches = (pattern, name) => {
+    if (!pattern) return true;
+    return new RegExp(pattern.replace(/\(\?i\)/g, ''), 'i').test(name);
+  };
+
+  for (const regex of [false, true]) {
+    const proxies = [chainedNode, ...independentNodes];
+    const result = loadConvert({ landing: true, regex }).main({ proxies });
+    const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+    const preProxy = groups['前置代理'];
+    assert.ok(preProxy, `前置代理 missing in ${regex ? 'regex' : 'enumerated'} mode`);
+    assert.equal(preProxy['include-all'], regex ? true : undefined);
+    const visit = (name, ancestors = []) => {
+      assert.equal(ancestors.includes(name), false, `circular dependency: ${[...ancestors, name].join('->')}`);
+      const group = groups[name];
+      const proxy = proxies.find((candidate) => candidate.name === name);
+      if (proxy && proxy['dialer-proxy']) visit(proxy['dialer-proxy'], [...ancestors, name]);
+      if (!group) return;
+      const children = [...(group.proxies || [])];
+      if (group['include-all']) {
+        children.push(...proxies
+          .filter((candidate) => matches(group.filter, candidate.name))
+          .filter((candidate) => !matches(group['exclude-filter'], candidate.name))
+          .map((candidate) => candidate.name));
+      }
+      for (const child of children) visit(child, [...ancestors, name]);
+    };
+
+    visit(preProxy.name);
+  }
+});
+
+test('convert fails clearly when a country landing group collides with an input proxy name', () => {
+  assert.throws(
+    () => loadConvert({ landing: true }).main({
+      proxies: [
+        { name: '台湾落地', type: 'ss', server: 'collision.example', port: 443 },
+        { name: '落地 台湾 01', type: 'ss', server: 'tw-landing.example', port: 443, 'dialer-proxy': '前置代理' },
+        { name: '香港 01', type: 'ss', server: 'hk.example', port: 443 }
+      ]
+    }),
+    /Proxy name conflicts with generated group: 台湾落地/
+  );
 });
 
 test('convert uses pinned Qure icons with distinct policy semantics', () => {
