@@ -44,9 +44,8 @@
  *                  true：国家组使用 include-all + filter + exclude-filter 正则匹配
  *                       低倍率组同样使用正则匹配；落地组枚举节点以保证兜底顺序
  *
- * [akcdnfallback]  启用 AKCDN IX → Dialer 落地自动兜底（默认关闭）
- *                  自动创建「IX节点」fallback 组：优先使用 AKCDN IX，
- *                  健康检查失败时切到 dialer-proxy 落地节点，最后使用自动选择
+ * [akcdnfallback]  启用 IX 手动选择组（默认关闭，沿用现有参数名）
+ *                  「IX节点」仅枚举台湾和新加坡 IX，不包含落地或自动选择兜底
  *                  「前置代理」会收敛为独立机场中转分组，避免再走 AKCDN/落地自环
  *                  开启后会自动启用落地/前置代理分组，避免 dialer 节点悬空
  *
@@ -67,7 +66,7 @@
  * 启用 QUIC + IPv6：
  * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#quic=true&ipv6=true
  *
- * AKCDN IX 优先、故障切 Dialer 落地：
+ * 台湾／新加坡 IX 手动选择 + 分国落地：
  * https://raw.githubusercontent.com/akaDRJ/ClashCustomRule/master/dist/substore/convert.js#akcdnfallback=true&landing=true
  *
  * ==================== 导出接口 ====================
@@ -492,16 +491,15 @@ function parseTransitNodes(proxies) {
     .filter(Boolean);
 }
 
-function parseAkcdnFallbackNodes(proxies, transitNodes) {
-  if (!transitNodes.length) return [];
-  const akcdnNodes = proxies.filter(isAkcdnNode).map((proxy) => proxy.name).filter(Boolean);
-  const dialerLandingNodes = proxies
-    .filter(isDialerLandingNode)
-    .map((proxy) => proxy.name)
-    .filter(Boolean);
-
-  if (!akcdnNodes.length || !dialerLandingNodes.length) return [];
-  return [...akcdnNodes, ...parseLandingCountryGroups(dialerLandingNodes).defaultNodes];
+function parseAkcdnFallbackNodes(proxies) {
+  return proxies
+    .filter((proxy) =>
+      isAkcdnNode(proxy) &&
+      !proxy['dialer-proxy'] &&
+      !isIspName(proxy.name) &&
+      ['台湾', '新加坡'].some((country) => COUNTRY_REGEX_MAP.get(country).test(proxy.name))
+    )
+    .map((proxy) => proxy.name);
 }
 
 function parseLowCostNodes(proxies, excludeDialerProxyNodes) {
@@ -771,7 +769,7 @@ function buildProxyGroups(
   } = defaults;
 
   const hasLowCostGroup = options.regexFilter || lowCostNodes.length > 0;
-  const hasAkcdnFallbackGroup = options.akcdnFallback && akcdnFallbackNodes.length > 1;
+  const hasAkcdnFallbackGroup = options.akcdnFallback && akcdnFallbackNodes.length > 0;
   const hasLandingGroup =
     (options.landing || hasAkcdnFallbackGroup) &&
     (options.regexFilter || landingNodes.length > 0);
@@ -832,7 +830,7 @@ function buildProxyGroups(
   }
   appendUnique(globalProxies, countryProxies);
 
-  const transitProxyGroups = hasAkcdnFallbackGroup
+  const transitProxyGroups = hasAkcdnFallbackGroup && transitNodes.length
     ? buildTransitProxyGroups(countryList, transitNodes)
     : [];
   const basicPreProxyManualGroup =
@@ -844,7 +842,7 @@ function buildProxyGroups(
           proxies: uniqueStrings(transitNodes)
         }
       : null;
-  const preProxySelector = hasAkcdnFallbackGroup
+  const preProxySelector = transitProxyGroups.length
     ? transitProxyGroups.map((group) => group.name)
     : defaultSelector
         .filter(
@@ -871,13 +869,8 @@ function buildProxyGroups(
       ? {
           name: 'IX节点',
           icon: ICON('Available.png'),
-          type: 'fallback',
-          url: 'http://cp.cloudflare.com/generate_204',
-          interval: 60,
-          timeout: 3000,
-          'max-failed-times': 2,
-          lazy: false,
-          proxies: [...akcdnFallbackNodes, '自动选择']
+          type: 'select',
+          proxies: [...akcdnFallbackNodes]
         }
       : null,
 
@@ -986,7 +979,7 @@ function main(config) {
   const landingCountryData = parseLandingCountryGroups(landingNodes);
   const transitNodes = landingEnabled ? parseTransitNodes(proxies) : [];
   const akcdnFallbackNodes = options.akcdnFallback
-    ? parseAkcdnFallbackNodes(proxies, transitNodes)
+    ? parseAkcdnFallbackNodes(proxies)
     : [];
   const countryBuckets = options.regexFilter
     ? {}

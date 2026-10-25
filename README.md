@@ -54,6 +54,8 @@ For OpenWrt, use Momo to manage the service and transparent routing. The existin
 
 Landing choices are country-specific: `台湾落地` contains only Taiwan landings and `新加坡落地` only Singapore landings. There is no mixed or generic `落地节点` group, and country landing groups never fall back to ordinary airport nodes. Mihomo uses ordered fallback within each country; sing-box uses URL testing. Where the root selector defaults to a landing, Taiwan remains preferred when available.
 
+For Mihomo, `akcdnfallback=true` retains its existing argument name and enables a manual `IX节点` selector containing only Taiwan and Singapore IX nodes. It does not include landing nodes or an automatic-selection fallback. One eligible IX node is enough; without eligible IX nodes, the group is omitted.
+
 Already converted sing-box outbounds retain their protocol, TLS, transport and `detour` fields. With chained nodes, the converter creates a manual `前置代理` selector which defaults to ordinary URL testing over independent airport nodes. It also exposes an independent `IX节点` selector when present. Ordered fallback and Mihomo Smart are not used in sing-box.
 
 For a Sub-Store file, set the script argument `collection` to the source collection name. The script uses Sub-Store's native sing-box exporter and writes a complete JSON configuration. Use `momo=true` only for the Momo compatibility target; omit it for general sing-box 1.14+ clients. The general target downloads rule sets through the independent front-proxy group (or automatic airport selection). Nodes containing unsupported `tls.certificate_sha256` pins are excluded with a warning rather than weakening certificate checks.

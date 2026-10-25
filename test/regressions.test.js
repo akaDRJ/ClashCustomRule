@@ -675,7 +675,7 @@ test('package check includes sing-box build drift checks', () => {
   assert.match(manifest.scripts.check, /npm run check:sing-box/);
 });
 
-test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups instead of raw nodes', () => {
+test('IX selector keeps only IX nodes and pre-proxy chooses independent transit groups', () => {
   const convert = loadAkcdnFallbackConvert({});
   const result = convert.main({
     proxies: [
@@ -714,9 +714,9 @@ test('akcdn fallback convert prefers IX and lets pre-proxy choose transit groups
   });
   const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
 
-  assert.equal(groups['IX节点'].type, 'fallback');
-  assert.deepEqual(groups['IX节点'].proxies, ['🇨🇳 台湾 01', '🇨🇳 台湾 02', '🇹🇼 落地 台湾 01', '自动选择']);
-  assert.equal(groups['IX节点'].lazy, false);
+  assert.equal(groups['IX节点'].type, 'select');
+  assert.deepEqual(groups['IX节点'].proxies, ['🇨🇳 台湾 01', '🇨🇳 台湾 02']);
+  assert.equal(groups['IX节点'].url, undefined);
   assert.equal(groups['节点选择'].proxies[0], 'IX节点');
   assert.equal(groups['GLOBAL'].proxies.includes('IX节点'), true);
   assert.equal(Object.prototype.hasOwnProperty.call(groups['自动选择'], 'proxies'), false);
@@ -751,12 +751,16 @@ test('automatic groups share probes while regional groups are lazy and fallback 
         assert.equal(groups[name].lazy, !name.endsWith('自动选择'), name);
       }
       assert.equal(groups['DNS代理'], undefined);
-      for (const name of ['IX节点', '台湾落地']) {
+      for (const name of ['台湾落地']) {
         assert.equal(groups[name].url, 'http://cp.cloudflare.com/generate_204', name);
         assert.equal(groups[name].interval, 60, name);
         assert.equal(groups[name].lazy, false, name);
       }
-      assert.equal(groups['IX节点'].proxies.at(-1), '自动选择');
+      assert.equal(groups['IX节点'].type, 'select');
+      assert.deepEqual(groups['IX节点'].proxies, ['台湾 IX 01']);
+      for (const key of ['url', 'interval', 'timeout', 'lazy', 'max-failed-times', 'include-all']) {
+        assert.equal(groups['IX节点'][key], undefined, key);
+      }
       assert.deepEqual(groups['台湾落地'].proxies, ['落地 台湾 01']);
     }
   }
@@ -795,7 +799,7 @@ test('country landings contain only their own nodes in enumerated, regex and sma
   }
 });
 
-test('convert prefers Taiwan landings in legacy fallbacks and excludes unclassified landings', () => {
+test('IX selector stays separate from country landings and unclassified landings', () => {
   const proxies = [
     { name: '🇸🇬 落地 新加坡 01', type: 'ss', server: 'sg1.example', port: 443, 'dialer-proxy': '前置代理' },
     { name: '家庭宽带 未分类 01', type: 'ss', server: 'unknown.example', port: 443, 'dialer-proxy': '前置代理' },
@@ -818,9 +822,7 @@ test('convert prefers Taiwan landings in legacy fallbacks and excludes unclassif
   }
   assert.equal(groups['落地节点'], undefined);
   assert.equal(JSON.stringify(result).includes('落地节点'), false);
-  assert.deepEqual(groups['IX节点'].proxies, [
-    '🇨🇳 IX 台湾 01', ...taiwanLandings, '自动选择'
-  ]);
+  assert.deepEqual(groups['IX节点'].proxies, ['🇨🇳 IX 台湾 01']);
   assert.equal(groups['手动切换']['include-all'], true);
   assert.equal(groups['手动切换']['exclude-filter'], undefined);
   assert.equal(groups['节点选择'].proxies[0], 'IX节点');
@@ -851,9 +853,55 @@ test('convert prefers Taiwan landings in legacy fallbacks and excludes unclassif
   const noTaiwanGroups = Object.fromEntries(noTaiwan['proxy-groups'].map((group) => [group.name, group]));
   assert.equal(noTaiwanGroups['落地节点'], undefined);
   assert.deepEqual(noTaiwanGroups['新加坡落地'].proxies, singaporeLandings);
-  assert.deepEqual(noTaiwanGroups['IX节点'].proxies, [
-    '🇨🇳 IX 台湾 01', ...singaporeLandings, '自动选择'
-  ]);
+  assert.deepEqual(noTaiwanGroups['IX节点'].proxies, ['🇨🇳 IX 台湾 01']);
+});
+
+test('IX selector admits only Taiwan and Singapore IX entries in every group mode', () => {
+  for (const regex of [false, true]) {
+    for (const smart of [false, true]) {
+      const result = loadAkcdnFallbackConvert({ regex, smart }).main({
+        proxies: [
+          { name: '香港 中转 01', type: 'ss', server: 'transit.example' },
+          { name: '🇨🇳 IX 台湾 01', type: 'anytls', server: '43.136.98.179', port: 443 },
+          { name: '🇸🇬 IX 新加坡 01', type: 'anytls', server: '43.136.98.179', port: 8443 },
+          { name: 'IX 香港 01', type: 'ss', server: '43.136.98.179' },
+          { name: 'IX 日本 01', type: 'ss', server: 'jp.example' },
+          { name: 'IX 未分类 01', type: 'ss', server: 'unknown.example' },
+          { name: '新加坡 机场 01', type: 'ss', server: 'airport.example' },
+          { name: '落地 台湾 01', type: 'ss', server: 'tw.example', 'dialer-proxy': '前置代理' },
+          { name: '落地 新加坡 01', type: 'ss', server: 'sg.example', 'dialer-proxy': '前置代理' },
+          { name: 'IX 新加坡 链式落地', type: 'ss', server: '43.136.98.179', 'dialer-proxy': '前置代理' },
+          { name: 'IX 台湾 家宽', type: 'ss', server: '43.136.98.179' }
+        ]
+      });
+      const group = result['proxy-groups'].find((g) => g.name === 'IX节点');
+      assert.equal(group.type, 'select');
+      assert.deepEqual(group.proxies, ['🇨🇳 IX 台湾 01', '🇸🇬 IX 新加坡 01']);
+      assert.equal(group['include-all'], undefined);
+    }
+  }
+});
+
+test('IX selector supports a single IX node without any landing or transit node', () => {
+  for (const name of ['IX 台湾 01', 'IX Singapore 01']) {
+    const result = loadAkcdnFallbackConvert({}).main({ proxies: [{ name, type: 'ss' }] });
+    const group = result['proxy-groups'].find((g) => g.name === 'IX节点');
+    assert.equal(group.type, 'select');
+    assert.deepEqual(group.proxies, [name]);
+    assert.ok(result['proxy-groups'].every((g) => !g.proxies || g.proxies.length > 0));
+  }
+});
+
+test('IX selector is omitted when all IX entries belong to other or unknown regions', () => {
+  const result = loadAkcdnFallbackConvert({}).main({
+    proxies: [
+      { name: '香港 中转 01', type: 'ss', server: 'transit.example' },
+      { name: 'IX 香港 01', type: 'ss', server: '43.136.98.179' },
+      { name: 'IX 未分类 01', type: 'ss' },
+      { name: '落地 台湾 01', type: 'ss', 'dialer-proxy': '前置代理' }
+    ]
+  });
+  assert.ok(!result['proxy-groups'].some((g) => g.name === 'IX节点'));
 });
 
 test('basic landing pre-proxy uses only independent manual transit nodes', () => {
@@ -975,7 +1023,7 @@ test('convert uses pinned Qure icons with distinct policy semantics', () => {
   assert.equal(groups['节点选择'].icon, `${base}Proxy.png`);
 });
 
-test('akcdn fallback convert omits fallback when no independent transit node exists', () => {
+test('IX selector remains available with landings but no independent transit node', () => {
   const convert = loadAkcdnFallbackConvert({});
   const result = convert.main({
     proxies: [
@@ -995,10 +1043,10 @@ test('akcdn fallback convert omits fallback when no independent transit node exi
     ]
   });
 
-  assert.equal(
-    result['proxy-groups'].some((group) => group.name === 'IX节点'),
-    false
-  );
+  const group = result['proxy-groups'].find((g) => g.name === 'IX节点');
+  assert.equal(group.type, 'select');
+  assert.deepEqual(group.proxies, ['🇨🇳 台湾 01']);
+  assert.ok(result['proxy-groups'].every((g) => !g.proxies || g.proxies.length > 0));
 });
 
 test('akcdn fallback convert keeps base behavior when no AKCDN and dialer pair exists', () => {
