@@ -52,8 +52,8 @@ test('real Mihomo resolves real-IP exclusions without proxies and preserves Fake
     const config = {
       'external-controller': `127.0.0.1:${controllerPort}`, ipv6: false,
       dns: { ...main({}).dns, listen: `127.0.0.1:${dnsPort}`,
-        // Synthetic membership avoids a dependency on downloaded geodata.
-        'fake-ip-filter': ['+.real.test'],
+        // Keep generated endpoint exclusions; omit external geodata dependencies.
+        'fake-ip-filter': [...main({}).dns['fake-ip-filter'].filter(entry => !/^(geosite|rule-set):/.test(entry)), '+.real.test'],
         'default-nameserver': [`tcp://127.0.0.1:${server.address().port}`],
         nameserver: [`tcp://127.0.0.1:${server.address().port}`] },
       rules: ['MATCH,DIRECT']
@@ -72,6 +72,10 @@ test('real Mihomo resolves real-IP exclusions without proxies and preserves Fake
     resolver.setServers([`127.0.0.1:${dnsPort}`]);
     assert.deepEqual(await resolver.resolve4('shop.real.test'), ['127.0.0.1']);
     assert.ok(queries.includes('shop.real.test'));
+    for (const domain of ['dynamodb.us-east-1.amazonaws.com', 'speed.cloudflare.com', 'v6.ident.me']) {
+      assert.deepEqual(await resolver.resolve4(domain), ['127.0.0.1'], domain);
+      assert.ok(queries.includes(domain));
+    }
     const fake = await resolver.resolve4('proxy.test');
     assert.ok(fake[0].startsWith('198.18.'));
     assert.ok(!queries.includes('proxy.test'), 'Fake-IP answer must not require upstream DNS');
