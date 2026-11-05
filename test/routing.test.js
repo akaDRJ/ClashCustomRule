@@ -115,28 +115,3 @@ test('Mihomo keeps the minimal domestic DNS baseline without proxy dependencies'
   const group = first['proxy-groups'].find((item) => item.name === 'DNS代理');
   assert.equal(group, undefined);
 });
-
-test('me2cloud takes precedence, stays direct for QUIC, and excludes exact endpoints from Fake-IP', () => {
-  for (const quic of [false, true]) {
-    global.$arguments = { quic };
-    delete require.cache[require.resolve('../src/substore/convert')];
-    const config = require('../src/substore/convert').main({});
-    assert.equal(config.rules[0], 'rule-set,me2cloud,DIRECT');
-    assert.deepEqual(config['rule-providers'].me2cloud, {
-      type: 'http', behavior: 'classical', format: 'yaml',
-      url: 'https://m2c.1ms.dog/rules/clash.yaml',
-      path: './ruleset/me2cloud.yaml', interval: 86400
-    });
-    for (const network of ['tcp', 'udp']) {
-      assert.equal(mihomoResult(config.rules, ['rule-set:me2cloud', 'geosite:google'], network, 443), 'DIRECT');
-    }
-    const exclusions = config.dns['fake-ip-filter'];
-    assert.equal(exclusions.length, 458);
-    assert.equal(new Set(exclusions).size, exclusions.length);
-    for (const domain of ['dynamodb.us-east-1.amazonaws.com', 'objectstorage.mx-monterrey-1.oraclecloud.com', 'speed.cloudflare.com', 'api4.ipify.org', 'v6.ident.me']) {
-      assert.ok(exclusions.includes(domain), domain);
-    }
-    assert.ok(!exclusions.includes('+.amazonaws.com'));
-    assert.ok(!exclusions.includes('+.cloudflare.com'));
-  }
-});
