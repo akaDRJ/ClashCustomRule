@@ -37,8 +37,8 @@
  *            示例：rmkey=Premium+Test 删除含 Premium 或 Test 的节点
  *
  * [clear]    清理含营销/广告关键词的节点名（套餐/到期/流量/机场等）
- * [nx]       只保留 1 倍率或不显示倍率的节点
- * [blnx]     只保留高倍率节点（排除 1 倍率）
+ * [nx]       过滤高倍率（>1 或标记“高倍”），保留低倍率、1 倍率和未标倍率节点
+ * [blnx]     只保留高倍率节点（>1 或标记“高倍”）
  * [key]      只保留指定国家/地区的节点（HK/SG/JP/US/KR等 + 序号）
  *
  * 【保留参数 - 节点名中保留原字段】
@@ -347,8 +347,7 @@ const nameclear =
 const regexArray=[/ˣ²/, /ˣ³/, /ˣ⁴/, /ˣ⁵/, /ˣ⁶/, /ˣ⁷/, /ˣ⁸/, /ˣ⁹/, /ˣ¹⁰/, /ˣ²⁰/, /ˣ³⁰/, /ˣ⁴⁰/, /ˣ⁵⁰/, /IPLC/i, /IEPL/i, /核心/, /边缘/, /高级/, /标准/, /实验/, /商宽/, /家宽/, /游戏|game/i, /购物/, /专线/, /LB/, /cloudflare/i, /\budp\b/i, /\bgpt\b/i,/udpn\b/];
 // prettier-ignore
 const valueArray= [ "2×","3×","4×","5×","6×","7×","8×","9×","10×","20×","30×","40×","50×","IPLC","IEPL","Kern","Edge","Pro","Std","Exp","Biz","Fam","Game","Buy","Zx","LB","CF","UDP","GPT","UDPN"];
-const nameblnx = /(高倍|(?!1)2+(x|倍)|ˣ²|ˣ³|ˣ⁴|ˣ⁵|ˣ¹⁰)/i;
-const namenx = /(高倍|(?!1)(0\.|\d)+(x|倍)|ˣ²|ˣ³|ˣ⁴|ˣ⁵|ˣ¹⁰)/i;
+
 const keya =
   /港|Hong|HK|新加坡|SG|Singapore|日本|Japan|JP|美国|United States|US|韩|土耳其|TR|Turkey|Korea|KR|🇸🇬|🇭🇰|🇯🇵|🇺🇸|🇰🇷|🇹🇷/i;
 const keyb =
@@ -391,8 +390,9 @@ const rurekey = {
   Esnc: /esnc/gi,
 };
 
+// 前导小数需有空白边界，避免将 jp.3x 的点分隔符误当成小数点。
 const MULTIPLIER_CAPTURE_RE =
-  /(?:倍率\s*[:：]?\s*)?(?:[Xx×]\s*(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)\s*(?:倍|[Xx×])|[\[\(]\s*(\d+(?:\.\d+)?)\s*[\]\)])/;
+  /(?:倍率\s*[:：]?\s*)?(?:[Xx×]\s*(\d+(?:\.\d+)?|\.\d+)|(\d+(?:\.\d+)?|(?<!\S)\.\d+)\s*(?:倍|[Xx×]))/;
 const KEY_DIGIT_FILTER_RE = /2|4|6|7/i;
 const BLKEY_RULES = BLKEY
   ? BLKEY.split("+")
@@ -599,14 +599,16 @@ function getFixedTag(name) {
   return tag;
 }
 
+function getMultiplier(name) {
+  const match = name.match(MULTIPLIER_CAPTURE_RE);
+  return match ? Number(match[1] || match[2]) : null;
+}
+
 function getMultiplierTag(name) {
   if (!bl) return "";
 
-  const match = name.match(MULTIPLIER_CAPTURE_RE);
-  if (!match) return "";
-
-  const value = match[1] || match[2] || match[3];
-  if (!value || Number(value) === 1) return "";
+  const value = getMultiplier(name);
+  if (value === null || value === 1) return "";
   return `${value}×`;
 }
 
@@ -631,10 +633,11 @@ function operator(pro) {
   if (clear || nx || blnx || key || RMKEY_RULES.length > 0) {
     proxies = proxies.filter((item) => {
       const normalized = normalizeProxyName(item.name);
+      const highMultiplier = normalized.includes("高倍") || getMultiplier(normalized) > 1;
       return !(
         (clear && nameclear.test(normalized)) ||
-        (nx && namenx.test(normalized)) ||
-        (blnx && !nameblnx.test(normalized)) ||
+        (nx && highMultiplier) ||
+        (blnx && !highMultiplier) ||
         (RMKEY_RULES.length > 0 && containsRemoveKey(normalized)) ||
         (key && !(keya.test(normalized) && KEY_DIGIT_FILTER_RE.test(normalized)))
       );

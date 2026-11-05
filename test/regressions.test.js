@@ -119,6 +119,72 @@ test('rename decodes percent-encoded argument values', () => {
   assert.equal(result[0].name, 'NX&Co 香港 01');
 });
 
+test('rename nx filters only high multipliers and bl displays retained low multipliers', () => {
+  const rename = loadRename({ nx: true, bl: true, flag: true, name: 'JY' });
+  const result = rename.operator([
+    { name: '香港 0.1x', id: 'low-01' },
+    { name: '香港 0.5x', id: 'low-05' },
+    { name: '香港 x0.25', id: 'low-prefix' },
+    { name: '香港 1x', id: 'one' },
+    { name: '香港 1.0x', id: 'one-decimal' },
+    { name: '香港', id: 'unmarked' },
+    { name: '香港 1.5x', id: 'high-decimal' },
+    { name: '香港 2x', id: 'high' },
+    { name: '香港 10x', id: 'high-ten' },
+    { name: '香港 20×', id: 'high-twenty' },
+    { name: '香港 高倍', id: 'high-label' }
+  ]);
+
+  assert.deepEqual(result.map((proxy) => proxy.id), [
+    'low-01', 'low-05', 'low-prefix', 'one', 'one-decimal', 'unmarked'
+  ]);
+  assert.deepEqual(result.slice(0, 3).map((proxy) => proxy.name), [
+    '🇭🇰 JY 香港 0.1× 01', '🇭🇰 JY 香港 0.5× 01', '🇭🇰 JY 香港 0.25× 01'
+  ]);
+  assert.ok(result.slice(3).every((proxy) => !proxy.name.includes('×')));
+});
+
+test('rename distinguishes dot-separated integer multipliers from leading decimal rates', () => {
+  const rename = loadRename({ nx: true, bl: true, flag: true, name: 'JY' });
+  const result = rename.operator([
+    { name: '🇯🇵Pro.ISP.jp.3x', id: 'high-dotted' },
+    { name: '🇹🇼Pro.ISP.tw.2x', id: 'high-dotted-two' },
+    { name: '🇯🇵Plus.CN.jp.0.5x-1', id: 'low-dotted' },
+    { name: '香港 .5x', id: 'low-leading-dot' }
+  ]);
+
+  assert.deepEqual(result.map((proxy) => proxy.id), ['low-dotted', 'low-leading-dot']);
+  assert.deepEqual(result.map((proxy) => proxy.name), ['🇯🇵 JY 日本 0.5× 01', '🇭🇰 JY 香港 0.5× 01']);
+});
+
+test('rename multiplier filters share numeric boundaries without treating bracketed indices as rates', () => {
+  const inputs = [
+    { name: '香港 .5x', id: 'fraction' },
+    { name: '香港 ０．２５ｘ', id: 'fullwidth-low' },
+    { name: '香港 [02]', id: 'square-index' },
+    { name: '香港 (03)', id: 'round-index' },
+    { name: '香港 1.00倍', id: 'one' },
+    { name: '香港 x1.01', id: 'decimal-high' },
+    { name: '香港 ˣ²', id: 'superscript-high' },
+    { name: '香港 ３倍', id: 'fullwidth-high' },
+    { name: '香港 [02] 20×', id: 'indexed-high' },
+    { name: '香港 高倍', id: 'label-high' }
+  ];
+  const run = (args) => loadRename(args).operator(inputs.map((proxy) => ({ ...proxy })));
+
+  const low = run({ nx: true, bl: true });
+  assert.deepEqual(low.map((proxy) => proxy.id), [
+    'fraction', 'fullwidth-low', 'square-index', 'round-index', 'one'
+  ]);
+  assert.equal(low[0].name, '香港 0.5× 01');
+  assert.equal(low[1].name, '香港 0.25× 01');
+  assert.ok(low.slice(2).every((proxy) => !proxy.name.includes('×')));
+  assert.deepEqual(run({ blnx: true }).map((proxy) => proxy.id), [
+    'decimal-high', 'superscript-high', 'fullwidth-high', 'indexed-high', 'label-high'
+  ]);
+  assert.equal(run({}).length, inputs.length);
+});
+
 test('rename preserves existing block-quic when argument is omitted', () => {
   const rename = loadRename({});
   const result = rename.operator([{ name: '香港 IPLC', 'block-quic': 'on' }]);
