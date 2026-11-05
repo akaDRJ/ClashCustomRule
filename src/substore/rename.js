@@ -46,8 +46,8 @@
  *            支持替换：GPT>新名字 表示将 GPT 替换为新名字
  *            示例：blkey=IPLC+GPT>AI+NF
  *
- * [blgd]     保留 ISP/线路标签（家宽/商宽/IPLC/IEPL/ˣ²等）
- * [bl]       保留倍率标识（2x/3倍/0.5x等）并添加到节点名
+ * [blgd]     保留原名中有区分价值的地区、等级与线路短标签，并优先沿用原序号
+ * [bl]       保留倍率标识（2x/3倍/0.5x/[0.2]等）并添加到节点名
  *
  * 【排序与分组】
  * [blpx]     按保留的特殊标识排序（需配合 bl 使用，无 bl 时不生效）
@@ -316,6 +316,16 @@ const COUNTRY_FIELD_BY_FORMAT = {
 };
 
 const COUNTRY_BY_CODE = new Map(COUNTRY_ROWS.map((row) => [row.code, row]));
+const REGION_ALIASES = Object.freeze({
+  HK: ["HKG"],
+  JP: ["JPN"],
+  DE: ["DEU"],
+  US: ["USA"],
+  GB: ["UK", "GBR"],
+  SG: ["SGP", "狮城"],
+  TW: ["TWN"],
+  KR: ["KOR"],
+});
 const AMBIGUOUS_SHORT_CODES = new Set(["IN", "NO", "TO", "DO", "LA", "AM", "AS", "IS"]);
 const AMBIGUOUS_CODE_GUARDS = {
   IN: /印度|India|🇮🇳/i,
@@ -343,11 +353,6 @@ const specialRegex = [
 ];
 const nameclear =
   /(套餐|到期|有效|剩余|版本|已用|过期|失联|测试|官方|网址|备用|群|TEST|客服|网站|获取|订阅|流量|机场|下次|官址|联系|邮箱|工单|学术|USE|USED|TOTAL|EXPIRE|EMAIL)/i;
-// prettier-ignore
-const regexArray=[/ˣ²/, /ˣ³/, /ˣ⁴/, /ˣ⁵/, /ˣ⁶/, /ˣ⁷/, /ˣ⁸/, /ˣ⁹/, /ˣ¹⁰/, /ˣ²⁰/, /ˣ³⁰/, /ˣ⁴⁰/, /ˣ⁵⁰/, /IPLC/i, /IEPL/i, /核心/, /边缘/, /高级/, /标准/, /实验/, /商宽/, /家宽/, /游戏|game/i, /购物/, /专线/, /LB/, /cloudflare/i, /\budp\b/i, /\bgpt\b/i,/udpn\b/];
-// prettier-ignore
-const valueArray= [ "2×","3×","4×","5×","6×","7×","8×","9×","10×","20×","30×","40×","50×","IPLC","IEPL","Kern","Edge","Pro","Std","Exp","Biz","Fam","Game","Buy","Zx","LB","CF","UDP","GPT","UDPN"];
-
 const keya =
   /港|Hong|HK|新加坡|SG|Singapore|日本|Japan|JP|美国|United States|US|韩|土耳其|TR|Turkey|Korea|KR|🇸🇬|🇭🇰|🇯🇵|🇺🇸|🇰🇷|🇹🇷/i;
 const keyb =
@@ -392,7 +397,9 @@ const rurekey = {
 
 // 前导小数需有空白边界，避免将 jp.3x 的点分隔符误当成小数点。
 const MULTIPLIER_CAPTURE_RE =
-  /(?:倍率\s*[:：]?\s*)?(?:[Xx×]\s*(\d+(?:\.\d+)?|\.\d+)|(\d+(?:\.\d+)?|(?<!\S)\.\d+)\s*(?:倍|[Xx×]))/;
+  /(?:倍率\s*[:：]?\s*)?(?:[Xx×]\s*(\d+(?:\.\d+)?|\.\d+)|(\d+(?:\.\d+)?|(?<!\S)\.\d+)\s*(?:倍|[Xx×]))/g;
+const BRACKETED_FRACTION_RE = /\[\s*(\d*\.\d+)\s*\]/g;
+const SOURCE_INDEX_RE = /\d{1,3}/g;
 const KEY_DIGIT_FILTER_RE = /2|4|6|7/i;
 const BLKEY_RULES = BLKEY
   ? BLKEY.split("+")
@@ -477,6 +484,11 @@ function buildAllMap(inputLists, outList) {
       });
     });
   }
+  COUNTRY_ROWS.forEach((row, index) => {
+    for (const alias of REGION_ALIASES[row.code] || []) {
+      map.set(alias, { value: outList[index], code: row.code });
+    }
+  });
   return map;
 }
 
@@ -586,22 +598,13 @@ function applyBlockQuic(proxy) {
   }
 }
 
-function getFixedTag(name) {
-  if (!blgd) return "";
-
-  let tag = "";
-  regexArray.forEach((regex, index) => {
-    regex.lastIndex = 0;
-    if (regex.test(name)) {
-      tag = valueArray[index];
-    }
-  });
-  return tag;
-}
-
 function getMultiplier(name) {
-  const match = name.match(MULTIPLIER_CAPTURE_RE);
-  return match ? Number(match[1] || match[2]) : null;
+  const source = String(name || "");
+  MULTIPLIER_CAPTURE_RE.lastIndex = 0;
+  const values = Array.from(source.matchAll(MULTIPLIER_CAPTURE_RE), (match) => Number(match[1] || match[2]));
+  BRACKETED_FRACTION_RE.lastIndex = 0;
+  values.push(...Array.from(source.matchAll(BRACKETED_FRACTION_RE), (match) => Number(match[1])));
+  return values.length ? Math.max(...values) : null;
 }
 
 function getMultiplierTag(name) {
@@ -610,6 +613,77 @@ function getMultiplierTag(name) {
   const value = getMultiplier(name);
   if (value === null || value === 1) return "";
   return `${value}×`;
+}
+
+function uniqueTags(tags) {
+  const seen = new Set();
+  return tags.filter((tag) => {
+    const key = String(tag || "").trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function parseSourceName(name, matchedRegion) {
+  let remainder = String(name || "");
+  remainder = remainder.replace(BRACKETED_FRACTION_RE, " ");
+  remainder = remainder.replace(MULTIPLIER_CAPTURE_RE, " ");
+
+  let sequence = "";
+  const indices = Array.from(remainder.matchAll(SOURCE_INDEX_RE));
+  for (let index = indices.length - 1; index >= 0; index--) {
+    const match = indices[index];
+    const before = remainder[match.index - 1] || "";
+    const after = remainder[match.index + match[0].length] || "";
+    const beforePrevious = remainder[match.index - 2] || "";
+    const afterNext = remainder[match.index + match[0].length + 1] || "";
+    const decimalPart = (before === "." && /\d/.test(beforePrevious)) ||
+      (after === "." && /\d/.test(afterNext));
+    const isBoundary = (char, allowHan = false) =>
+      !char || /[\s._|｜/\\()[\]{}-]/.test(char) || (allowHan && /\p{Script=Han}/u.test(char));
+    if (!decimalPart && isBoundary(before, true) && isBoundary(after)) {
+      sequence = String(Number(match[0])).padStart(2, "0");
+      remainder = `${remainder.slice(0, match.index)} ${remainder.slice(match.index + match[0].length)}`;
+      break;
+    }
+  }
+
+  remainder = remainder.replace(/[\u{1F1E6}-\u{1F1FF}]{2}/gu, " ").trimStart();
+  if (FNAME) {
+    const sourcePrefix = new RegExp(`^${escapeRegex(FNAME)}(?=$|[^A-Za-z0-9])`);
+    remainder = remainder.replace(sourcePrefix, " ");
+  }
+  const row = matchedRegion && COUNTRY_BY_CODE.get(matchedRegion.code);
+  if (row) {
+    const regionNames = [row.zh, row.code, row.quan, ...(REGION_ALIASES[row.code] || [])]
+      .filter(Boolean)
+      .sort((a, b) => b.length - a.length);
+    for (const regionName of regionNames) {
+      const englishName = /^[\x00-\x7f]+$/.test(regionName);
+      const pattern = englishName
+        ? new RegExp(`(^|[^A-Za-z])${escapeRegex(regionName)}(?=$|[^A-Za-z])`, "i")
+        : new RegExp(escapeRegex(regionName));
+      remainder = remainder.replace(pattern, englishName ? "$1" : " ");
+    }
+  }
+
+  remainder = remainder.replace(/高速|优化|节点/g, " ");
+  if (/IPLC|IEPL/i.test(remainder)) remainder = remainder.replace(/专线/g, " ");
+  const words = remainder.split(/[\s._|｜/\\,:;，、·\-—()[\]{}]+/).filter(Boolean);
+  const tags = [];
+  for (let index = 0; index < words.length; index++) {
+    let word = words[index];
+    // shortcut: join common English city prefixes only; broaden if real node names require it.
+    if (/^(?:San|St|New|Los)$/.test(word) && /^[A-Z][a-z]+$/.test(words[index + 1] || "")) {
+      word += ` ${words[++index]}`;
+    }
+    if (/^(?:ss(?:2022)?|shadowsocks|anytls|vless|vmess|trojan|hysteria2?|tuic|snell|wireguard)$/i.test(word) || /^\d+$/.test(word)) {
+      continue;
+    }
+    tags.push(word);
+  }
+  return { sequence, tags: uniqueTags(tags) };
 }
 
 function operator(pro) {
@@ -644,6 +718,7 @@ function operator(pro) {
     });
   }
 
+  const sourceSequences = new Map();
   for (const proxy of proxies) {
     const sourceName = normalizeProxyName(proxy.name);
     const replacedName = applyRuleReplacements(sourceName);
@@ -653,8 +728,17 @@ function operator(pro) {
 
     const retainKey = resolveRetainKey(sourceName, currentName);
     const multiplierTag = getMultiplierTag(currentName);
-    const fixedTag = getFixedTag(currentName);
     const matchedRegion = matchRegionKey(currentName, regionEntries);
+    const sourceForTags = BLKEY_RULES.reduce(
+      (name, rule) => rule.source && rule.replacement ? name.split(rule.source).join(rule.replacement) : name,
+      sourceName
+    );
+    const sourceData = blgd && matchedRegion ? parseSourceName(sourceForTags, matchedRegion) : null;
+    if (sourceData) sourceSequences.set(proxy, sourceData.sequence);
+    const retainedTags = retainKey ? (blgd ? retainKey.split(",").map((tag) => tag.trim()) : [retainKey]) : [];
+    const labelTag = blgd
+      ? uniqueTags([...(sourceData ? sourceData.tags : []), ...retainedTags]).join("·")
+      : retainKey;
 
     const prefixFirst = nf ? FNAME : "";
     const prefixSecond = nf ? "" : FNAME;
@@ -673,9 +757,8 @@ function operator(pro) {
         flagValue,
         prefixSecond,
         matchedRegion.value,
-        retainKey,
+        labelTag,
         multiplierTag,
-        fixedTag,
       ]
         .filter((item) => item !== "")
         .join(FGF);
@@ -691,7 +774,7 @@ function operator(pro) {
   }
 
   proxies = proxies.filter((item) => item.name !== null);
-  jxh(proxies);
+  jxh(proxies, sourceSequences);
   if (numone) oneP(proxies);
   if (blpx) proxies = fampx(proxies);
   if (key) proxies = proxies.filter((item) => !keyb.test(item.name));
@@ -704,7 +787,7 @@ function getList(arg) {
   return COUNTRY_ROWS.map((row) => row[field]);
 }
 
-function jxh(items) {
+function jxh(items, sourceSequences = new Map()) {
   const grouped = new Map();
   for (const item of items) {
     const name = item.name;
@@ -716,8 +799,18 @@ function jxh(items) {
 
   const expanded = [];
   for (const [name, group] of grouped.entries()) {
-    group.forEach((item, index) => {
-      expanded.push({ ...item, name: `${name}${XHFGF}${String(index + 1).padStart(2, "0")}` });
+    const sourceNumbers = group.map((item) => sourceSequences.get(item)).filter(Boolean);
+    const hasConflict = new Set(sourceNumbers).size !== sourceNumbers.length;
+    const used = new Set(hasConflict ? [] : sourceNumbers);
+    let next = 1;
+    group.forEach((item) => {
+      let sequence = hasConflict ? "" : sourceSequences.get(item);
+      if (!sequence) {
+        sequence = String(next++).padStart(2, "0");
+        while (used.has(sequence)) sequence = String(next++).padStart(2, "0");
+        used.add(sequence);
+      }
+      expanded.push({ ...item, name: `${name}${XHFGF}${sequence}` });
     });
   }
 

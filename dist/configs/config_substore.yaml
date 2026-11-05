@@ -542,7 +542,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Hong_Kong.png
     type: url-test
     include-all: true
-    filter: (?i)香港|港|HK|hk|Hong Kong|HongKong|hongkong
+    filter: (?i)香港|港|(?:^|[^A-Za-z])HK(?:[^A-Za-z]|$)|(?:^|[^A-Za-z])hk(?:[^A-Za-z]|$)|Hong Kong|HongKong|hongkong
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -552,7 +552,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Macao.png
     type: url-test
     include-all: true
-    filter: (?i)澳门|MO|Macau
+    filter: (?i)澳门|(?:^|[^A-Za-z])MO(?:[^A-Za-z]|$)|Macau
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -562,7 +562,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Taiwan.png
     type: url-test
     include-all: true
-    filter: (?i)台|新北|彰化|TW|Taiwan
+    filter: (?i)台|新北|彰化|(?:^|[^A-Za-z])TW(?:[^A-Za-z]|$)|Taiwan
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -572,7 +572,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Singapore.png
     type: url-test
     include-all: true
-    filter: (?i)新加坡|坡|狮城|SG|Singapore
+    filter: (?i)新加坡|坡|狮城|(?:^|[^A-Za-z])SG(?:[^A-Za-z]|$)|Singapore
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -582,7 +582,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Japan.png
     type: url-test
     include-all: true
-    filter: (?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan
+    filter: (?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?:^|[^A-Za-z])JP(?:[^A-Za-z]|$)|Japan
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -592,7 +592,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Korea.png
     type: url-test
     include-all: true
-    filter: (?i)KR|Korea|KOR|首尔|韩|韓
+    filter: (?i)(?:^|[^A-Za-z])KR(?:[^A-Za-z]|$)|Korea|(?:^|[^A-Za-z])KOR(?:[^A-Za-z]|$)|首尔|韩|韓
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -602,7 +602,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/United_States.png
     type: url-test
     include-all: true
-    filter: (?i)美国|美|US|United States
+    filter: (?i)美国|美|(?:^|[^A-Za-z])US(?:[^A-Za-z]|$)|United States
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -612,7 +612,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Canada.png
     type: url-test
     include-all: true
-    filter: (?i)加拿大|Canada|CA
+    filter: (?i)加拿大|Canada|(?:^|[^A-Za-z])CA(?:[^A-Za-z]|$)
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -622,7 +622,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/United_Kingdom.png
     type: url-test
     include-all: true
-    filter: (?i)英国|United Kingdom|UK|伦敦|London
+    filter: (?i)英国|United Kingdom|(?:^|[^A-Za-z])UK(?:[^A-Za-z]|$)|伦敦|London
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -632,7 +632,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Australia.png
     type: url-test
     include-all: true
-    filter: (?i)澳洲|澳大利亚|AU|Australia
+    filter: (?i)澳洲|澳大利亚|(?:^|[^A-Za-z])AU(?:[^A-Za-z]|$)|Australia
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -642,7 +642,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Germany.png
     type: url-test
     include-all: true
-    filter: (?i)德国|德|DE|Germany
+    filter: (?i)德国|德|(?:^|[^A-Za-z])DE(?:[^A-Za-z]|$)|Germany
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -652,7 +652,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/France.png
     type: url-test
     include-all: true
-    filter: (?i)法国|法|FR|France
+    filter: (?i)法国|法|(?:^|[^A-Za-z])FR(?:[^A-Za-z]|$)|France
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -662,7 +662,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Russia.png
     type: url-test
     include-all: true
-    filter: (?i)俄罗斯|俄|RU|Russia
+    filter: (?i)俄罗斯|俄|(?:^|[^A-Za-z])RU(?:[^A-Za-z]|$)|Russia
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -672,7 +672,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Thailand.png
     type: url-test
     include-all: true
-    filter: (?i)泰国|泰|TH|Thailand
+    filter: (?i)泰国|泰|(?:^|[^A-Za-z])TH(?:[^A-Za-z]|$)|Thailand
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -682,7 +682,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/India.png
     type: url-test
     include-all: true
-    filter: (?i)印度|IN|India
+    filter: (?i)印度|(?:^|[^A-Za-z])IN(?:[^A-Za-z]|$)|India
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -692,7 +692,7 @@ proxy-groups:
     icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Malaysia.png
     type: url-test
     include-all: true
-    filter: (?i)马来西亚|马来|MY|Malaysia
+    filter: (?i)马来西亚|马来|(?:^|[^A-Za-z])MY(?:[^A-Za-z]|$)|Malaysia
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
     url: https://cp.cloudflare.com/generate_204
     interval: 300

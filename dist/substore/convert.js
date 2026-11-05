@@ -309,6 +309,11 @@ const countryRegex = {
   马来西亚: '(?i)马来西亚|马来|MY|Malaysia'
 };
 
+// Country codes are tokens, not substrings of supplier/tier labels such as Datacamp or Plus.
+for (const country of Object.keys(countryRegex)) {
+  countryRegex[country] = countryRegex[country].replace(/\b[A-Za-z]{2,3}\b/g, '(?:^|[^A-Za-z])$&(?:[^A-Za-z]|$)');
+}
+
 const countryIconURLs = {
   香港: ICON('Hong_Kong.png'),
   台湾: ICON('Taiwan.png'),

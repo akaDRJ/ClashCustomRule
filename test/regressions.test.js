@@ -185,6 +185,196 @@ test('rename multiplier filters share numeric boundaries without treating bracke
   assert.equal(run({}).length, inputs.length);
 });
 
+test('rename keeps useful labels and explicit source indexes with blgd enabled', () => {
+  const cases = [
+    { name: 'JY', input: '🇯🇵Pro.GM.jp', expected: '🇯🇵 JY 日本 Pro·GM 01' },
+    { name: 'JY', input: '🇯🇵Plus.CN.jp.0.5x-1', expected: '🇯🇵 JY 日本 Plus·CN 0.5× 01' },
+    { name: 'HY', input: '香港高级 IEPL 专线 1', expected: '🇭🇰 HY 香港 高级·IEPL 01' },
+    { name: 'YT', input: '高级 专线 香港 01', expected: '🇭🇰 YT 香港 高级·专线 01' },
+    { name: 'NX', input: 'USA San Jose 01 [Premium]', expected: '🇺🇸 NX 美国 San Jose·Premium 01' },
+    { name: 'NX', input: 'Australia Sydney 01 [Premium]', expected: '🇦🇺 NX 澳大利亚 Sydney·Premium 01' },
+    { name: 'NX', input: 'Russia St. Petersburg', expected: '🇷🇺 NX 俄罗斯 St Petersburg 01' },
+    { name: 'IT', input: 'HKG 01', expected: '🇭🇰 IT 香港 01' },
+    { name: 'IT', input: 'JPN 05', expected: '🇯🇵 IT 日本 05' },
+    { name: 'IT', input: 'DEU 03', expected: '🇩🇪 IT 德国 03' },
+    { name: 'IT', input: '香港 第2代', expected: '🇭🇰 IT 香港 第2代 01' },
+    { name: 'IT', input: '🇭🇰 落地 香港 01 AnyTLS', expected: '🇭🇰 IT 香港 落地 01' },
+    { name: 'LX', input: '🇭🇰香港高速01|BGP|CMCU', expected: '🇭🇰 LX 香港 BGP·CMCU 01' },
+    { name: 'LX', input: '🇺🇸美国洛杉矶01|流媒体|0.01x', expected: '🇺🇸 LX 美国 洛杉矶·流媒体 0.01× 01' },
+    { name: 'VK', input: '🇭🇰 HK-Go-02-HKT', expected: '🇭🇰 VK 香港 Go·HKT 02' },
+    { name: 'MJ', input: '新加坡-优化-GPT', expected: '🇸🇬 MJ 新加坡 GPT 01' }
+  ];
+
+  for (const { name, input, expected } of cases) {
+    const rename = loadRename({ flag: true, name, blgd: true, bl: true });
+    assert.equal(rename.operator([{ name: input }])[0].name, expected, input);
+  }
+});
+
+test('rename applies explicit blkey replacements before extracting source labels', () => {
+  const rename = loadRename({ flag: true, blgd: true, blkey: 'GPT>AI' });
+  const result = rename.operator([{ name: '香港 BGP GPT' }]);
+
+  assert.equal(result[0].name, '🇭🇰 香港 BGP·AI 01');
+});
+
+test('rename retains decimal bracket rates and source indexes without confusing them', () => {
+  const rename = loadRename({ flag: true, name: 'YT', blgd: true, bl: true, nx: true });
+  const result = rename.operator([
+    { name: '香港 [02]', id: 'index' },
+    { name: '日用 专线 香港 [0.2]', id: 'rate' },
+    { name: '香港 2x', id: 'high-rate' }
+  ]);
+
+  assert.deepEqual(result.map(({ id, name }) => ({ id, name })), [
+    { id: 'index', name: '🇭🇰 YT 香港 02' },
+    { id: 'rate', name: '🇭🇰 YT 香港 日用·专线 0.2× 01' }
+  ]);
+});
+
+test('rename strips case-insensitive ASCII region names that contain spaces', () => {
+  const cases = [
+    { input: 'hOnG kOnG BGP 01', expected: '🇭🇰 香港 BGP 01' },
+    { input: 'uNiTeD kInGdOm Pro 02', expected: '🇬🇧 英国 Pro 02' }
+  ];
+
+  for (const { input, expected } of cases) {
+    const rename = loadRename({ flag: true, blgd: true });
+    assert.equal(rename.operator([{ name: input }])[0].name, expected, input);
+  }
+});
+
+test('rename recognizes observed regional aliases and removes them from retained labels', () => {
+  const cases = [
+    { input: '高级 专线 狮城 05', expected: '🇸🇬 新加坡 高级·专线 05' },
+    { input: 'SGP 03', expected: '🇸🇬 新加坡 03' },
+    { input: 'TWN 04', expected: '🇨🇳 台湾 04' },
+    { input: 'KOR 02', expected: '🇰🇷 韩国 02' },
+    { input: 'GBR 06', expected: '🇬🇧 英国 06' }
+  ];
+
+  for (const { input, expected } of cases) {
+    const rename = loadRename({ flag: true, blgd: true });
+    assert.equal(rename.operator([{ name: input }])[0].name, expected, input);
+  }
+});
+
+test('rename removes only one occurrence of a region alias from source labels', () => {
+  const rename = loadRename({ flag: true, blgd: true });
+  const result = rename.operator([{ name: '🇸🇬 SG-Go-01-SG.GS' }]);
+
+  assert.equal(result[0].name, '🇸🇬 新加坡 Go·SG·GS 01');
+});
+
+test('rename resolves conflicting rate markers by maximum and strips every marker', () => {
+  const inputs = [
+    { name: '香港 2x [0.2]', id: 'explicit-first' },
+    { name: '香港 [0.2] 2x', id: 'explicit-last' },
+    { name: '香港 [1.5]', id: 'bracket-high' },
+    { name: '香港 [0.2]', id: 'bracket-low' },
+    { name: '香港 [02]', id: 'integer-index' }
+  ];
+  const run = (args) => loadRename({ flag: true, blgd: true, bl: true, ...args })
+    .operator(inputs.map((proxy) => ({ ...proxy })));
+
+  assert.deepEqual(run({ nx: true }).map((proxy) => proxy.id), ['bracket-low', 'integer-index']);
+  assert.deepEqual(run({}).map(({ id, name }) => ({ id, name })), [
+    { id: 'explicit-first', name: '🇭🇰 香港 2× 01' },
+    { id: 'explicit-last', name: '🇭🇰 香港 2× 02' },
+    { id: 'bracket-high', name: '🇭🇰 香港 1.5× 01' },
+    { id: 'bracket-low', name: '🇭🇰 香港 0.2× 01' },
+    { id: 'integer-index', name: '🇭🇰 香港 02' }
+  ]);
+});
+
+test('rename falls back to unique group numbering when source indexes conflict', () => {
+  const rename = loadRename({ flag: true, name: 'JY', blgd: true });
+  const result = rename.operator([
+    { name: '🇭🇰Pro.GM.hk-02' },
+    { name: '🇭🇰Pro.GM.hk' },
+    { name: '🇭🇰Pro.GM.hk-02' }
+  ]);
+
+  assert.deepEqual(result.map((proxy) => proxy.name), [
+    '🇭🇰 JY 香港 Pro·GM 01',
+    '🇭🇰 JY 香港 Pro·GM 02',
+    '🇭🇰 JY 香港 Pro·GM 03'
+  ]);
+  assert.equal(new Set(result.map((proxy) => proxy.name)).size, result.length);
+});
+
+test('rename avoids repeating its own leading prefix while preserving later same-named labels', () => {
+  const rename = loadRename({ flag: true, name: 'LX', blgd: true });
+  const result = rename.operator([
+    { name: '🇭🇰 LX 香港 BGP·CMCU 01' },
+    { name: '🇭🇰 香港 LX BGP·CMCU 02' }
+  ]);
+
+  assert.deepEqual(result.map((proxy) => proxy.name), [
+    '🇭🇰 LX 香港 BGP·CMCU 01',
+    '🇭🇰 LX 香港 LX·BGP·CMCU 02'
+  ]);
+});
+
+test('rename removes duplicate retained labels and changes only the name field', () => {
+  const rename = loadRename({ flag: true, name: 'LX', blgd: true, blkey: 'IEPL' });
+  const input = { name: '🇭🇰香港 IEPL 专线 IEPL 04', server: 'example.invalid', port: 443, type: 'ss' };
+  const result = rename.operator([input])[0];
+
+  assert.equal(result.name, '🇭🇰 LX 香港 IEPL 04');
+  assert.deepEqual({ server: result.server, port: result.port, type: result.type }, {
+    server: 'example.invalid', port: 443, type: 'ss'
+  });
+});
+
+test('rename keeps compact output unchanged when blgd is disabled', () => {
+  const rename = loadRename({ flag: true, name: 'JY', blgd: false });
+  const result = rename.operator([
+    { name: '🇭🇰Pro.GM.hk' },
+    { name: '🇭🇰Plus.CN.hk.0.5x-1' }
+  ]);
+
+  assert.deepEqual(result.map((proxy) => proxy.name), ['🇭🇰 JY 香港 01', '🇭🇰 JY 香港 02']);
+});
+
+test('rename preserves five self-source naming patterns with blgd and bl disabled', () => {
+  const cases = [
+    { name: 'ARGO', input: '🇨🇳 ARGO 台湾 01 VLESS', expected: '🇨🇳 ARGO 台湾 01' },
+    { name: 'IX', input: '🇨🇳 IX 台湾 01', expected: '🇨🇳 IX 台湾 01' },
+    { name: '落地', input: '🇨🇳 落地 台湾 01 AnyTLS', expected: '🇨🇳 落地 台湾 01' },
+    { name: '落地', input: '🇸🇬 落地 新加坡 01 AnyTLS', expected: '🇸🇬 落地 新加坡 01' },
+    { name: 'IX', input: '🇸🇬 IX 新加坡 01', expected: '🇸🇬 IX 新加坡 01' }
+  ];
+
+  for (const { name, input, expected } of cases) {
+    const rename = loadRename({ flag: true, name, blgd: false, bl: false });
+    assert.equal(rename.operator([{ name: input }])[0].name, expected, input);
+  }
+});
+
+test('convert does not treat retained supplier and tier substrings as country codes', () => {
+  for (const regex of [false, true]) {
+    const result = loadAkcdnFallbackConvert({ regex }).main({
+      proxies: [
+        { name: '🇸🇬 VK 新加坡 Go·Datacamp 02', type: 'ss' },
+        { name: '🇯🇵 VK 日本 Go·Jinx 01', type: 'ss' },
+        { name: '🇸🇬 VK 新加坡 HostHatch 05', type: 'ss' },
+        { name: '🇯🇵 JY 日本 Plus·GM 01', type: 'ss' }
+      ]
+    });
+    const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+    for (const country of ['加拿大', '印度', '泰国', '美国']) {
+      assert.equal(groups[`${country}节点`], undefined, `${country}, regex=${regex}`);
+    }
+    const defined = new Set([...Object.keys(groups), ...result.proxies.map((proxy) => proxy.name), 'DIRECT', 'REJECT']);
+    for (const group of result['proxy-groups']) {
+      for (const reference of group.proxies || []) {
+        assert.ok(defined.has(reference), `${group.name} references missing ${reference}`);
+      }
+    }
+  }
+});
+
 test('rename preserves existing block-quic when argument is omitted', () => {
   const rename = loadRename({});
   const result = rename.operator([{ name: '香港 IPLC', 'block-quic': 'on' }]);
