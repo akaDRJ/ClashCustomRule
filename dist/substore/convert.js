@@ -832,6 +832,11 @@ function buildProxyGroups(
       defaultSelector.unshift(defaultLanding);
     }
     insertAfter(globalProxies, '自动选择', '前置代理');
+    insertUniqueAt(
+      globalProxies,
+      globalProxies.indexOf(hasAkcdnFallbackGroup ? 'IX节点' : '前置代理') + 1,
+      landingCountryGroupNames
+    );
   }
   appendUnique(globalProxies, countryProxies);
 

@@ -618,6 +618,32 @@ test('convert keeps global country groups in detected country order', () => {
   );
 });
 
+test('convert places country landings beside IX and low-cost groups in GLOBAL', () => {
+  for (const akcdnfallback of [false, true]) {
+    for (const regex of [false, true]) {
+      for (const smart of [false, true]) {
+        const result = loadConvert({ landing: true, akcdnfallback, regex, smart }).main({
+          proxies: [
+            { name: '香港 0.5x', type: 'ss' },
+            { name: 'IX 台湾 01', type: 'ss' },
+            { name: '落地 新加坡 01', type: 'ss', 'dialer-proxy': '前置代理' },
+            { name: '落地 台湾 01', type: 'ss', 'dialer-proxy': '前置代理' }
+          ]
+        });
+        const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
+        const expectedFront = [
+          '节点选择', '手动切换', '自动选择', '前置代理',
+          ...(akcdnfallback ? ['IX节点'] : []),
+          '新加坡落地', '台湾落地', '低倍率节点'
+        ];
+        assert.deepEqual(groups.GLOBAL.proxies.slice(0, expectedFront.length), expectedFront);
+        assert.equal(new Set(groups.GLOBAL.proxies).size, groups.GLOBAL.proxies.length);
+        assert.equal(groups['节点选择'].proxies[0], akcdnfallback ? 'IX节点' : '台湾落地');
+      }
+    }
+  }
+});
+
 test('convert omits empty landing group in enumerated mode', () => {
   const convert = loadConvert({ landing: true });
   const result = convert.main({
