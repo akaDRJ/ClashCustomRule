@@ -62,6 +62,12 @@ For a Sub-Store file, set the script argument `collection` to the source collect
 
 In link mode, include public arguments in the script URL fragment, for example `#collection=My%20Collection#noCache`. Keep private API/proxy credentials in the local file content's JSON `options` object rather than the link. This object can also set `mixedListen`, `mixedPort`, `httpPort`, `socksPort` and `mixedUsers` to retain existing authenticated LAN listeners and unauthenticated IPv4/IPv6 loopback access.
 
+## Policy Icons
+
+Mihomo/Sub-Store policy groups and both YAML templates use [aaANDkk/Qure_Style_SVG](https://github.com/aaANDkk/Qure_Style_SVG), pinned to commit `dec37a65d73ea1b558706a446c0798397c2b05c0` through the existing jsDelivr CDN. Service and strategy icons use `common/`; country, transit-country and landing groups use `flag/`. The client UI must support SVG icons; PNG-only clients cannot display them.
+
+Credits: aaANDkk and Koolson/Qure. The upstream [third-party notices](https://github.com/aaANDkk/Qure_Style_SVG/blob/dec37a65d73ea1b558706a446c0798397c2b05c0/THIRD_PARTY_NOTICES.md) retain the original source licenses and learning/non-commercial usage requirements.
+
 ## Maintenance
 
 ```bash

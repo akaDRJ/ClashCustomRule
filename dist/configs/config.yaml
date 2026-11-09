@@ -88,7 +88,7 @@ geox-url:
   asn: https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@release/GeoLite2-ASN.mmdb
 proxy-groups:
   - name: 节点选择
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Proxy.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Proxy.svg
     type: select
     proxies:
       - 自动选择
@@ -112,7 +112,7 @@ proxy-groups:
       - 手动切换
       - DIRECT
   - name: 低倍率节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Pig.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Pig.svg
     type: url-test
     url: https://cp.cloudflare.com/generate_204
     interval: 300
@@ -121,11 +121,11 @@ proxy-groups:
     include-all: true
     filter: (?i)0\.[0-5]|低倍率|省流|大流量|实验性
   - name: 手动切换
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Static.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Static.svg
     type: select
     include-all: true
   - name: 自动选择
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Auto.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Auto.svg
     type: url-test
     include-all: true
     exclude-filter: (?i)家宽|家庭|家庭宽带|商宽|商业宽带|星链|Starlink|落地
@@ -134,14 +134,14 @@ proxy-groups:
     tolerance: 20
     lazy: false
   - name: 强制代理
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Proxy.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Proxy.svg
     type: select
     proxies:
       - 节点选择
       - 手动切换
       - 全球直连
   - name: 人工智能
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/AI.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/AI.svg
     type: select
     proxies:
       - 节点选择
@@ -166,7 +166,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: 加密货币
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Cryptocurrency_1.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Cryptocurrency.svg
     type: select
     proxies:
       - 节点选择
@@ -191,7 +191,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: PayPal
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/PayPal.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/PayPal.svg
     type: select
     proxies:
       - 节点选择
@@ -216,7 +216,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Telegram
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Telegram.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Telegram.svg
     type: select
     proxies:
       - 节点选择
@@ -241,7 +241,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Microsoft
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Microsoft.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Microsoft.svg
     type: select
     proxies:
       - 节点选择
@@ -266,7 +266,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Apple
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Apple_1.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Apple.svg
     type: select
     proxies:
       - 节点选择
@@ -291,7 +291,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Google
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Google_Search.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Google.svg
     type: select
     proxies:
       - 节点选择
@@ -316,7 +316,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: YouTube
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/YouTube.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/YouTube.svg
     type: select
     proxies:
       - 节点选择
@@ -341,7 +341,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Disney
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Disney+.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Disney.svg
     type: select
     proxies:
       - 节点选择
@@ -366,7 +366,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Netflix
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Netflix.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Netflix.svg
     type: select
     proxies:
       - 节点选择
@@ -391,7 +391,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Spotify
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Spotify.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Spotify.svg
     type: select
     proxies:
       - 节点选择
@@ -416,7 +416,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Twitter(X)
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/X.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/X.svg
     type: select
     proxies:
       - 节点选择
@@ -441,14 +441,14 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: 学术资源
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Scholar.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Scholar.svg
     type: select
     proxies:
       - 节点选择
       - 手动切换
       - 全球直连
   - name: 开发者资源
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/GitHub.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/GitHub.svg
     type: select
     proxies:
       - 节点选择
@@ -473,7 +473,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: 游戏下载
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Download.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Download.svg
     type: select
     proxies:
       - 节点选择
@@ -498,7 +498,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: 游戏平台
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Game.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Game.svg
     type: select
     proxies:
       - 节点选择
@@ -523,7 +523,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: Speedtest
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Speedtest.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Speedtest.svg
     type: select
     proxies:
       - 节点选择
@@ -548,13 +548,13 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: 全球直连
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Direct.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Direct.svg
     type: select
     proxies:
       - DIRECT
       - 节点选择
   - name: 香港节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Hong_Kong.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Hong_Kong.svg
     type: url-test
     include-all: true
     filter: (?i)香港|港|(?:^|[^A-Za-z])HK(?:[^A-Za-z]|$)|(?:^|[^A-Za-z])hk(?:[^A-Za-z]|$)|Hong Kong|HongKong|hongkong
@@ -564,7 +564,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 澳门节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Macao.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Macau.svg
     type: url-test
     include-all: true
     filter: (?i)澳门|(?:^|[^A-Za-z])MO(?:[^A-Za-z]|$)|Macau
@@ -574,7 +574,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 台湾节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Taiwan.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/China_Taiwan.svg
     type: url-test
     include-all: true
     filter: (?i)台|新北|彰化|(?:^|[^A-Za-z])TW(?:[^A-Za-z]|$)|Taiwan
@@ -584,7 +584,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 新加坡节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Singapore.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Singapore.svg
     type: url-test
     include-all: true
     filter: (?i)新加坡|坡|狮城|(?:^|[^A-Za-z])SG(?:[^A-Za-z]|$)|Singapore
@@ -594,7 +594,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 日本节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Japan.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Japan.svg
     type: url-test
     include-all: true
     filter: (?i)日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?:^|[^A-Za-z])JP(?:[^A-Za-z]|$)|Japan
@@ -604,7 +604,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 韩国节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Korea.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/South_Korea.svg
     type: url-test
     include-all: true
     filter: (?i)(?:^|[^A-Za-z])KR(?:[^A-Za-z]|$)|Korea|(?:^|[^A-Za-z])KOR(?:[^A-Za-z]|$)|首尔|韩|韓
@@ -614,7 +614,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 美国节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/United_States.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/United_States.svg
     type: url-test
     include-all: true
     filter: (?i)美国|美|(?:^|[^A-Za-z])US(?:[^A-Za-z]|$)|United States
@@ -624,7 +624,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 加拿大节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Canada.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Canada.svg
     type: url-test
     include-all: true
     filter: (?i)加拿大|Canada|(?:^|[^A-Za-z])CA(?:[^A-Za-z]|$)
@@ -634,7 +634,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 英国节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/United_Kingdom.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/United_Kingdom.svg
     type: url-test
     include-all: true
     filter: (?i)英国|United Kingdom|(?:^|[^A-Za-z])UK(?:[^A-Za-z]|$)|伦敦|London
@@ -644,7 +644,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 澳大利亚节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Australia.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Australia.svg
     type: url-test
     include-all: true
     filter: (?i)澳洲|澳大利亚|(?:^|[^A-Za-z])AU(?:[^A-Za-z]|$)|Australia
@@ -654,7 +654,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 德国节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Germany.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Germany.svg
     type: url-test
     include-all: true
     filter: (?i)德国|德|(?:^|[^A-Za-z])DE(?:[^A-Za-z]|$)|Germany
@@ -664,7 +664,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 法国节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/France.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/France.svg
     type: url-test
     include-all: true
     filter: (?i)法国|法|(?:^|[^A-Za-z])FR(?:[^A-Za-z]|$)|France
@@ -674,7 +674,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 俄罗斯节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Russia.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Russia.svg
     type: url-test
     include-all: true
     filter: (?i)俄罗斯|俄|(?:^|[^A-Za-z])RU(?:[^A-Za-z]|$)|Russia
@@ -684,7 +684,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 泰国节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Thailand.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Thailand.svg
     type: url-test
     include-all: true
     filter: (?i)泰国|泰|(?:^|[^A-Za-z])TH(?:[^A-Za-z]|$)|Thailand
@@ -694,7 +694,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 印度节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/India.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/India.svg
     type: url-test
     include-all: true
     filter: (?i)印度|(?:^|[^A-Za-z])IN(?:[^A-Za-z]|$)|India
@@ -704,7 +704,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: 马来西亚节点
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Malaysia.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/flag/Malaysia.svg
     type: url-test
     include-all: true
     filter: (?i)马来西亚|马来|(?:^|[^A-Za-z])MY(?:[^A-Za-z]|$)|Malaysia
@@ -714,7 +714,7 @@ proxy-groups:
     tolerance: 20
     lazy: true
   - name: GLOBAL
-    icon: https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/Global.png
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Global.svg
     type: select
     include-all: true
     proxies:

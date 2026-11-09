@@ -197,8 +197,8 @@ function buildRules(quicEnabled) {
 
 // ======================= 统一资源与图标 =======================
 const CDN = 'https://gcore.jsdelivr.net';
-const QURE_REF = 'b16b260625f873266f6a6a9b88710132774997b8';
-const ICON = (path) => `${CDN}/gh/Koolson/Qure@${QURE_REF}/IconSet/Color/${path}`;
+const QURE_REF = 'dec37a65d73ea1b558706a446c0798397c2b05c0';
+const ICON = (path) => `${CDN}/gh/aaANDkk/Qure_Style_SVG@${QURE_REF}/icon/svg/${path}`;
 const GEOX_CDN = 'https://cdn.jsdelivr.net';
 
 // ================= rule-providers（工厂） =================
@@ -315,22 +315,22 @@ for (const country of Object.keys(countryRegex)) {
 }
 
 const countryIconURLs = {
-  香港: ICON('Hong_Kong.png'),
-  台湾: ICON('Taiwan.png'),
-  新加坡: ICON('Singapore.png'),
-  日本: ICON('Japan.png'),
-  韩国: ICON('Korea.png'),
-  美国: ICON('United_States.png'),
-  英国: ICON('United_Kingdom.png'),
-  加拿大: ICON('Canada.png'),
-  澳大利亚: ICON('Australia.png'),
-  德国: ICON('Germany.png'),
-  俄罗斯: ICON('Russia.png'),
-  泰国: ICON('Thailand.png'),
-  印度: ICON('India.png'),
-  马来西亚: ICON('Malaysia.png'),
-  澳门: ICON('Macao.png'),
-  法国: ICON('France.png')
+  香港: ICON('flag/Hong_Kong.svg'),
+  台湾: ICON('flag/China_Taiwan.svg'),
+  新加坡: ICON('flag/Singapore.svg'),
+  日本: ICON('flag/Japan.svg'),
+  韩国: ICON('flag/South_Korea.svg'),
+  美国: ICON('flag/United_States.svg'),
+  英国: ICON('flag/United_Kingdom.svg'),
+  加拿大: ICON('flag/Canada.svg'),
+  澳大利亚: ICON('flag/Australia.svg'),
+  德国: ICON('flag/Germany.svg'),
+  俄罗斯: ICON('flag/Russia.svg'),
+  泰国: ICON('flag/Thailand.svg'),
+  印度: ICON('flag/India.svg'),
+  马来西亚: ICON('flag/Malaysia.svg'),
+  澳门: ICON('flag/Macau.svg'),
+  法国: ICON('flag/France.svg')
 };
 
 const ISP_EXCLUDE_PATTERN =
@@ -350,23 +350,23 @@ const COUNTRY_REGEX_MAP = new Map(
 );
 
 const SERVICE_GROUP_SPECS = Object.freeze([
-  { name: '人工智能', icon: 'AI.png', source: 'default' },
-  { name: '加密货币', icon: 'Cryptocurrency_1.png', source: 'default' },
-  { name: 'PayPal', icon: 'PayPal.png', source: 'default' },
-  { name: 'Telegram', icon: 'Telegram.png', source: 'default' },
-  { name: 'Microsoft', icon: 'Microsoft.png', source: 'default' },
-  { name: 'Apple', icon: 'Apple_1.png', source: 'default' },
-  { name: 'Google', icon: 'Google_Search.png', source: 'default' },
-  { name: 'YouTube', icon: 'YouTube.png', source: 'default' },
-  { name: 'Disney', icon: 'Disney+.png', source: 'default' },
-  { name: 'Netflix', icon: 'Netflix.png', source: 'default' },
-  { name: 'Spotify', icon: 'Spotify.png', source: 'default' },
-  { name: 'Twitter(X)', icon: 'X.png', source: 'default' },
-  { name: '学术资源', icon: 'Scholar.png', source: 'direct' },
-  { name: '开发者资源', icon: 'GitHub.png', source: 'default' },
-  { name: '游戏下载', icon: 'Download.png', source: 'default' },
-  { name: '游戏平台', icon: 'Game.png', source: 'default' },
-  { name: 'Speedtest', icon: 'Speedtest.png', source: 'default' }
+  { name: '人工智能', icon: 'common/AI.svg', source: 'default' },
+  { name: '加密货币', icon: 'common/Cryptocurrency.svg', source: 'default' },
+  { name: 'PayPal', icon: 'common/PayPal.svg', source: 'default' },
+  { name: 'Telegram', icon: 'common/Telegram.svg', source: 'default' },
+  { name: 'Microsoft', icon: 'common/Microsoft.svg', source: 'default' },
+  { name: 'Apple', icon: 'common/Apple.svg', source: 'default' },
+  { name: 'Google', icon: 'common/Google.svg', source: 'default' },
+  { name: 'YouTube', icon: 'common/YouTube.svg', source: 'default' },
+  { name: 'Disney', icon: 'common/Disney.svg', source: 'default' },
+  { name: 'Netflix', icon: 'common/Netflix.svg', source: 'default' },
+  { name: 'Spotify', icon: 'common/Spotify.svg', source: 'default' },
+  { name: 'Twitter(X)', icon: 'common/X.svg', source: 'default' },
+  { name: '学术资源', icon: 'common/Scholar.svg', source: 'direct' },
+  { name: '开发者资源', icon: 'common/GitHub.svg', source: 'default' },
+  { name: '游戏下载', icon: 'common/Download.svg', source: 'default' },
+  { name: '游戏平台', icon: 'common/Game.svg', source: 'default' },
+  { name: 'Speedtest', icon: 'common/Speedtest.svg', source: 'default' }
 ]);
 
 // ======================== 工具函数 ========================
@@ -659,7 +659,7 @@ function buildTransitProxyGroups(countryList, transitNodes) {
   const groups = [
     {
       name: '中转自动选择',
-      icon: ICON('Auto.png'),
+      icon: ICON('common/Auto.svg'),
       type: autoGroupType(),
       proxies: [...uniqueTransitNodes],
       ...timedAutoGroupFields()
@@ -670,7 +670,7 @@ function buildTransitProxyGroups(countryList, transitNodes) {
   if (lowCostTransitNodes.length) {
     const lowCostGroup = {
       name: '中转低倍率节点',
-      icon: ICON('Pig.png'),
+      icon: ICON('common/Pig.svg'),
       type: regionalAutoGroupType(),
       proxies: lowCostTransitNodes
     };
@@ -682,7 +682,7 @@ function buildTransitProxyGroups(countryList, transitNodes) {
 
   groups.push({
     name: '中转手动切换',
-    icon: ICON('Static.png'),
+    icon: ICON('common/Static.svg'),
     type: 'select',
     proxies: [...uniqueTransitNodes]
   });
@@ -847,7 +847,7 @@ function buildProxyGroups(
     hasLandingGroup && !hasAkcdnFallbackGroup && transitNodes.length
       ? {
           name: '中转手动切换',
-          icon: ICON('Static.png'),
+          icon: ICON('common/Static.svg'),
           type: 'select',
           proxies: uniqueStrings(transitNodes)
         }
@@ -870,7 +870,7 @@ function buildProxyGroups(
   return [
     {
       name: '节点选择',
-      icon: ICON('Proxy.png'),
+      icon: ICON('common/Proxy.svg'),
       type: 'select',
       proxies: [...defaultSelector]
     },
@@ -878,7 +878,7 @@ function buildProxyGroups(
     hasAkcdnFallbackGroup
       ? {
           name: 'IX节点',
-          icon: ICON('Available.png'),
+          icon: ICON('common/Available.svg'),
           type: 'select',
           proxies: [...akcdnFallbackNodes]
         }
@@ -889,7 +889,7 @@ function buildProxyGroups(
     hasLandingGroup
       ? {
           name: '前置代理',
-          icon: ICON('LinkCube.png'),
+          icon: ICON('common/LinkCube.svg'),
           type: 'select',
           ...(hasAkcdnFallbackGroup
             ? { proxies: [...preProxySelector] }
@@ -909,7 +909,7 @@ function buildProxyGroups(
     hasLowCostGroup
       ? {
           name: '低倍率节点',
-          icon: ICON('Pig.png'),
+          icon: ICON('common/Pig.svg'),
           type: regionalAutoGroupType(),
           ...(!options.loadBalance ? timedAutoGroupFields(true) : {}),
           ...(options.regexFilter
@@ -926,14 +926,14 @@ function buildProxyGroups(
 
     {
       name: '手动切换',
-      icon: ICON('Static.png'),
+      icon: ICON('common/Static.svg'),
       type: 'select',
       'include-all': true
     },
 
     {
       name: '自动选择',
-      icon: ICON('Auto.png'),
+      icon: ICON('common/Auto.svg'),
       type: autoGroupType(),
       'include-all': true,
       'exclude-filter': addExcludePattern(ISP_EXCLUDE_PATTERN, dialerProxyExcludePattern),
@@ -942,7 +942,7 @@ function buildProxyGroups(
 
     {
       name: '强制代理',
-      icon: ICON('Proxy.png'),
+      icon: ICON('common/Proxy.svg'),
       type: 'select',
       proxies: ['节点选择', '手动切换', '全球直连']
     },
@@ -951,7 +951,7 @@ function buildProxyGroups(
 
     {
       name: '全球直连',
-      icon: ICON('Direct.png'),
+      icon: ICON('common/Direct.svg'),
       type: 'select',
       proxies: ['DIRECT', '节点选择']
     },
@@ -960,7 +960,7 @@ function buildProxyGroups(
 
     {
       name: 'GLOBAL',
-      icon: ICON('Global.png'),
+      icon: ICON('common/Global.svg'),
       type: 'select',
       'include-all': true,
       proxies: [...globalProxies]

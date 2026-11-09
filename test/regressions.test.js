@@ -1268,7 +1268,7 @@ test('convert fails clearly when a country landing group collides with an input 
   );
 });
 
-test('convert uses pinned Qure icons with distinct policy semantics', () => {
+test('convert uses pinned Qure Style SVG icons with distinct policy semantics', () => {
   const convert = loadAkcdnFallbackConvert({});
   const result = convert.main({
     proxies: [
@@ -1286,23 +1286,33 @@ test('convert uses pinned Qure icons with distinct policy semantics', () => {
     ]
   });
   const groups = Object.fromEntries(result['proxy-groups'].map((group) => [group.name, group]));
-  const base = 'https://gcore.jsdelivr.net/gh/Koolson/Qure@b16b260625f873266f6a6a9b88710132774997b8/IconSet/Color/';
+  const base = 'https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/';
 
-  assert.equal(groups['人工智能'].icon, `${base}AI.png`);
-  assert.equal(groups['加密货币'].icon, `${base}Cryptocurrency_1.png`);
-  assert.equal(groups.Apple.icon, `${base}Apple_1.png`);
-  assert.equal(groups['Twitter(X)'].icon, `${base}X.png`);
-  assert.equal(groups['游戏下载'].icon, `${base}Download.png`);
-  assert.equal(groups['游戏平台'].icon, `${base}Game.png`);
-  assert.equal(groups['IX节点'].icon, `${base}Available.png`);
-  assert.equal(groups['台湾落地'].icon, `${base}Taiwan.png`);
-  assert.equal(groups['前置代理'].icon, `${base}LinkCube.png`);
-  assert.equal(groups['低倍率节点'].icon, `${base}Pig.png`);
-  assert.equal(groups['中转低倍率节点'].icon, `${base}Pig.png`);
-  assert.equal(groups['手动切换'].icon, `${base}Static.png`);
-  assert.equal(groups['中转手动切换'].icon, `${base}Static.png`);
-  assert.equal(groups['自动选择'].icon, `${base}Auto.png`);
-  assert.equal(groups['节点选择'].icon, `${base}Proxy.png`);
+  for (const group of result['proxy-groups']) {
+    assert.ok(group.icon.startsWith(base), `${group.name}: icon must use the pinned SVG library`);
+    assert.match(group.icon.slice(base.length), /^(common|flag)\/[^/]+\.svg$/);
+  }
+
+  assert.equal(groups['人工智能'].icon, `${base}common/AI.svg`);
+  assert.equal(groups['加密货币'].icon, `${base}common/Cryptocurrency.svg`);
+  assert.equal(groups.Apple.icon, `${base}common/Apple.svg`);
+  assert.equal(groups.Google.icon, `${base}common/Google.svg`);
+  assert.equal(groups.Disney.icon, `${base}common/Disney.svg`);
+  assert.equal(groups['香港节点'].icon, `${base}flag/Hong_Kong.svg`);
+  assert.equal(groups['中转香港节点'].icon, `${base}flag/Hong_Kong.svg`);
+  assert.equal(groups['日本节点'].icon, `${base}flag/Japan.svg`);
+  assert.equal(groups['Twitter(X)'].icon, `${base}common/X.svg`);
+  assert.equal(groups['游戏下载'].icon, `${base}common/Download.svg`);
+  assert.equal(groups['游戏平台'].icon, `${base}common/Game.svg`);
+  assert.equal(groups['IX节点'].icon, `${base}common/Available.svg`);
+  assert.equal(groups['台湾落地'].icon, `${base}flag/China_Taiwan.svg`);
+  assert.equal(groups['前置代理'].icon, `${base}common/LinkCube.svg`);
+  assert.equal(groups['低倍率节点'].icon, `${base}common/Pig.svg`);
+  assert.equal(groups['中转低倍率节点'].icon, `${base}common/Pig.svg`);
+  assert.equal(groups['手动切换'].icon, `${base}common/Static.svg`);
+  assert.equal(groups['中转手动切换'].icon, `${base}common/Static.svg`);
+  assert.equal(groups['自动选择'].icon, `${base}common/Auto.svg`);
+  assert.equal(groups['节点选择'].icon, `${base}common/Proxy.svg`);
 });
 
 test('IX selector remains available with landings but no independent transit node', () => {
