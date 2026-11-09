@@ -1304,13 +1304,14 @@ test('convert uses pinned Qure Style SVG icons with distinct policy semantics', 
   assert.equal(groups['Twitter(X)'].icon, `${base}common/X.svg`);
   assert.equal(groups['游戏下载'].icon, `${base}common/Download.svg`);
   assert.equal(groups['游戏平台'].icon, `${base}common/Game.svg`);
+  assert.equal(groups['开发者资源'].icon, `${base}common/Stack.svg`);
   assert.equal(groups['IX节点'].icon, `${base}common/Available.svg`);
   assert.equal(groups['台湾落地'].icon, `${base}flag/China_Taiwan.svg`);
-  assert.equal(groups['前置代理'].icon, `${base}common/LinkCube.svg`);
+  assert.equal(groups['前置代理'].icon, `${base}common/Server.svg`);
   assert.equal(groups['低倍率节点'].icon, `${base}common/Pig.svg`);
   assert.equal(groups['中转低倍率节点'].icon, `${base}common/Pig.svg`);
-  assert.equal(groups['手动切换'].icon, `${base}common/Static.svg`);
-  assert.equal(groups['中转手动切换'].icon, `${base}common/Static.svg`);
+  assert.equal(groups['手动切换'].icon, `${base}common/Available.svg`);
+  assert.equal(groups['中转手动切换'].icon, `${base}common/Available.svg`);
   assert.equal(groups['自动选择'].icon, `${base}common/Auto.svg`);
   assert.equal(groups['节点选择'].icon, `${base}common/Proxy.svg`);
 });

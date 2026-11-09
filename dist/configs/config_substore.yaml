@@ -106,7 +106,7 @@ proxy-groups:
     include-all: true
     filter: (?i)0\.[0-5]|低倍率|省流|大流量|实验性
   - name: 手动切换
-    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Static.svg
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Available.svg
     type: select
     include-all: true
   - name: 自动选择
@@ -433,7 +433,7 @@ proxy-groups:
       - 手动切换
       - 全球直连
   - name: 开发者资源
-    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/GitHub.svg
+    icon: https://gcore.jsdelivr.net/gh/aaANDkk/Qure_Style_SVG@dec37a65d73ea1b558706a446c0798397c2b05c0/icon/svg/common/Stack.svg
     type: select
     proxies:
       - 节点选择

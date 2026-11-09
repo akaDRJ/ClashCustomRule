@@ -363,7 +363,7 @@ const SERVICE_GROUP_SPECS = Object.freeze([
   { name: 'Spotify', icon: 'common/Spotify.svg', source: 'default' },
   { name: 'Twitter(X)', icon: 'common/X.svg', source: 'default' },
   { name: '学术资源', icon: 'common/Scholar.svg', source: 'direct' },
-  { name: '开发者资源', icon: 'common/GitHub.svg', source: 'default' },
+  { name: '开发者资源', icon: 'common/Stack.svg', source: 'default' },
   { name: '游戏下载', icon: 'common/Download.svg', source: 'default' },
   { name: '游戏平台', icon: 'common/Game.svg', source: 'default' },
   { name: 'Speedtest', icon: 'common/Speedtest.svg', source: 'default' }
@@ -682,7 +682,7 @@ function buildTransitProxyGroups(countryList, transitNodes) {
 
   groups.push({
     name: '中转手动切换',
-    icon: ICON('common/Static.svg'),
+    icon: ICON('common/Available.svg'),
     type: 'select',
     proxies: [...uniqueTransitNodes]
   });
@@ -847,7 +847,7 @@ function buildProxyGroups(
     hasLandingGroup && !hasAkcdnFallbackGroup && transitNodes.length
       ? {
           name: '中转手动切换',
-          icon: ICON('common/Static.svg'),
+          icon: ICON('common/Available.svg'),
           type: 'select',
           proxies: uniqueStrings(transitNodes)
         }
@@ -889,7 +889,7 @@ function buildProxyGroups(
     hasLandingGroup
       ? {
           name: '前置代理',
-          icon: ICON('common/LinkCube.svg'),
+          icon: ICON('common/Server.svg'),
           type: 'select',
           ...(hasAkcdnFallbackGroup
             ? { proxies: [...preProxySelector] }
@@ -926,7 +926,7 @@ function buildProxyGroups(
 
     {
       name: '手动切换',
-      icon: ICON('common/Static.svg'),
+      icon: ICON('common/Available.svg'),
       type: 'select',
       'include-all': true
     },
