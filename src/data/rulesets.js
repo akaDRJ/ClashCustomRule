@@ -1,5 +1,6 @@
 module.exports = {
   "forcedirect.yaml": [
+    "openclaw-service.yoooclaw.com",
     "+.nxonearth.com",
     "+.zenithgrid.co",
     "+.redringvip.com",

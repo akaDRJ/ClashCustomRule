@@ -10,10 +10,22 @@ const cases = [
   ['play.google.com', ['geosite:google-play', 'geosite:google', 'geosite:cn'], 'Google'],
   ['www.baidu.com', ['geosite:cn', 'geoip:cn'], '全球直连'],
   ['nas.drj028.com', ['rule-set:forcedirect'], '全球直连'],
+  ['openclaw-service.yoooclaw.com', ['rule-set:forcedirect', 'geosite:category-ai-chat-!cn'], '全球直连'],
   ['router.lan', ['geosite:private', 'geoip:private'], '全球直连'],
   ['192.168.1.1', ['geoip:private'], '全球直连'],
   ['unknown.example', [], '节点选择']
 ];
+
+test('YoooClaw bridge bypasses the proxy without covering sibling domains', () => {
+  const payload = require('../src/data/rulesets')['forcedirect.yaml'];
+  const { buildSourceRuleSet } = require('../src/sing-box/rule-sets');
+  const domain = 'openclaw-service.yoooclaw.com';
+  assert.ok(payload.includes(domain));
+  assert.ok(!payload.includes('+.yoooclaw.com'));
+  const rule = buildSourceRuleSet(payload).rules[0];
+  assert.ok(rule.domain.includes(domain));
+  assert.ok(!rule.domain_suffix.includes('.yoooclaw.com'));
+});
 
 function matchesAtom(atom, tags, network, port) {
   const [kind, value] = atom.toLowerCase().split(',');
