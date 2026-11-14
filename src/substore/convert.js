@@ -5,7 +5,7 @@
  * 核心特性：
  * - 自动生成国家/地区分组（支持正则运行时匹配或枚举节点名）
  * - 内置完整规则集（强制直连/代理、微软服务、流媒体、加密货币等）
- * - 支持落地节点、低倍率节点、负载均衡等高级分组
+ * - 支持按地区自动生成自建组，以及落地节点、低倍率节点、负载均衡等高级分组
  * - 统一 MRS 格式规则源，支持 QUIC 控制
  *
  * ==================== 运行参数 ====================
@@ -540,6 +540,29 @@ function parseLandingCountryGroups(landingNodes) {
   };
 }
 
+function isSelfHostedNode(proxy) {
+  const name = asString(proxy.name);
+  if (proxy['dialer-proxy'] || isAkcdnNode(proxy) || isIspName(name)) return false;
+  if (['direct', 'reject'].includes(proxy.type)) return false;
+  return name.includes('自建') || /(?:^|\s)NB(?:\s|$)/i.test(name);
+}
+
+function parseSelfHostedCountryGroups(proxies) {
+  const groups = new Map();
+  for (const proxy of proxies.filter(isSelfHostedNode)) {
+    const match = COUNTRY_ENTRIES.find(({ regex }) => regex.test(proxy.name));
+    if (!match) continue;
+    if (!groups.has(match.country)) groups.set(match.country, []);
+    groups.get(match.country).push(proxy.name);
+  }
+  return [...groups].map(([country, nodes]) => ({
+    name: `${country}自建`,
+    icon: countryIconURLs[country],
+    type: 'select',
+    proxies: uniqueStrings(nodes)
+  }));
+}
+
 function parseCountryBuckets(proxies, countryList, excludeDialerProxyNodes) {
   const buckets = Object.fromEntries(countryList.map((country) => [country, []]));
 
@@ -760,6 +783,7 @@ function buildProxyGroups(
   lowCostNodes,
   landingNodes,
   landingCountryData,
+  selfHostedCountryProxyGroups,
   akcdnFallbackNodes,
   transitNodes,
   defaults,
@@ -792,8 +816,9 @@ function buildProxyGroups(
       }))
     : [];
   const landingCountryGroupNames = landingCountryProxyGroups.map((group) => group.name);
+  const selfHostedCountryGroupNames = selfHostedCountryProxyGroups.map((group) => group.name);
   const proxyNames = new Set(proxies.map((proxy) => proxy.name));
-  for (const name of landingCountryGroupNames) {
+  for (const name of [...landingCountryGroupNames, ...selfHostedCountryGroupNames]) {
     if (proxyNames.has(name)) {
       throw new Error(`Proxy name conflicts with generated group: ${name}`);
     }
@@ -805,6 +830,7 @@ function buildProxyGroups(
     countryProxies.push(groupName);
   }
   appendUnique(countryProxies, landingCountryGroupNames);
+  appendUnique(countryProxies, selfHostedCountryGroupNames);
 
   if (hasLowCostGroup) {
     insertAfter(globalProxies, '自动选择', '低倍率节点');
@@ -885,6 +911,7 @@ function buildProxyGroups(
       : null,
 
     ...landingCountryProxyGroups,
+    ...selfHostedCountryProxyGroups,
 
     hasLandingGroup
       ? {
@@ -987,6 +1014,7 @@ function main(config) {
   const landingNodes =
     landingEnabled ? parseLandingNodes(proxies) : [];
   const landingCountryData = parseLandingCountryGroups(landingNodes);
+  const selfHostedCountryProxyGroups = parseSelfHostedCountryGroups(proxies);
   const transitNodes = landingEnabled ? parseTransitNodes(proxies) : [];
   const akcdnFallbackNodes = options.akcdnFallback
     ? parseAkcdnFallbackNodes(proxies)
@@ -1006,6 +1034,7 @@ function main(config) {
     lowCostNodes,
     landingNodes,
     landingCountryData,
+    selfHostedCountryProxyGroups,
     akcdnFallbackNodes,
     transitNodes,
     { defaultProxies, defaultSelector, defaultProxiesDirect, globalProxies },
