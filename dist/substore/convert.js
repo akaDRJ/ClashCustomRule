@@ -891,6 +891,16 @@ function buildProxyGroups(
           return basicPreProxyManualGroup ? [basicPreProxyManualGroup.name] : [];
         });
   const directFallbackProxies = ['节点选择', '手动切换', '全球直连'];
+  // Keep existing defaults and pre-proxy choices; promote only the self-hosted shortcuts.
+  for (const [list, index] of [
+    [defaultProxies, 1],
+    [defaultSelector, 1],
+    [defaultProxiesDirect, 2],
+    [globalProxies, globalProxies.indexOf(hasLowCostGroup ? '低倍率节点' : '强制代理')]
+  ]) {
+    list.splice(0, list.length, ...list.filter((name) => !selfHostedCountryGroupNames.includes(name)));
+    insertUniqueAt(list, index, selfHostedCountryGroupNames);
+  }
   const serviceGroups = buildServiceGroups(defaultProxies, directFallbackProxies);
 
   return [

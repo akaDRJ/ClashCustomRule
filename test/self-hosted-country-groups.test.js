@@ -111,3 +111,34 @@ test('a node cannot shadow an automatically generated self-hosted country group'
   assert.throws(() => convert([{ name: '香港自建', type: 'ss' }]),
     /Proxy name conflicts with generated group: 香港自建/);
 });
+
+test('self-hosted shortcuts are near the top and beside low-cost groups, not at the country tail', () => {
+  for (const args of modes) {
+    for (const withLowCost of [false, true]) {
+      const proxies = [nbDirect, nbCdn, airport, ...hongKong,
+        ...(withLowCost ? [{ name: '🇯🇵 Airport 日本 0.5x', type: 'ss' }] : [])];
+      const groups = Object.fromEntries(convert(proxies, args)['proxy-groups'].map((g) => [g.name, g]));
+      const hosted = ['新加坡自建', '香港自建'];
+      for (const parent of ['节点选择', 'YouTube', 'Google', '人工智能']) {
+        assert.deepEqual(groups[parent].proxies.slice(1, 3), hosted, `${parent}: priority shortcuts`);
+        assert.ok(groups[parent].proxies.indexOf('香港自建') < groups[parent].proxies.indexOf('香港节点'));
+      }
+      assert.equal(groups['节点选择'].proxies[0], '自动选择');
+      assert.equal(groups.YouTube.proxies[0], '节点选择');
+      const global = groups.GLOBAL.proxies;
+      const anchor = global.indexOf(groups['低倍率节点'] ? '低倍率节点' : '强制代理');
+      assert.deepEqual(global.slice(anchor - hosted.length, anchor), hosted);
+      assert.ok(global.indexOf('香港自建') < global.indexOf('香港节点'));
+    }
+  }
+});
+
+test('prioritizing self-hosted shortcuts does not replace landing or front-proxy defaults', () => {
+  const proxies = [nbDirect, nbCdn,
+    { name: '🇹🇼 落地 台湾 01', type: 'vless', 'dialer-proxy': '前置代理' },
+    { name: '🇭🇰 Airport 香港 01', type: 'ss' }];
+  const groups = Object.fromEntries(convert(proxies, { landing: true })['proxy-groups'].map((g) => [g.name, g]));
+  assert.deepEqual(groups['节点选择'].proxies.slice(0, 2), ['台湾落地', '新加坡自建']);
+  assert.equal(groups['前置代理'].proxies[0], '自动选择');
+  assert.ok(groups['前置代理'].proxies.indexOf('新加坡自建') > groups['前置代理'].proxies.indexOf('香港节点'));
+});
