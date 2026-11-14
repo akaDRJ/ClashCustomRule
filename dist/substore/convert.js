@@ -618,9 +618,9 @@ function uniqueStrings(values) {
   return result;
 }
 
-function proxyNameExcludePattern(proxies) {
+function proxyNameExcludePattern(proxies, excludeProxy = (proxy) => proxy['dialer-proxy']) {
   const names = uniqueStrings(
-    proxies.filter((proxy) => proxy['dialer-proxy']).map((proxy) => proxy.name)
+    proxies.filter(excludeProxy).map((proxy) => proxy.name)
   ).map((name) => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   return names.length ? `^(${names.join('|')})$` : '';
 }
@@ -732,8 +732,8 @@ function parseCountries(proxies, excludeDialerProxyNodes) {
   );
 }
 
-// ========== 国家组（无智能兜底，固定排除 ISP/落地） ==========
-function buildCountryProxyGroups(countryList, countryBuckets, dialerProxyExcludePattern) {
+// ========== 普通国家组（排除 ISP/落地、自建，无智能兜底） ==========
+function buildCountryProxyGroups(countryList, countryBuckets, proxyExcludePattern) {
   const groups = [];
   const groupType = regionalAutoGroupType();
 
@@ -750,7 +750,7 @@ function buildCountryProxyGroups(countryList, countryBuckets, dialerProxyExclude
       Object.assign(group, {
         'include-all': true,
         filter: countryRegex[country],
-        'exclude-filter': addExcludePattern(ISP_EXCLUDE_PATTERN, dialerProxyExcludePattern)
+        'exclude-filter': addExcludePattern(ISP_EXCLUDE_PATTERN, proxyExcludePattern)
       });
     } else {
       const nodes = countryBuckets[country] || [];
@@ -823,12 +823,7 @@ function buildProxyGroups(
       throw new Error(`Proxy name conflicts with generated group: ${name}`);
     }
   }
-  const countryProxies = [];
-
-  for (const country of countryList) {
-    const groupName = `${country}节点`;
-    countryProxies.push(groupName);
-  }
+  const countryProxies = countryProxyGroups.map((group) => group.name);
   appendUnique(countryProxies, landingCountryGroupNames);
   appendUnique(countryProxies, selfHostedCountryGroupNames);
 
@@ -1020,6 +1015,12 @@ function main(config) {
   const landingEnabled = options.landing || options.akcdnFallback;
   const dialerProxyExcludePattern = landingEnabled ? proxyNameExcludePattern(proxies) : '';
   const countryList = parseCountries(proxies, landingEnabled);
+  const regularCountryProxies = proxies.filter((proxy) => !isSelfHostedNode(proxy));
+  const regularCountryList = parseCountries(regularCountryProxies, landingEnabled);
+  const countryProxyExcludePattern = addExcludePattern(
+    dialerProxyExcludePattern,
+    proxyNameExcludePattern(proxies, isSelfHostedNode)
+  );
   const lowCostNodes = parseLowCostNodes(proxies, landingEnabled);
   const landingNodes =
     landingEnabled ? parseLandingNodes(proxies) : [];
@@ -1031,11 +1032,11 @@ function main(config) {
     : [];
   const countryBuckets = options.regexFilter
     ? {}
-    : parseCountryBuckets(proxies, countryList, landingEnabled);
+    : parseCountryBuckets(regularCountryProxies, regularCountryList, landingEnabled);
   const countryProxyGroups = buildCountryProxyGroups(
-    countryList,
+    regularCountryList,
     countryBuckets,
-    dialerProxyExcludePattern
+    countryProxyExcludePattern
   );
 
   const proxyGroups = buildProxyGroups(
